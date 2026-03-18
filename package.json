@@ -40,7 +40,9 @@
       "./jest.setup.ts"
     ],
     "moduleNameMapper": {
-      "^react-native/Libraries/BatchedBridge/NativeModules$": "<rootDir>/__mocks__/NativeModules.js"
+      "^react-native/Libraries/BatchedBridge/NativeModules$": "<rootDir>/__mocks__/NativeModules.js",
+      "react-native/Libraries/Components/Switch/Switch": "<rootDir>/__mocks__/SwitchMock.js",
+      "^@react-native-async-storage/async-storage/jest/async-storage-mock$": "<rootDir>/__mocks__/asyncStorageMock.js"
     },
     "transformIgnorePatterns": [
       "node_modules/(?!((jest-)?react-native|@react-native(-community)?)|expo(nent)?|@expo(nent)?/.*|react-navigation|@react-navigation/.*|@gorhom/.*|react-native-reanimated)"

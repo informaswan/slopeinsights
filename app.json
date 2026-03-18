@@ -8,7 +8,10 @@
     "userInterfaceStyle": "light",
     "ios": {
       "bundleIdentifier": "com.yourcompany.powderpass",
-      "supportsTablet": false
+      "supportsTablet": false,
+      "iap": {
+        "products": ["com.yourcompany.powderpass.fullaccess"]
+      }
     },
     "android": {
       "package": "com.yourcompany.powderpass",
