@@ -3,6 +3,7 @@ from fastapi import FastAPI
 from app.database import SessionLocal, Base, engine
 from app.seed import seed_resorts
 from app.scheduler import create_scheduler
+from app.routers import resorts as resorts_router
 
 
 @asynccontextmanager
@@ -20,6 +21,7 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(title="PowderPass API", lifespan=lifespan)
+app.include_router(resorts_router.router, prefix="/api")
 
 
 @app.get("/health")

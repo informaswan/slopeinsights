@@ -6,6 +6,7 @@ from sqlalchemy.orm import sessionmaker
 
 from app.main import app
 from app.database import get_db, Base
+from app.cache import invalidate_cache
 
 TEST_DATABASE_URL = "sqlite:///./test.db"
 engine = create_engine(TEST_DATABASE_URL, connect_args={"check_same_thread": False})
@@ -15,8 +16,10 @@ TestingSessionLocal = sessionmaker(bind=engine)
 @pytest.fixture(autouse=True)
 def setup_db():
     Base.metadata.create_all(bind=engine)
+    invalidate_cache()
     yield
     Base.metadata.drop_all(bind=engine)
+    invalidate_cache()
 
 
 @pytest.fixture
