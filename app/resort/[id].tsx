@@ -11,6 +11,16 @@ import { LiftList } from '../../components/LiftList';
 import { ParkingSection } from '../../components/ParkingSection';
 import { Colors, Spacing, FontSize, Radius } from '../../constants/theme';
 
+function getCurrentHourIndex(crowd: { hourly_start: string; hourly: number[] } | null): number | null {
+  if (!crowd) return null;
+  const now = new Date();
+  const [startH] = crowd.hourly_start.split(':').map(Number);
+  const currentH = now.getHours();
+  const index = currentH - startH;
+  if (index < 0 || index >= crowd.hourly.length) return null;
+  return index;
+}
+
 export default function ResortDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const { resort, loading, error, refresh } = useResortDetail(Array.isArray(id) ? id[0] : id);
@@ -60,7 +70,7 @@ export default function ResortDetailScreen() {
 
       {/* Crowd */}
       <View testID="crowd-chart" style={styles.section}>
-        <CrowdChart crowd={resort.crowd} currentHourIndex={null} />
+        <CrowdChart crowd={resort.crowd} currentHourIndex={getCurrentHourIndex(resort.crowd)} />
       </View>
 
       {/* Weather */}

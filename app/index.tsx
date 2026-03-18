@@ -71,13 +71,16 @@ export default function HomeScreen() {
           <Text style={styles.filterIconText}>⚙</Text>
         </Pressable>
       </View>
-      <View style={styles.list}>
+      <ScrollView
+        style={styles.list}
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />}
+      >
         {best.length > 0 && <BestBanner resorts={passFilter === 'all' ? best : best.filter(r => r.pass_type === passFilter)} />}
         {displayed.length === 0
           ? <Text style={styles.emptyText}>No resorts match your filters</Text>
           : displayed.map((item) => <ResortCard key={item.id} resort={item} />)
         }
-      </View>
+      </ScrollView>
       <FilterSheet ref={sheetRef} filterState={filterState} onApply={(state) => setFilterState(state)} filteredCount={displayed.length} />
     </View>
   );
