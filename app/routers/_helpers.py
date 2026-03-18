@@ -68,7 +68,10 @@ def build_resort_summary(resort: Resort, db: Session) -> dict:
     snow = db.query(SnowCondition).filter_by(resort_id=resort.id).first()
     lifts = db.query(LiftStatus).filter_by(resort_id=resort.id).all()
     open_lifts = [l for l in lifts if l.status == "open"]
-    today_dow = datetime.now(ZoneInfo(resort.timezone)).weekday()
+    try:
+        today_dow = datetime.now(ZoneInfo(resort.timezone)).weekday()
+    except Exception:
+        today_dow = datetime.now(timezone.utc).weekday()
     crowd_row = db.query(CrowdData).filter_by(resort_id=resort.id, day_of_week=today_dow).first()
 
     snow_summary = None

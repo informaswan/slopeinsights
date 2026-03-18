@@ -79,7 +79,10 @@ def get_resort_detail(resort_id: str, db: Session = Depends(get_db), _: str = De
 
     snow = db.query(SnowCondition).filter_by(resort_id=resort_id).first()
     lifts = db.query(LiftStatus).filter_by(resort_id=resort_id).all()
-    today_dow = datetime.now(ZoneInfo(resort.timezone)).weekday()
+    try:
+        today_dow = datetime.now(ZoneInfo(resort.timezone)).weekday()
+    except Exception:
+        today_dow = datetime.now(timezone.utc).weekday()
     crowd_row = db.query(CrowdData).filter_by(resort_id=resort_id, day_of_week=today_dow).first()
     weather_rows = db.query(WeatherForecast).filter_by(resort_id=resort_id).all()
     webcams = db.query(Webcam).filter_by(resort_id=resort_id).all()
@@ -172,7 +175,7 @@ def get_resort_detail(resort_id: str, db: Session = Depends(get_db), _: str = De
 def get_resort_lifts(resort_id: str, db: Session = Depends(get_db), _: str = Depends(_require_api_key)):
     resort = db.query(Resort).filter_by(id=resort_id).first()
     if not resort:
-        raise HTTPException(status_code=404, detail={"error": "Resort not found", "code": 404})
+        raise HTTPException(status_code=404, detail=ErrorResponse(error="Resort not found", code=404).model_dump())
     lifts = db.query(LiftStatus).filter_by(resort_id=resort_id).all()
     open_lifts = [l for l in lifts if l.status == "open"]
     stale = is_stale(lifts[0].scraped_at if lifts else None, STALE_LIFT_SECONDS)
@@ -189,7 +192,7 @@ def get_resort_lifts(resort_id: str, db: Session = Depends(get_db), _: str = Dep
 def get_resort_webcams(resort_id: str, db: Session = Depends(get_db), _: str = Depends(_require_api_key)):
     resort = db.query(Resort).filter_by(id=resort_id).first()
     if not resort:
-        raise HTTPException(status_code=404, detail={"error": "Resort not found", "code": 404})
+        raise HTTPException(status_code=404, detail=ErrorResponse(error="Resort not found", code=404).model_dump())
     webcams = db.query(Webcam).filter_by(resort_id=resort_id).all()
     return {
         "resort_id": resort_id,
@@ -201,7 +204,7 @@ def get_resort_webcams(resort_id: str, db: Session = Depends(get_db), _: str = D
 def get_resort_parking(resort_id: str, db: Session = Depends(get_db), _: str = Depends(_require_api_key)):
     resort = db.query(Resort).filter_by(id=resort_id).first()
     if not resort:
-        raise HTTPException(status_code=404, detail={"error": "Resort not found", "code": 404})
+        raise HTTPException(status_code=404, detail=ErrorResponse(error="Resort not found", code=404).model_dump())
     live = db.query(ParkingLot).filter_by(resort_id=resort_id, is_live=True).all()
     static = db.query(ParkingLot).filter_by(resort_id=resort_id, is_live=False).all()
     scraped_at = live[0].scraped_at if live else None
