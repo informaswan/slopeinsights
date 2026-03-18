@@ -54,12 +54,12 @@ async def _job_weather() -> None:
     try:
         scraper = NOAAScraper(db)
         await scraper.scrape_all()
+        # Invalidate cache so current_pct (which changes each operating hour) stays fresh.
+        invalidate_cache()
     except Exception as exc:
         logger.error("Weather job failed: %s", exc)
     finally:
         db.close()
-    # Invalidate cache so current_pct (which changes each operating hour) stays fresh.
-    invalidate_cache()
 
 
 async def _job_parking() -> None:
