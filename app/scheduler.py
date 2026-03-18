@@ -30,7 +30,7 @@ async def _job_lift_status() -> None:
         scraper = LiftieScraper(db)
         await scraper.scrape_all()
     except Exception as exc:
-        logger.error("Lift status job failed: %s", exc)
+        logger.error("Lift status job failed: %s", exc, exc_info=True)
     finally:
         db.close()
 
@@ -38,27 +38,33 @@ async def _job_lift_status() -> None:
 async def _job_snow_conditions() -> None:
     from app.scrapers.onthesnow import OnTheSnowScraper
     db = SessionLocal()
+    scraper = None
     try:
         scraper = OnTheSnowScraper(db)
         await scraper.scrape_all()
         invalidate_cache()  # triggers home screen cache rebuild on next request
     except Exception as exc:
-        logger.error("Snow conditions job failed: %s", exc)
+        logger.error("Snow conditions job failed: %s", exc, exc_info=True)
     finally:
+        if scraper is not None:
+            await scraper.close()
         db.close()
 
 
 async def _job_weather() -> None:
     from app.scrapers.noaa import NOAAScraper
     db = SessionLocal()
+    scraper = None
     try:
         scraper = NOAAScraper(db)
         await scraper.scrape_all()
         # Invalidate cache so current_pct (which changes each operating hour) stays fresh.
         invalidate_cache()
     except Exception as exc:
-        logger.error("Weather job failed: %s", exc)
+        logger.error("Weather job failed: %s", exc, exc_info=True)
     finally:
+        if scraper is not None:
+            await scraper.close()
         db.close()
 
 
@@ -68,7 +74,7 @@ async def _job_parking() -> None:
     try:
         await run_parking_scrapers(db)
     except Exception as exc:
-        logger.error("Parking job failed: %s", exc)
+        logger.error("Parking job failed: %s", exc, exc_info=True)
     finally:
         db.close()
 
@@ -76,24 +82,30 @@ async def _job_parking() -> None:
 async def _job_webcam_health() -> None:
     from app.scrapers.webcam_health import WebcamHealthChecker
     db = SessionLocal()
+    checker = None
     try:
         checker = WebcamHealthChecker(db)
         await checker.check_all()
     except Exception as exc:
-        logger.error("Webcam health job failed: %s", exc)
+        logger.error("Webcam health job failed: %s", exc, exc_info=True)
     finally:
+        if checker is not None:
+            await checker.close()
         db.close()
 
 
 async def _job_crowd_patterns() -> None:
     from app.scrapers.besttime import BestTimeScraper
     db = SessionLocal()
+    scraper = None
     try:
         scraper = BestTimeScraper(db)
         await scraper.scrape_all()
     except Exception as exc:
-        logger.error("Crowd patterns job failed: %s", exc)
+        logger.error("Crowd patterns job failed: %s", exc, exc_info=True)
     finally:
+        if scraper is not None:
+            await scraper.close()
         db.close()
 
 
