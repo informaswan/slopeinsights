@@ -33,9 +33,9 @@ export function SnowStats({ snow, trails }: Props) {
         ))}
       </View>
       {snow.is_stale && (
-        <Text style={styles.stale}>❄ Updated {formatAgo(snow.scraped_at)}</Text>
+        <Text style={styles.stale}>❄ Updated {formatAgo(snow.scraped_at) ?? 'recently'}</Text>
       )}
-      {trails != null && (
+      {trails != null && trails.open != null && trails.total != null && (
         <Text style={styles.trails}>{trails.open}/{trails.total} trails open</Text>
       )}
     </View>

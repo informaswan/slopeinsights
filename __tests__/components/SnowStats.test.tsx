@@ -52,3 +52,14 @@ it('omits trail count when trails is null', () => {
   const { queryByText } = render(<SnowStats snow={snow} trails={null} />);
   expect(queryByText(/trails open/)).toBeNull();
 });
+
+it('omits trail count when trails.open is null', () => {
+  const { queryByText } = render(<SnowStats snow={snow} trails={{ open: null as any, total: 195 }} />);
+  expect(queryByText(/trails open/)).toBeNull();
+});
+
+it('renders stale indicator with fallback when scraped_at is null', () => {
+  const stale = { ...snow, is_stale: true, scraped_at: null as any };
+  const { getByText } = render(<SnowStats snow={stale} trails={null} />);
+  expect(getByText(/Updated/)).toBeTruthy();
+});
