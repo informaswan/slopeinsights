@@ -88,8 +88,9 @@ describe('WebcamViewer — web HLS', () => {
 
   it('calls Linking.openURL when Open Cam is pressed', async () => {
     const Linking = require('expo-linking');
+    const { fireEvent } = require('@testing-library/react-native');
     render(<WebcamViewer webcams={[hlsCam]} />);
-    await act(async () => { screen.getByText('Open Cam').props.onPress(); });
+    await act(async () => { fireEvent.press(screen.getByText('Open Cam')); });
     expect(Linking.openURL).toHaveBeenCalledWith(hlsCam.url);
   });
 });

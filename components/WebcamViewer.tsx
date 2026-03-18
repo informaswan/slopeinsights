@@ -44,7 +44,7 @@ function CamView({ cam }: { cam: WebcamItem }) {
       return (
         <View style={styles.openCamContainer}>
           <TouchableOpacity style={styles.openCamButton} onPress={() => Linking.openURL(cam.url)}>
-            <Text style={styles.openCamText} onPress={() => Linking.openURL(cam.url)}>Open Cam</Text>
+            <Text style={styles.openCamText}>Open Cam</Text>
           </TouchableOpacity>
         </View>
       );
