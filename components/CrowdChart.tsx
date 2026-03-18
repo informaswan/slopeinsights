@@ -25,11 +25,11 @@ export function CrowdChart({ crowd, currentHourIndex }: Props) {
   return (
     <View style={styles.container}>
       <View style={styles.chartArea}>
-        {crowd.hourly.map((value, i) => {
+        {crowd.hourly.slice(0, 10).map((value, i) => {
           const isCurrent = i === currentHourIndex;
           const height = Math.max(4, (value / 100) * BAR_MAX_HEIGHT);
           return (
-            <View key={i} style={styles.barCol}>
+            <View key={X_LABELS[i]} style={styles.barCol}>
               <View
                 testID="crowd-bar"
                 style={[
@@ -58,7 +58,7 @@ const styles = StyleSheet.create({
   chartArea: { flexDirection: 'row', alignItems: 'flex-end', height: BAR_MAX_HEIGHT + 24, gap: 2 },
   barCol: { flex: 1, alignItems: 'center', justifyContent: 'flex-end' },
   bar: { width: '100%', borderRadius: 2 },
-  xLabel: { fontSize: 9, color: Colors.textMuted, marginTop: 2 },
+  xLabel: { fontSize: FontSize.xs, color: Colors.textMuted, marginTop: 2 },
   crowdLabel: { fontSize: FontSize.sm, color: Colors.textSecondary, marginTop: Spacing.sm, textAlign: 'center' },
   disclaimer: { fontSize: FontSize.xs, color: Colors.textMuted, marginTop: Spacing.xs, textAlign: 'center' },
 });

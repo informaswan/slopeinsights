@@ -46,3 +46,9 @@ it('marks the current hour bar as highlighted', () => {
     expect.arrayContaining([expect.objectContaining({ opacity: 1 })])
   );
 });
+
+it('omits label when crowd.label is null', () => {
+  const noLabel = { ...crowd, label: null };
+  const { queryByText } = render(<CrowdChart crowd={noLabel as any} currentHourIndex={null} />);
+  expect(queryByText('Typically busiest')).toBeNull();
+});
