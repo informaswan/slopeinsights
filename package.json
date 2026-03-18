@@ -10,20 +10,21 @@
     "test": "jest --watchAll=false"
   },
   "dependencies": {
+    "@gorhom/bottom-sheet": "^5.0.0",
+    "@react-native-async-storage/async-storage": "2.1.2",
     "expo": "~53.0.0",
-    "expo-router": "~4.0.0",
-    "expo-video": "~2.2.0",
     "expo-linking": "~7.0.0",
+    "expo-router": "~4.0.0",
     "expo-status-bar": "~2.0.0",
     "expo-system-ui": "~4.0.0",
-    "@react-native-async-storage/async-storage": "2.1.2",
+    "expo-video": "~2.2.0",
     "react": "18.3.1",
     "react-native": "0.76.9",
-    "@gorhom/bottom-sheet": "^5.0.0",
     "react-native-gesture-handler": "~2.20.0",
     "react-native-reanimated": "~3.16.0",
     "react-native-safe-area-context": "4.12.0",
-    "react-native-screens": "~4.4.0"
+    "react-native-screens": "~4.4.0",
+    "react-test-renderer": "^18.3.1"
   },
   "devDependencies": {
     "@babel/core": "^7.25.0",
@@ -35,7 +36,9 @@
   },
   "jest": {
     "preset": "jest-expo",
-    "setupFilesAfterEnv": ["./jest.setup.ts"],
+    "setupFilesAfterEnv": [
+      "./jest.setup.ts"
+    ],
     "moduleNameMapper": {
       "^react-native/Libraries/BatchedBridge/NativeModules$": "<rootDir>/__mocks__/NativeModules.js"
     },
