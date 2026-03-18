@@ -41,7 +41,7 @@ export default function HomeScreen() {
   if (loading && resorts.length === 0) {
     return (
       <View style={styles.center}>
-        <ActivityIndicator testID="loading-spinner" size="large" color={Colors.epic} />
+        <ActivityIndicator testID="loading-spinner" size="large" color={Colors.snowBlue} />
       </View>
     );
   }
@@ -49,6 +49,7 @@ export default function HomeScreen() {
   if (error && resorts.length === 0) {
     return (
       <View style={styles.center}>
+        <Text style={styles.errorTitle}>Unable to load</Text>
         <Text style={styles.errorText}>{error}</Text>
         <Pressable onPress={refresh} style={styles.retryButton}>
           <Text style={styles.retryText}>Tap to retry</Text>
@@ -57,49 +58,171 @@ export default function HomeScreen() {
     );
   }
 
+  const filteredBest = passFilter === 'all' ? best : best.filter(r => r.pass_type === passFilter);
+
   return (
     <View style={styles.root}>
+      {/* Toolbar */}
       <View style={styles.toolbar}>
         <View style={styles.tabs}>
-          {PASS_TABS.map((tab) => (
-            <Pressable key={tab.value} style={[styles.tab, passFilter === tab.value && styles.tabActive]} onPress={() => setPassFilter(tab.value)}>
-              <Text style={[styles.tabText, passFilter === tab.value && styles.tabTextActive]}>{tab.label}</Text>
-            </Pressable>
-          ))}
+          {PASS_TABS.map((tab) => {
+            const isActive = passFilter === tab.value;
+            const activeColor = tab.value === 'epic' ? Colors.epic : tab.value === 'ikon' ? Colors.ikon : Colors.snowBlue;
+            return (
+              <Pressable
+                key={tab.value}
+                style={[styles.tab, isActive && { backgroundColor: activeColor + '22', borderColor: activeColor }]}
+                onPress={() => setPassFilter(tab.value)}
+              >
+                <Text style={[styles.tabText, isActive && { color: activeColor, fontWeight: '700' }]}>
+                  {tab.label}
+                </Text>
+              </Pressable>
+            );
+          })}
         </View>
-        <Pressable style={styles.filterIcon} onPress={() => sheetRef.current?.expand()}>
-          <Text style={styles.filterIconText}>⚙</Text>
+        <Pressable style={styles.filterButton} onPress={() => sheetRef.current?.expand()}>
+          <Text style={styles.filterButtonText}>FILTER</Text>
+          {(filterState.selectedRegions.size > 0 || filterState.sort !== 'snow') && (
+            <View style={styles.filterDot} />
+          )}
         </Pressable>
       </View>
+
+      {/* Main list */}
       <ScrollView
         style={styles.list}
-        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />}
-      >
-        {best.length > 0 && <BestBanner resorts={passFilter === 'all' ? best : best.filter(r => r.pass_type === passFilter)} />}
-        {displayed.length === 0
-          ? <Text style={styles.emptyText}>No resorts match your filters</Text>
-          : displayed.map((item) => <ResortCard key={item.id} resort={item} />)
+        contentContainerStyle={styles.listContent}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={handleRefresh}
+            tintColor={Colors.snowBlue}
+            colors={[Colors.snowBlue]}
+          />
         }
+      >
+        {filteredBest.length > 0 && <BestBanner resorts={filteredBest} />}
+        <View style={styles.listBody}>
+          {displayed.length === 0 ? (
+            <View style={styles.emptyContainer}>
+              <Text style={styles.emptyEmoji}>🏔</Text>
+              <Text style={styles.emptyText}>No resorts match your filters</Text>
+              <Text style={styles.emptySubtext}>Try changing the sort or region</Text>
+            </View>
+          ) : (
+            displayed.map((item) => <ResortCard key={item.id} resort={item} />)
+          )}
+        </View>
       </ScrollView>
-      <FilterSheet ref={sheetRef} filterState={filterState} onApply={(state) => setFilterState(state)} filteredCount={displayed.length} />
+
+      <FilterSheet
+        ref={sheetRef}
+        filterState={filterState}
+        onApply={(state) => setFilterState(state)}
+        filteredCount={displayed.length}
+      />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   root: { flex: 1, backgroundColor: Colors.background },
-  center: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: Spacing.xl },
-  toolbar: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: Spacing.md, paddingVertical: Spacing.sm, backgroundColor: Colors.surface, borderBottomWidth: 1, borderBottomColor: Colors.border },
-  tabs: { flexDirection: 'row', gap: Spacing.xs, flex: 1 },
-  tab: { paddingHorizontal: Spacing.md, paddingVertical: Spacing.xs, borderRadius: Radius.full, backgroundColor: Colors.surfaceAlt },
-  tabActive: { backgroundColor: Colors.epic },
-  tabText: { fontSize: FontSize.sm, color: Colors.textSecondary, fontWeight: '500' },
-  tabTextActive: { color: '#fff', fontWeight: '700' },
-  filterIcon: { padding: Spacing.xs },
-  filterIconText: { fontSize: FontSize.lg },
-  list: { paddingTop: Spacing.sm, paddingBottom: Spacing.xl },
-  emptyText: { textAlign: 'center', color: Colors.textMuted, marginTop: Spacing.xl, fontSize: FontSize.md },
-  errorText: { fontSize: FontSize.md, color: Colors.textSecondary, marginBottom: Spacing.md, textAlign: 'center' },
-  retryButton: { backgroundColor: Colors.epic, borderRadius: Radius.md, paddingHorizontal: Spacing.lg, paddingVertical: Spacing.sm },
-  retryText: { color: '#fff', fontWeight: '700', fontSize: FontSize.md },
+  center: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: Spacing.xl,
+    backgroundColor: Colors.background,
+    gap: Spacing.sm,
+  },
+  errorTitle: {
+    fontSize: FontSize.xl,
+    fontWeight: '800',
+    color: Colors.text,
+    letterSpacing: -0.5,
+  },
+  errorText: {
+    fontSize: FontSize.sm,
+    color: Colors.textSecondary,
+    textAlign: 'center',
+    marginBottom: Spacing.md,
+  },
+  retryButton: {
+    backgroundColor: Colors.epic,
+    borderRadius: Radius.lg,
+    paddingHorizontal: Spacing.lg,
+    paddingVertical: Spacing.sm + 2,
+  },
+  retryText: {
+    color: '#fff',
+    fontWeight: '700',
+    fontSize: FontSize.sm,
+    letterSpacing: 0.3,
+  },
+  toolbar: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: Spacing.md,
+    paddingVertical: Spacing.sm,
+    backgroundColor: Colors.surface,
+    borderBottomWidth: 1,
+    borderBottomColor: Colors.border,
+    gap: Spacing.sm,
+  },
+  tabs: {
+    flexDirection: 'row',
+    gap: Spacing.xs,
+    flex: 1,
+  },
+  tab: {
+    paddingHorizontal: Spacing.md,
+    paddingVertical: 6,
+    borderRadius: Radius.full,
+    borderWidth: 1,
+    borderColor: Colors.border,
+  },
+  tabText: {
+    fontSize: FontSize.sm,
+    color: Colors.textMuted,
+    fontWeight: '600',
+    letterSpacing: 0.2,
+  },
+  filterButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    paddingHorizontal: Spacing.sm,
+    paddingVertical: 6,
+  },
+  filterButtonText: {
+    fontSize: 10,
+    fontWeight: '800',
+    color: Colors.textMuted,
+    letterSpacing: 1.2,
+  },
+  filterDot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: Colors.snowBlue,
+  },
+  list: { flex: 1 },
+  listContent: { paddingBottom: Spacing.xl },
+  listBody: { paddingTop: Spacing.sm },
+  emptyContainer: {
+    alignItems: 'center',
+    paddingTop: Spacing.xxl,
+    gap: Spacing.sm,
+  },
+  emptyEmoji: { fontSize: 32 },
+  emptyText: {
+    fontSize: FontSize.md,
+    fontWeight: '700',
+    color: Colors.textSecondary,
+  },
+  emptySubtext: {
+    fontSize: FontSize.sm,
+    color: Colors.textMuted,
+  },
 });

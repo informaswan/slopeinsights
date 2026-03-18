@@ -1,22 +1,27 @@
-// constants/theme.ts
+// constants/theme.ts — Pre-Dawn Alpine dark theme
 export const Colors = {
   // Pass type
-  epic: '#1d4ed8',        // blue-700
-  ikon: '#ea580c',        // orange-600
+  epic: '#3B82F6',          // electric blue
+  ikon: '#F97316',          // vivid orange
   // Crowd level
-  crowdLow: '#22c55e',    // green-500
-  crowdMedium: '#f59e0b', // amber-500
-  crowdHigh: '#ef4444',   // red-500
-  // UI
-  background: '#f1f5f9',
-  surface: '#ffffff',
-  surfaceAlt: '#f8fafc',
-  border: '#e2e8f0',
-  text: '#0f172a',
-  textSecondary: '#64748b',
-  textMuted: '#94a3b8',
-  warning: '#f59e0b',
-  snowBlue: '#60a5fa',
+  crowdLow: '#34D399',      // emerald
+  crowdMedium: '#FBBF24',   // amber
+  crowdHigh: '#F87171',     // coral
+  // Backgrounds
+  background: '#080E1A',    // near-black, cold
+  surface: '#111827',       // dark slate
+  surfaceAlt: '#1A2537',    // lifted surface
+  surfaceRaised: '#1E2D42', // highest surface
+  // Borders
+  border: '#1E293B',
+  borderSubtle: '#0F172A',
+  // Text
+  text: '#F1F5F9',           // near-white
+  textSecondary: '#94A3B8',  // slate-400
+  textMuted: '#475569',      // slate-600
+  // Accents
+  snowBlue: '#BAE6FD',       // powder-blue — used for snow data
+  warning: '#FBBF24',        // amber
 };
 
 export const Spacing = {
@@ -25,6 +30,7 @@ export const Spacing = {
   md: 16,
   lg: 24,
   xl: 32,
+  xxl: 48,
 };
 
 export const FontSize = {
@@ -32,13 +38,15 @@ export const FontSize = {
   sm: 13,
   md: 15,
   lg: 18,
-  xl: 22,
-  xxl: 28,
+  xl: 24,
+  xxl: 30,
+  hero: 40,
 };
 
 export const Radius = {
-  sm: 6,
-  md: 10,
-  lg: 16,
+  sm: 4,
+  md: 8,
+  lg: 14,
+  xl: 20,
   full: 999,
 };
