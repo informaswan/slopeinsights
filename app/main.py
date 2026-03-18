@@ -31,5 +31,6 @@ app.include_router(resorts_router.router, prefix="/api")
 
 
 @app.get("/health")
+@limiter.exempt
 def health():
     return {"status": "ok"}
