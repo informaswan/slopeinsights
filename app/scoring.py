@@ -20,9 +20,9 @@ def compute_best_score(
     if all(v is None for v in [new_24h_in, current_pct, lifts_open]):
         return None
 
-    snow = min((new_24h_in or 0.0) / 12.0, 1.0) * 0.5
-    crowd = ((100 - (current_pct or 0)) / 100.0) * 0.3 if current_pct is not None else 0.0
-    lift = ((lifts_open or 0) / lifts_total) * 0.2 if lifts_total else 0.0
+    snow = min((new_24h_in if new_24h_in is not None else 0.0) / 12.0, 1.0) * 0.5
+    crowd = ((100 - current_pct) / 100.0) * 0.3 if current_pct is not None else 0.0
+    lift = ((lifts_open if lifts_open is not None else 0) / lifts_total) * 0.2 if lifts_total else 0.0
 
     return round(snow + crowd + lift, 4)
 
