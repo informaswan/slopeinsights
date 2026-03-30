@@ -53,3 +53,54 @@ def test_get_current_user_returns_user(db):
     token = create_jwt(user_id=uid, email="jwt@test.com")
     result = get_current_user(authorization=f"Bearer {token}", db=db)
     assert result.id == uid
+
+
+def test_google_auth_creates_user(client):
+    mock_id_info = {
+        "sub": "google-new-user-123",
+        "email": "new@google.com",
+        "name": "New Google User",
+        "picture": "https://example.com/pic.jpg",
+    }
+    with patch("app.routers.auth.id_token.verify_oauth2_token", return_value=mock_id_info):
+        resp = client.post("/api/auth/google", json={"id_token": "fake-google-token"})
+    assert resp.status_code == 200
+    data = resp.json()
+    assert data["user"]["email"] == "new@google.com"
+    assert data["user"]["name"] == "New Google User"
+    assert "token" in data
+
+
+def test_google_auth_returns_existing_user(client, db):
+    import uuid
+    uid = str(uuid.uuid4())
+    db.add(User(id=uid, name="Existing", email="existing@google.com",
+                provider="google", provider_id="google-existing-456"))
+    db.commit()
+    mock_id_info = {
+        "sub": "google-existing-456",
+        "email": "existing@google.com",
+        "name": "Existing",
+        "picture": None,
+    }
+    with patch("app.routers.auth.id_token.verify_oauth2_token", return_value=mock_id_info):
+        resp = client.post("/api/auth/google", json={"id_token": "fake-token"})
+    assert resp.status_code == 200
+    assert resp.json()["user"]["id"] == uid
+
+
+def test_auth_me_returns_current_user(client, db):
+    import uuid
+    uid = str(uuid.uuid4())
+    db.add(User(id=uid, name="Me User", email="me@test.com",
+                provider="google", provider_id="gid-me"))
+    db.commit()
+    token = create_jwt(user_id=uid, email="me@test.com")
+    resp = client.get("/api/auth/me", headers={"Authorization": f"Bearer {token}"})
+    assert resp.status_code == 200
+    assert resp.json()["email"] == "me@test.com"
+
+
+def test_auth_me_rejects_no_token(client):
+    resp = client.get("/api/auth/me")
+    assert resp.status_code == 401
