@@ -9,6 +9,7 @@ class Settings(BaseSettings):
     api_key: str = "dev-key"
     besttime_api_key: str = ""
     environment: str = "development"
+    jwt_secret: str = "dev-secret-change-in-production"
 
 
 settings = Settings()
