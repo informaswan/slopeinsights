@@ -9,6 +9,7 @@ from app.seed import seed_resorts, seed_webcams
 from app.scheduler import create_scheduler
 from app.routers import resorts as resorts_router
 from app.routers import auth as auth_router
+from app.routers import user_resorts as user_resorts_router
 
 
 @asynccontextmanager
@@ -39,6 +40,7 @@ app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 app.include_router(resorts_router.router, prefix="/api")
 app.include_router(auth_router.router, prefix="/api")
+app.include_router(user_resorts_router.router, prefix="/api")
 
 
 @app.get("/health")
