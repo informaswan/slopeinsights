@@ -1,28 +1,63 @@
-// constants/theme.ts — Pre-Dawn Alpine dark theme
-export const Colors = {
-  // Pass type
-  epic: '#3B82F6',          // electric blue
-  ikon: '#F97316',          // vivid orange
-  // Crowd level
-  crowdLow: '#34D399',      // emerald
-  crowdMedium: '#FBBF24',   // amber
-  crowdHigh: '#F87171',     // coral
-  // Backgrounds
-  background: '#080E1A',    // near-black, cold
-  surface: '#111827',       // dark slate
-  surfaceAlt: '#1A2537',    // lifted surface
-  surfaceRaised: '#1E2D42', // highest surface
-  // Borders
-  border: '#1E293B',
-  borderSubtle: '#0F172A',
-  // Text
-  text: '#F1F5F9',           // near-white
-  textSecondary: '#94A3B8',  // slate-400
-  textMuted: '#475569',      // slate-600
-  // Accents
-  snowBlue: '#BAE6FD',       // powder-blue — used for snow data
-  warning: '#FBBF24',        // amber
+// constants/theme.ts — Alpine Morning (light) + Deep Ocean (dark)
+
+export const LightColors = {
+  headerGradientStart: '#1e3a5f',
+  headerGradientEnd: '#2d5a87',
+  background: '#f0f4f8',
+  surface: '#ffffff',
+  surfaceAlt: '#f8fafc',
+  text: '#1e3a5f',
+  textSecondary: '#64748b',
+  textMuted: '#94a3b8',
+  border: '#e2e8f0',
+  borderSubtle: '#f1f5f9',
+  epic: '#3B82F6',
+  epicBg: 'rgba(59,130,246,0.1)',
+  ikon: '#F97316',
+  ikonBg: 'rgba(249,115,22,0.1)',
+  crowdLow: '#059669',
+  crowdLowBg: 'rgba(52,211,153,0.1)',
+  crowdMedium: '#d97706',
+  crowdMediumBg: 'rgba(251,191,36,0.1)',
+  crowdHigh: '#ef4444',
+  crowdHighBg: 'rgba(239,68,68,0.1)',
+  snowBlue: '#3B82F6',
+  warning: '#d97706',
+  headerText: '#ffffff',
+  headerTextSecondary: '#a8d4f0',
 };
+
+export const DarkColors = {
+  headerGradientStart: '#0f2942',
+  headerGradientEnd: '#163d5e',
+  background: '#0c1f33',
+  surface: '#132d47',
+  surfaceAlt: '#1a3550',
+  text: '#e0eaf5',
+  textSecondary: '#6a94b8',
+  textMuted: '#4a7a9e',
+  border: 'rgba(106,148,184,0.2)',
+  borderSubtle: 'rgba(106,148,184,0.1)',
+  epic: '#7cb8f7',
+  epicBg: 'rgba(59,130,246,0.2)',
+  ikon: '#fb923c',
+  ikonBg: 'rgba(249,115,22,0.2)',
+  crowdLow: '#6ee7b7',
+  crowdLowBg: 'rgba(52,211,153,0.12)',
+  crowdMedium: '#fcd34d',
+  crowdMediumBg: 'rgba(251,191,36,0.12)',
+  crowdHigh: '#fca5a5',
+  crowdHighBg: 'rgba(239,68,68,0.12)',
+  snowBlue: '#7cb8f7',
+  warning: '#fcd34d',
+  headerText: '#c8dff0',
+  headerTextSecondary: '#5a9bc4',
+};
+
+export type ThemeColors = typeof LightColors;
+
+// Keep legacy export for backward compatibility during migration
+export const Colors = LightColors;
 
 export const Spacing = {
   xs: 4,
