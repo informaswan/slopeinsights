@@ -132,3 +132,21 @@ export interface BestResortResponse {
   resorts: ResortSummary[];
   generated_at: string;
 }
+
+// Auth types
+export interface UserProfile {
+  id: string;
+  name: string;
+  email: string;
+  avatar_url: string | null;
+  provider: string;
+}
+
+export interface AuthResponse {
+  token: string;
+  user: UserProfile;
+}
+
+export interface UserResortsResponse {
+  resort_ids: string[];
+}
