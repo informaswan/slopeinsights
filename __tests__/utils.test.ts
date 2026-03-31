@@ -1,6 +1,6 @@
 // __tests__/utils.test.ts
 import { formatAgo, crowdColor, crowdLabel } from '../lib/utils';
-import { Colors } from '../constants/theme';
+import { LightColors } from '../constants/theme';
 
 describe('formatAgo', () => {
   it('returns "just now" for timestamps under 2 minutes ago', () => {
@@ -24,11 +24,11 @@ describe('formatAgo', () => {
 });
 
 describe('crowdColor', () => {
-  it('returns green for low', () => expect(crowdColor('low')).toBe(Colors.crowdLow));
-  it('returns amber for medium', () => expect(crowdColor('medium')).toBe(Colors.crowdMedium));
-  it('returns red for high', () => expect(crowdColor('high')).toBe(Colors.crowdHigh));
-  it('returns muted for null', () => expect(crowdColor(null)).toBe(Colors.textMuted));
-  it('returns muted for closed', () => expect(crowdColor('closed')).toBe(Colors.textMuted));
+  it('returns green for low', () => expect(crowdColor('low', LightColors)).toBe(LightColors.crowdLow));
+  it('returns amber for medium', () => expect(crowdColor('medium', LightColors)).toBe(LightColors.crowdMedium));
+  it('returns red for high', () => expect(crowdColor('high', LightColors)).toBe(LightColors.crowdHigh));
+  it('returns muted for null', () => expect(crowdColor(null, LightColors)).toBe(LightColors.textMuted));
+  it('returns muted for closed', () => expect(crowdColor('closed', LightColors)).toBe(LightColors.textMuted));
 });
 
 describe('crowdLabel', () => {

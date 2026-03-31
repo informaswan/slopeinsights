@@ -3,6 +3,7 @@ import React from 'react';
 import { render } from '@testing-library/react-native';
 import { SnowStats } from '../../components/SnowStats';
 import type { SnowDetail, TrailSummary } from '../../lib/types';
+import { TestWrapper } from '../test-utils';
 
 const snow: SnowDetail = {
   base_in: 42, new_24h_in: 8, new_48h_in: 14, new_7d_in: 22,
@@ -12,7 +13,7 @@ const snow: SnowDetail = {
 const trails: TrailSummary = { open: 120, total: 195 };
 
 it('renders all four snow stat labels', () => {
-  const { getByText } = render(<SnowStats snow={snow} trails={null} />);
+  const { getByText } = render(<SnowStats snow={snow} trails={null} />, { wrapper: TestWrapper });
   expect(getByText('Base')).toBeTruthy();
   expect(getByText('24h')).toBeTruthy();
   expect(getByText('48h')).toBeTruthy();
@@ -20,7 +21,7 @@ it('renders all four snow stat labels', () => {
 });
 
 it('renders snow values in inches', () => {
-  const { getByText } = render(<SnowStats snow={snow} trails={null} />);
+  const { getByText } = render(<SnowStats snow={snow} trails={null} />, { wrapper: TestWrapper });
   expect(getByText('42"')).toBeTruthy();
   expect(getByText('8"')).toBeTruthy();
   expect(getByText('14"')).toBeTruthy();
@@ -28,38 +29,38 @@ it('renders snow values in inches', () => {
 });
 
 it('shows "Snow data unavailable" when snow is null', () => {
-  const { getByText } = render(<SnowStats snow={null} trails={null} />);
+  const { getByText } = render(<SnowStats snow={null} trails={null} />, { wrapper: TestWrapper });
   expect(getByText('Snow data unavailable')).toBeTruthy();
 });
 
 it('shows stale indicator when is_stale is true', () => {
   const stale = { ...snow, is_stale: true };
-  const { getByText } = render(<SnowStats snow={stale} trails={null} />);
+  const { getByText } = render(<SnowStats snow={stale} trails={null} />, { wrapper: TestWrapper });
   expect(getByText(/Updated/)).toBeTruthy();
 });
 
 it('does not show stale indicator when is_stale is false', () => {
-  const { queryByText } = render(<SnowStats snow={snow} trails={null} />);
+  const { queryByText } = render(<SnowStats snow={snow} trails={null} />, { wrapper: TestWrapper });
   expect(queryByText(/Updated/)).toBeNull();
 });
 
 it('renders trail count when trails is provided', () => {
-  const { getByText } = render(<SnowStats snow={snow} trails={trails} />);
+  const { getByText } = render(<SnowStats snow={snow} trails={trails} />, { wrapper: TestWrapper });
   expect(getByText('120/195 trails open')).toBeTruthy();
 });
 
 it('omits trail count when trails is null', () => {
-  const { queryByText } = render(<SnowStats snow={snow} trails={null} />);
+  const { queryByText } = render(<SnowStats snow={snow} trails={null} />, { wrapper: TestWrapper });
   expect(queryByText(/trails open/)).toBeNull();
 });
 
 it('omits trail count when trails.open is null', () => {
-  const { queryByText } = render(<SnowStats snow={snow} trails={{ open: null as any, total: 195 }} />);
+  const { queryByText } = render(<SnowStats snow={snow} trails={{ open: null as any, total: 195 }} />, { wrapper: TestWrapper });
   expect(queryByText(/trails open/)).toBeNull();
 });
 
 it('renders stale indicator with fallback when scraped_at is null', () => {
   const stale = { ...snow, is_stale: true, scraped_at: null as any };
-  const { getByText } = render(<SnowStats snow={stale} trails={null} />);
+  const { getByText } = render(<SnowStats snow={stale} trails={null} />, { wrapper: TestWrapper });
   expect(getByText(/Updated/)).toBeTruthy();
 });

@@ -10,6 +10,28 @@ jest.mock('@gorhom/bottom-sheet', () => {
   BottomSheet.displayName = 'BottomSheet';
   return { default: BottomSheet };
 });
+jest.mock('expo-linear-gradient', () => {
+  const { View } = require('react-native');
+  return { LinearGradient: (props: any) => <View {...props} /> };
+});
+jest.mock('../../contexts/ThemeContext', () => {
+  const { LightColors } = require('../../constants/theme');
+  return {
+    useTheme: () => ({ colors: LightColors, isDark: false, toggleTheme: jest.fn() }),
+    ThemeProvider: ({ children }: any) => children,
+  };
+});
+jest.mock('../../contexts/AuthContext', () => ({
+  useAuth: () => ({
+    user: { id: '1', name: 'Test', email: 'test@test.com', avatar_url: null },
+    isAuthenticated: true,
+    isLoading: false,
+    savedResortIds: ['vail', 'mammoth'],
+    signOut: jest.fn(),
+    refreshResorts: jest.fn(),
+    updateResorts: jest.fn(),
+  }),
+}));
 
 const mockResorts = [
   { id: 'vail', name: 'Vail', pass_type: 'epic', region: 'Colorado', state: 'CO',

@@ -2,6 +2,7 @@ import React from 'react';
 import { render } from '@testing-library/react-native';
 import { WeatherRow } from '../../components/WeatherRow';
 import type { WeatherDetail } from '../../lib/types';
+import { TestWrapper } from '../test-utils';
 
 const weather: WeatherDetail = {
   scraped_at: '2026-03-16T09:00:00Z',
@@ -14,51 +15,51 @@ const weather: WeatherDetail = {
 };
 
 it('renders "Weather data unavailable" when weather is null', () => {
-  const { getByText } = render(<WeatherRow weather={null} />);
+  const { getByText } = render(<WeatherRow weather={null} />, { wrapper: TestWrapper });
   expect(getByText('Weather data unavailable')).toBeTruthy();
 });
 
 it('renders high and low temps for each forecast day', () => {
-  const { getByText } = render(<WeatherRow weather={weather} />);
+  const { getByText } = render(<WeatherRow weather={weather} />, { wrapper: TestWrapper });
   expect(getByText('28°')).toBeTruthy();
   expect(getByText('14°')).toBeTruthy();
   expect(getByText('22°')).toBeTruthy();
 });
 
 it('renders precipitation percentages', () => {
-  const { getByText } = render(<WeatherRow weather={weather} />);
+  const { getByText } = render(<WeatherRow weather={weather} />, { wrapper: TestWrapper });
   expect(getByText('20%')).toBeTruthy();
   expect(getByText('80%')).toBeTruthy();
 });
 
 it('renders wind speeds', () => {
-  const { getByText } = render(<WeatherRow weather={weather} />);
+  const { getByText } = render(<WeatherRow weather={weather} />, { wrapper: TestWrapper });
   expect(getByText('12 mph')).toBeTruthy();
   expect(getByText('25 mph')).toBeTruthy();
 });
 
 it('renders snow icon ❄ only on days with snow in forecast', () => {
-  const { getAllByText } = render(<WeatherRow weather={weather} />);
+  const { getAllByText } = render(<WeatherRow weather={weather} />, { wrapper: TestWrapper });
   expect(getAllByText('❄')).toHaveLength(1);
 });
 
 it('renders "Today" label for the first forecast card', () => {
-  const { getByText } = render(<WeatherRow weather={weather} />);
+  const { getByText } = render(<WeatherRow weather={weather} />, { wrapper: TestWrapper });
   expect(getByText('Today')).toBeTruthy();
 });
 
 it('renders "Tomorrow" label for the second forecast card', () => {
-  const { getByText } = render(<WeatherRow weather={weather} />);
+  const { getByText } = render(<WeatherRow weather={weather} />, { wrapper: TestWrapper });
   expect(getByText('Tomorrow')).toBeTruthy();
 });
 
 it('shows stale warning note when is_stale is true', () => {
   const stale = { ...weather, is_stale: true };
-  const { getByText } = render(<WeatherRow weather={stale} />);
+  const { getByText } = render(<WeatherRow weather={stale} />, { wrapper: TestWrapper });
   expect(getByText('Weather data may be outdated')).toBeTruthy();
 });
 
 it('does not show stale note when is_stale is false', () => {
-  const { queryByText } = render(<WeatherRow weather={weather} />);
+  const { queryByText } = render(<WeatherRow weather={weather} />, { wrapper: TestWrapper });
   expect(queryByText('Weather data may be outdated')).toBeNull();
 });

@@ -4,8 +4,16 @@ import { render, screen, fireEvent } from '@testing-library/react-native';
 jest.mock('expo-router', () => ({
   useLocalSearchParams: jest.fn(() => ({ id: 'jackson-hole' })),
   useRouter: jest.fn(() => ({ back: jest.fn() })),
+  useNavigation: jest.fn(() => ({ setOptions: jest.fn() })),
   Stack: { Screen: () => null },
 }));
+jest.mock('../../contexts/ThemeContext', () => {
+  const { LightColors } = require('../../constants/theme');
+  return {
+    useTheme: () => ({ colors: LightColors, isDark: false, toggleTheme: jest.fn() }),
+    ThemeProvider: ({ children }: any) => children,
+  };
+});
 jest.mock('expo-video', () => ({
   VideoView: () => null,
   useVideoPlayer: jest.fn(() => ({ play: jest.fn(), addListener: jest.fn(() => ({ remove: jest.fn() })) })),

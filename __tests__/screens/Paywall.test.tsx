@@ -6,10 +6,6 @@ jest.mock('expo-router', () => ({
   useRouter: jest.fn(() => ({ replace: jest.fn() })),
   Stack: { Screen: () => null },
 }));
-jest.mock('@react-native-async-storage/async-storage', () =>
-  require('@react-native-async-storage/async-storage/jest/async-storage-mock')
-);
-
 const originalEnv = process.env;
 beforeEach(() => { jest.resetModules(); process.env = { ...originalEnv }; AsyncStorage.clear(); });
 afterAll(() => { process.env = originalEnv; });

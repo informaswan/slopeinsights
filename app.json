@@ -10,7 +10,9 @@
       "bundleIdentifier": "com.yourcompany.powderpass",
       "supportsTablet": false,
       "iap": {
-        "products": ["com.yourcompany.powderpass.fullaccess"]
+        "products": [
+          "com.yourcompany.powderpass.fullaccess"
+        ]
       }
     },
     "android": {
@@ -25,7 +27,13 @@
     "plugins": [
       "expo-router",
       "expo-video",
-      ["expo-system-ui", { "userInterfaceStyle": "light" }]
+      [
+        "expo-system-ui",
+        {
+          "userInterfaceStyle": "light"
+        }
+      ],
+      "expo-web-browser"
     ],
     "experiments": {
       "typedRoutes": true
