@@ -3,7 +3,8 @@ import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import type { SnowDetail, TrailSummary } from '../lib/types';
 import { formatAgo } from '../lib/utils';
-import { Colors, Spacing, FontSize, Radius } from '../constants/theme';
+import { Spacing, FontSize, Radius } from '../constants/theme';
+import { useTheme } from '../contexts/ThemeContext';
 
 interface Props {
   snow: SnowDetail | null;
@@ -11,8 +12,10 @@ interface Props {
 }
 
 export function SnowStats({ snow, trails }: Props) {
+  const { colors } = useTheme();
+
   if (!snow) {
-    return <Text style={styles.unavailable}>Snow data unavailable</Text>;
+    return <Text style={[styles.unavailable, { color: colors.textMuted }]}>Snow data unavailable</Text>;
   }
 
   const stats = [
@@ -23,32 +26,32 @@ export function SnowStats({ snow, trails }: Props) {
   ];
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: colors.surface }]}>
       <View style={styles.row}>
         {stats.map((s) => (
           <View key={s.label} style={styles.statCol}>
-            <Text style={styles.value}>{s.value ?? '—'}"</Text>
-            <Text style={styles.label}>{s.label}</Text>
+            <Text style={[styles.value, { color: colors.text }]}>{s.value ?? '—'}"</Text>
+            <Text style={[styles.label, { color: colors.textMuted }]}>{s.label}</Text>
           </View>
         ))}
       </View>
       {snow.is_stale && (
-        <Text style={styles.stale}>❄ Updated {formatAgo(snow.scraped_at) ?? 'recently'}</Text>
+        <Text style={[styles.stale, { color: colors.warning }]}>❄ Updated {formatAgo(snow.scraped_at) ?? 'recently'}</Text>
       )}
       {trails != null && trails.open != null && trails.total != null && (
-        <Text style={styles.trails}>{trails.open}/{trails.total} trails open</Text>
+        <Text style={[styles.trails, { color: colors.textSecondary }]}>{trails.open}/{trails.total} trails open</Text>
       )}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { padding: Spacing.md, backgroundColor: Colors.surface, borderRadius: Radius.md },
+  container: { padding: Spacing.md, borderRadius: Radius.md },
   row: { flexDirection: 'row', justifyContent: 'space-around' },
   statCol: { alignItems: 'center', flex: 1 },
-  value: { fontSize: FontSize.xl, fontWeight: '700', color: Colors.text },
-  label: { fontSize: FontSize.xs, color: Colors.textMuted, marginTop: 2 },
-  stale: { fontSize: FontSize.xs, color: Colors.warning, marginTop: Spacing.sm, textAlign: 'center' },
-  unavailable: { fontSize: FontSize.md, color: Colors.textMuted, padding: Spacing.md },
-  trails: { fontSize: FontSize.sm, color: Colors.textSecondary, marginTop: Spacing.sm, textAlign: 'center' },
+  value: { fontSize: FontSize.xl, fontWeight: '700' },
+  label: { fontSize: FontSize.xs, marginTop: 2 },
+  stale: { fontSize: FontSize.xs, marginTop: Spacing.sm, textAlign: 'center' },
+  unavailable: { fontSize: FontSize.md, padding: Spacing.md },
+  trails: { fontSize: FontSize.sm, marginTop: Spacing.sm, textAlign: 'center' },
 });

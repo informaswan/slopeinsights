@@ -1,7 +1,9 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import type { LiftDetail, LiftItem } from '../lib/types';
-import { Colors, Spacing, FontSize, Radius } from '../constants/theme';
+import { Spacing, FontSize, Radius } from '../constants/theme';
+import { useTheme } from '../contexts/ThemeContext';
+import type { ThemeColors } from '../constants/theme';
 
 interface Props {
   lifts: LiftDetail | null;
@@ -11,17 +13,19 @@ function isGondola(name: string): boolean {
   return name.includes('Gondola') || name.includes('Tram');
 }
 
-function statusColor(status: LiftItem['status']): string {
+function statusColor(status: LiftItem['status'], colors: ThemeColors): string {
   switch (status) {
-    case 'open':    return Colors.crowdLow;
-    case 'on-hold': return Colors.crowdMedium;
-    case 'closed':  return Colors.crowdHigh;
+    case 'open':    return colors.crowdLow;
+    case 'on-hold': return colors.crowdMedium;
+    case 'closed':  return colors.crowdHigh;
   }
 }
 
 export function LiftList({ lifts }: Props) {
+  const { colors } = useTheme();
+
   if (!lifts) {
-    return <Text style={styles.unavailable}>Lift data unavailable</Text>;
+    return <Text style={[styles.unavailable, { color: colors.textMuted }]}>Lift data unavailable</Text>;
   }
 
   const sorted = [...lifts.items].sort((a, b) => {
@@ -33,15 +37,15 @@ export function LiftList({ lifts }: Props) {
   });
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: colors.surface }]}>
       <View style={styles.header}>
-        <Text style={styles.headerText}>{lifts.open}/{lifts.total} lifts open</Text>
-        {lifts.is_stale && <Text style={styles.stale}>Data may be outdated</Text>}
+        <Text style={[styles.headerText, { color: colors.text }]}>{lifts.open}/{lifts.total} lifts open</Text>
+        {lifts.is_stale && <Text style={[styles.stale, { color: colors.warning }]}>Data may be outdated</Text>}
       </View>
       {sorted.map((item) => (
         <View key={item.name} testID="lift-item" style={styles.liftRow}>
-          <View style={[styles.dot, { backgroundColor: statusColor(item.status) }]} />
-          <Text style={styles.liftName}>{item.name}</Text>
+          <View style={[styles.dot, { backgroundColor: statusColor(item.status, colors) }]} />
+          <Text style={[styles.liftName, { color: colors.text }]}>{item.name}</Text>
         </View>
       ))}
     </View>
@@ -49,12 +53,12 @@ export function LiftList({ lifts }: Props) {
 }
 
 const styles = StyleSheet.create({
-  container: { backgroundColor: Colors.surface, borderRadius: Radius.md, padding: Spacing.md },
-  unavailable: { fontSize: FontSize.md, color: Colors.textMuted, padding: Spacing.md },
+  container: { borderRadius: Radius.md, padding: Spacing.md },
+  unavailable: { fontSize: FontSize.md, padding: Spacing.md },
   header: { flexDirection: 'row', alignItems: 'center', marginBottom: Spacing.sm, gap: Spacing.sm },
-  headerText: { fontSize: FontSize.md, fontWeight: '700', color: Colors.text },
-  stale: { fontSize: FontSize.xs, color: Colors.warning },
+  headerText: { fontSize: FontSize.md, fontWeight: '700' },
+  stale: { fontSize: FontSize.xs },
   liftRow: { flexDirection: 'row', alignItems: 'center', paddingVertical: Spacing.xs, gap: Spacing.sm },
   dot: { width: 10, height: 10, borderRadius: 5 },
-  liftName: { fontSize: FontSize.sm, color: Colors.text },
+  liftName: { fontSize: FontSize.sm },
 });

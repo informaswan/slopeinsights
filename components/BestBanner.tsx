@@ -2,19 +2,21 @@ import React from 'react';
 import { View, Text, ScrollView, Pressable, StyleSheet } from 'react-native';
 import { useRouter } from 'expo-router';
 import type { ResortSummary } from '../lib/types';
-import { Colors, Spacing, FontSize, Radius } from '../constants/theme';
+import { Spacing, FontSize, Radius } from '../constants/theme';
+import { useTheme } from '../contexts/ThemeContext';
 
 interface Props { resorts: ResortSummary[]; }
 
 export function BestBanner({ resorts }: Props) {
   const router = useRouter();
+  const { colors } = useTheme();
   if (resorts.length === 0) return null;
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { borderBottomColor: colors.border }]}>
       <View style={styles.headingRow}>
-        <View style={styles.headingAccent} />
-        <Text style={styles.heading}>Best Conditions Today</Text>
+        <View style={[styles.headingAccent, { backgroundColor: colors.snowBlue }]} />
+        <Text style={[styles.heading, { color: colors.textMuted }]}>Best Conditions Today</Text>
       </View>
       <ScrollView
         horizontal
@@ -22,14 +24,14 @@ export function BestBanner({ resorts }: Props) {
         contentContainerStyle={styles.scroll}
       >
         {resorts.map((r) => {
-          const passColor = r.pass_type === 'epic' ? Colors.epic : Colors.ikon;
+          const passColor = r.pass_type === 'epic' ? colors.epic : colors.ikon;
           const passLabel = r.pass_type === 'epic' ? 'EPIC' : 'IKON';
           const snow24h = r.snow?.new_24h_in;
           const baseIn = r.snow?.base_in;
           return (
             <Pressable
               key={r.id}
-              style={({ pressed }) => [styles.card, { borderTopColor: passColor }, pressed && styles.cardPressed]}
+              style={({ pressed }) => [styles.card, { backgroundColor: colors.surfaceAlt, borderTopColor: passColor }, pressed && styles.cardPressed]}
               onPress={() => router.push(`/resort/${r.id}`)}
             >
               {/* Pass strip */}
@@ -40,25 +42,25 @@ export function BestBanner({ resorts }: Props) {
               {/* Snow hero — single Text node so getByText('14"') matches */}
               <View style={styles.heroRow}>
                 {snow24h != null ? (
-                  <Text style={styles.heroNumber}>
-                    {snow24h}<Text style={styles.heroUnit}>"</Text>
+                  <Text style={[styles.heroNumber, { color: colors.snowBlue }]}>
+                    {snow24h}<Text style={[styles.heroUnit, { color: colors.snowBlue }]}>"</Text>
                   </Text>
                 ) : (
-                  <Text style={styles.heroFallback}>No snow data</Text>
+                  <Text style={[styles.heroFallback, { color: colors.textMuted }]}>No snow data</Text>
                 )}
               </View>
-              {snow24h != null && <Text style={styles.heroLabel}>NEW 24H</Text>}
+              {snow24h != null && <Text style={[styles.heroLabel, { color: colors.textMuted }]}>NEW 24H</Text>}
 
               {/* Base */}
               {baseIn != null && (
-                <Text style={styles.base}>{baseIn}" base</Text>
+                <Text style={[styles.base, { color: colors.textSecondary }]}>{baseIn}" base</Text>
               )}
 
               {/* Divider */}
-              <View style={styles.nameDivider} />
+              <View style={[styles.nameDivider, { backgroundColor: colors.border }]} />
 
               {/* Name */}
-              <Text style={styles.name} numberOfLines={2}>{r.name}</Text>
+              <Text style={[styles.name, { color: colors.text }]} numberOfLines={2}>{r.name}</Text>
             </Pressable>
           );
         })}
@@ -71,7 +73,6 @@ const styles = StyleSheet.create({
   container: {
     paddingBottom: Spacing.sm,
     borderBottomWidth: 1,
-    borderBottomColor: Colors.border,
   },
   headingRow: {
     flexDirection: 'row',
@@ -84,13 +85,11 @@ const styles = StyleSheet.create({
   headingAccent: {
     width: 3,
     height: 12,
-    backgroundColor: Colors.snowBlue,
     borderRadius: 2,
   },
   heading: {
     fontSize: 10,
     fontWeight: '800',
-    color: Colors.textMuted,
     letterSpacing: 1.5,
   },
   scroll: {
@@ -100,7 +99,6 @@ const styles = StyleSheet.create({
   },
   card: {
     width: 120,
-    backgroundColor: Colors.surfaceAlt,
     borderRadius: Radius.md,
     borderTopWidth: 3,
     overflow: 'hidden',
@@ -132,26 +130,22 @@ const styles = StyleSheet.create({
   heroNumber: {
     fontSize: FontSize.hero,
     fontWeight: '800',
-    color: Colors.snowBlue,
     lineHeight: FontSize.hero + 4,
     letterSpacing: -1,
   },
   heroUnit: {
     fontSize: FontSize.xl,
     fontWeight: '700',
-    color: Colors.snowBlue,
     lineHeight: FontSize.hero + 4,
   },
   heroFallback: {
     fontSize: FontSize.xl,
     fontWeight: '700',
-    color: Colors.textMuted,
     lineHeight: FontSize.hero + 4,
   },
   heroLabel: {
     fontSize: 9,
     fontWeight: '700',
-    color: Colors.textMuted,
     letterSpacing: 0.8,
     paddingHorizontal: Spacing.sm,
     marginTop: 1,
@@ -160,20 +154,17 @@ const styles = StyleSheet.create({
   base: {
     fontSize: FontSize.xs,
     fontWeight: '600',
-    color: Colors.textSecondary,
     paddingHorizontal: Spacing.sm,
     marginBottom: Spacing.sm,
   },
   nameDivider: {
     height: 1,
-    backgroundColor: Colors.border,
     marginHorizontal: Spacing.sm,
     marginBottom: Spacing.sm,
   },
   name: {
     fontSize: FontSize.xs,
     fontWeight: '700',
-    color: Colors.text,
     paddingHorizontal: Spacing.sm,
     paddingBottom: Spacing.sm,
     letterSpacing: -0.1,
