@@ -28,6 +28,8 @@ export const api = {
   getResorts:      ()           => apiFetch<ResortSummary[]>('/api/resorts'),
   getBestResorts:  ()           => apiFetch<BestResortResponse>('/api/resorts/best'),
   getResortDetail: (id: string) => apiFetch<ResortDetail>(`/api/resorts/${id}`),
+  authDev: () =>
+    apiFetch<AuthResponse>('/api/auth/dev', { method: 'POST' }),
   authGoogle: (idToken: string) =>
     apiFetch<AuthResponse>('/api/auth/google', {
       method: 'POST', body: JSON.stringify({ id_token: idToken }),

@@ -8,6 +8,7 @@ interface AuthContextValue {
   isAuthenticated: boolean;
   isLoading: boolean;
   savedResortIds: string[];
+  signInDev: () => Promise<void>;
   signInWithGoogle: (idToken: string) => Promise<void>;
   signInWithApple: (identityToken: string, name?: string) => Promise<void>;
   signOut: () => Promise<void>;
@@ -20,6 +21,7 @@ const AuthContext = createContext<AuthContextValue>({
   isAuthenticated: false,
   isLoading: true,
   savedResortIds: [],
+  signInDev: async () => {},
   signInWithGoogle: async () => {},
   signInWithApple: async () => {},
   signOut: async () => {},
@@ -47,6 +49,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
       setIsLoading(false);
     })();
+  }, []);
+
+  const signInDev = useCallback(async () => {
+    const resp = await api.authDev();
+    await setToken(resp.token);
+    setUser(resp.user);
+    try {
+      const resorts = await api.getUserResorts();
+      setSavedResortIds(resorts.resort_ids);
+    } catch {
+      setSavedResortIds([]);
+    }
   }, []);
 
   const signInWithGoogle = useCallback(async (idToken: string) => {
@@ -85,7 +99,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     <AuthContext.Provider
       value={{
         user, isAuthenticated: !!user, isLoading, savedResortIds,
-        signInWithGoogle, signInWithApple, signOut, refreshResorts, updateResorts,
+        signInDev, signInWithGoogle, signInWithApple, signOut, refreshResorts, updateResorts,
       }}
     >
       {children}

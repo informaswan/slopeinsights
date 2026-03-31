@@ -43,7 +43,7 @@ function AppNavigator() {
       ) : (
         <>
           <Stack.Screen testID="stack-index" name="index" options={{ headerShown: false }} />
-          <Stack.Screen name="resort/[id]" options={{ headerBackTitle: 'Home' }} />
+          <Stack.Screen name="resort/[id]" options={{ title: '', headerBackTitle: 'Home' }} />
           <Stack.Screen name="explore" options={{ title: 'Explore Resorts' }} />
           <Stack.Screen name="profile" options={{ title: 'Profile' }} />
         </>

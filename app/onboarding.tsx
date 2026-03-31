@@ -1,5 +1,6 @@
 import React, { useState, useMemo } from 'react';
-import { View, Text, ScrollView, Pressable, StyleSheet } from 'react-native';
+import { View, Text, ScrollView, Pressable, StyleSheet, ActivityIndicator } from 'react-native';
+import { useRouter } from 'expo-router';
 import { useAuth } from '../contexts/AuthContext';
 import { useResorts } from '../hooks/useResorts';
 import { useTheme } from '../contexts/ThemeContext';
@@ -11,8 +12,11 @@ export default function OnboardingScreen() {
   const { colors } = useTheme();
   const { resorts } = useResorts();
   const { updateResorts } = useAuth();
+  const router = useRouter();
   const [activeTab, setActiveTab] = useState<PassTab>('epic');
   const [selected, setSelected] = useState<Set<string>>(new Set());
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const grouped = useMemo(() => {
     const filtered = resorts.filter((r) => r.pass_type === activeTab);
@@ -36,7 +40,19 @@ export default function OnboardingScreen() {
 
   const handleSubmit = async () => {
     if (selected.size === 0) return;
-    await updateResorts(Array.from(selected));
+    setLoading(true);
+    setError(null);
+    try {
+      console.log('[Onboarding] Submitting resorts:', Array.from(selected));
+      await updateResorts(Array.from(selected));
+      console.log('[Onboarding] Success, navigating to home');
+      router.replace('/');
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : 'Failed to save resorts';
+      console.error('[Onboarding] Error:', msg);
+      setError(msg);
+      setLoading(false);
+    }
   };
 
   return (
@@ -115,15 +131,22 @@ export default function OnboardingScreen() {
       </ScrollView>
 
       <View style={[styles.bottomBar, { backgroundColor: colors.surface, borderTopColor: colors.border }]}>
-        <Text style={[styles.selectedCount, { color: colors.textSecondary }]}>
-          {selected.size} resort{selected.size !== 1 ? 's' : ''} selected
-        </Text>
+        <View style={styles.bottomLeft}>
+          <Text style={[styles.selectedCount, { color: colors.textSecondary }]}>
+            {selected.size} resort{selected.size !== 1 ? 's' : ''} selected
+          </Text>
+          {error && <Text style={styles.errorText}>{error}</Text>}
+        </View>
         <Pressable
-          style={[styles.submitButton, { opacity: selected.size === 0 ? 0.5 : 1 }]}
+          style={[styles.submitButton, { opacity: selected.size === 0 || loading ? 0.5 : 1 }]}
           onPress={handleSubmit}
-          disabled={selected.size === 0}
+          disabled={selected.size === 0 || loading}
         >
-          <Text style={styles.submitText}>Let's Go</Text>
+          {loading ? (
+            <ActivityIndicator size="small" color="#fff" />
+          ) : (
+            <Text style={styles.submitText}>Let's Go</Text>
+          )}
         </Pressable>
       </View>
     </View>
@@ -153,10 +176,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',
     padding: Spacing.md, borderTopWidth: 1,
   },
+  bottomLeft: { flex: 1 },
   selectedCount: { fontSize: FontSize.sm },
+  errorText: { color: '#ef4444', fontSize: FontSize.xs, marginTop: 4 },
   submitButton: {
     backgroundColor: '#1e3a5f', paddingHorizontal: Spacing.xl, paddingVertical: Spacing.md,
-    borderRadius: Radius.lg,
+    borderRadius: Radius.lg, minHeight: 40, justifyContent: 'center', alignItems: 'center',
   },
   submitText: { color: '#fff', fontWeight: '700', fontSize: FontSize.md },
 });
