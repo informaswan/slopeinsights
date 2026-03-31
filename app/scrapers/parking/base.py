@@ -18,6 +18,13 @@ class BaseParkingScraper(BaseScraper):
         """Return list of {"lot_name": str, "status": str, "capacity_pct": int|None}."""
 
     async def scrape(self) -> None:
+        # Live parking data is served through resort apps and proprietary systems;
+        # the public web pages that were originally scraped no longer expose
+        # structured data.  Skip silently until proper data sources are identified.
+        logger.debug("Parking scraper disabled for %s (URLs need updating)", self.resort_id)
+        return
+
+    async def _scrape_impl(self) -> None:
         if self.is_circuit_open():
             self.decrement_skip()
             return

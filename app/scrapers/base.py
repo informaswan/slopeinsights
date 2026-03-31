@@ -3,6 +3,7 @@ import asyncio
 import logging
 from abc import ABC
 from datetime import datetime, timezone
+from typing import Callable, Awaitable
 
 import httpx
 from sqlalchemy.orm import Session
@@ -14,6 +15,7 @@ logger = logging.getLogger(__name__)
 MAX_RETRIES = 3
 CIRCUIT_BREAK_AFTER = 5
 CIRCUIT_SKIP_RUNS = 6
+RETRY_BACKOFF_BASE = 5  # exponential backoff: 5s, 10s, 20s
 
 
 class ScraperError(Exception):
@@ -53,7 +55,7 @@ class BaseScraper(ABC):
             except (httpx.NetworkError, httpx.TimeoutException, httpx.HTTPStatusError) as exc:
                 last_exc = exc
                 if attempt < MAX_RETRIES - 1:
-                    await asyncio.sleep(2 ** attempt)
+                    await asyncio.sleep(RETRY_BACKOFF_BASE * (2 ** attempt))
         raise ScraperError(f"Failed after {MAX_RETRIES} attempts: {last_exc}") from last_exc
 
     def _record_success(self) -> None:
@@ -95,3 +97,17 @@ class BaseScraper(ABC):
     async def close(self) -> None:
         if self._client is not None:
             await self._client.aclose()
+
+
+async def run_concurrently(
+    tasks: list[Callable[[], Awaitable[None]]],
+    concurrency: int,
+) -> None:
+    """Run async callables with a bounded concurrency limit."""
+    sem = asyncio.Semaphore(concurrency)
+
+    async def _run(task):
+        async with sem:
+            await task()
+
+    await asyncio.gather(*[_run(t) for t in tasks])

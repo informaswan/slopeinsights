@@ -43,6 +43,8 @@ class NOAAScraper(BaseScraper):
         return forecast_url
 
     async def scrape_resort(self, resort: Resort) -> None:
+        if resort.country != "US":
+            return  # NOAA only covers the United States
         if self.is_circuit_open():
             self.decrement_skip()
             return
@@ -76,7 +78,7 @@ class NOAAScraper(BaseScraper):
         self._record_success()
 
     async def scrape_all(self) -> None:
+        from app.scrapers.base import run_concurrently
         resorts = self.db.query(Resort).all()
-        for resort in resorts:
-            await self.scrape_resort(resort)
+        await run_concurrently([lambda r=r: self.scrape_resort(r) for r in resorts], concurrency=5)
         await self.close()

@@ -36,24 +36,27 @@ class OnTheSnowScraper(BaseScraper):
 
     def _parse_resort_data(self, data: dict) -> dict | None:
         try:
-            resort_data = data["props"]["pageProps"]["resort"]
+            fr = data["props"]["pageProps"]["fullResort"]
         except (KeyError, TypeError):
             return None
+        snow = fr.get("snow") or {}
+        lifts = fr.get("lifts") or {}
+        runs = fr.get("runs") or {}
         return {
-            "base_in": _cm_to_in(resort_data.get("snowDepthBase")),
-            "new_24h_in": _cm_to_in(resort_data.get("snowfall24Hours")),
-            "new_48h_in": _cm_to_in(resort_data.get("snowfall48Hours")),
-            "new_7d_in": _cm_to_in(resort_data.get("snowfall7Days")),
-            "surface": resort_data.get("surfaceConditions"),
-            "trails_open": resort_data.get("openTrails"),
-            "trails_total": resort_data.get("totalTrails"),
+            "base_in": _cm_to_in(snow.get("base")),
+            "new_24h_in": _cm_to_in(snow.get("last24")),
+            "new_48h_in": _cm_to_in(snow.get("last48")),
+            "new_7d_in": _cm_to_in(snow.get("last72")),  # closest available field
+            "surface": str(fr.get("surfaceType")) if fr.get("surfaceType") is not None else None,
+            "trails_open": runs.get("open"),
+            "trails_total": runs.get("total"),
         }
 
     async def scrape_resort(self, resort: Resort) -> None:
         if self.is_circuit_open():
             self.decrement_skip()
             return
-        url = f"{BASE_URL}/{resort.onthesnow_slug}"
+        url = f"{BASE_URL}/{resort.onthesnow_slug}/skireport"
         try:
             html = await self._fetch_html(url)
             next_data = self._extract_next_data(html)
@@ -84,7 +87,7 @@ class OnTheSnowScraper(BaseScraper):
         self._record_success()
 
     async def scrape_all(self) -> None:
+        from app.scrapers.base import run_concurrently
         resorts = self.db.query(Resort).all()
-        for resort in resorts:
-            await self.scrape_resort(resort)
+        await run_concurrently([lambda r=r: self.scrape_resort(r) for r in resorts], concurrency=3)
         await self.close()

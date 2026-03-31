@@ -7,6 +7,7 @@ from google.auth.transport import requests as google_requests
 
 from app.database import get_db
 from app.auth import create_jwt, get_current_user
+from app.config import settings
 from app.models.user import User
 from app.schemas.auth import (
     GoogleAuthRequest, AppleAuthRequest, AuthResponse, UserResponse,
@@ -70,6 +71,28 @@ def apple_auth(body: AppleAuthRequest, db: Session = Depends(get_db)):
             id=str(uuid.uuid4()),
             name=name, email=email, avatar_url=None,
             provider="apple", provider_id=provider_id,
+        )
+        db.add(user)
+        db.commit()
+        db.refresh(user)
+    token = create_jwt(user_id=user.id, email=user.email)
+    return AuthResponse(token=token, user=_user_response(user))
+
+
+@router.post("/auth/dev", response_model=AuthResponse)
+def dev_auth(db: Session = Depends(get_db)):
+    if settings.environment != "development":
+        raise HTTPException(status_code=404, detail="Not found")
+    dev_provider_id = "dev-user-001"
+    user = db.query(User).filter_by(provider_id=dev_provider_id).first()
+    if not user:
+        user = User(
+            id="dev-user-" + str(uuid.uuid4())[:8],
+            name="Dev User",
+            email="dev@powderpass.local",
+            avatar_url=None,
+            provider="dev",
+            provider_id=dev_provider_id,
         )
         db.add(user)
         db.commit()

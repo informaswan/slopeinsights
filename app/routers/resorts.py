@@ -8,7 +8,9 @@ import logging
 from datetime import datetime, timezone
 from zoneinfo import ZoneInfo
 
-from fastapi import APIRouter, Depends, HTTPException, Security
+import httpx
+from fastapi import APIRouter, Depends, HTTPException, Query, Security
+from fastapi.responses import Response
 from fastapi.security.api_key import APIKeyHeader
 from sqlalchemy.orm import Session
 
@@ -41,6 +43,9 @@ _api_key_header = APIKeyHeader(name="X-API-Key", auto_error=False)
 
 
 def _require_api_key(api_key: str = Security(_api_key_header)):
+    # Skip auth entirely in development (when api_key is empty or env is development)
+    if settings.environment == "development" or not settings.api_key:
+        return api_key
     if api_key != settings.api_key:
         raise HTTPException(status_code=401, detail=ErrorResponse(error="Unauthorized", code=401).model_dump())
     return api_key
@@ -198,6 +203,24 @@ def get_resort_webcams(resort_id: str, db: Session = Depends(get_db), _: str = D
         "resort_id": resort_id,
         "items": [{"label": w.label, "cam_type": w.cam_type, "url": w.url, "is_alive": w.is_alive} for w in webcams],
     }
+
+
+@router.get("/webcam-proxy")
+async def webcam_proxy(url: str = Query(...)):
+    """Proxy webcam JPEG images to avoid cross-origin hotlink blocks."""
+    allowed_hosts = {"webcams.opensnow.com", "media.mammothresorts.com", "backend.roundshot.com"}
+    from urllib.parse import urlparse
+    host = urlparse(url).hostname or ""
+    if host not in allowed_hosts:
+        raise HTTPException(status_code=400, detail="Disallowed webcam host")
+    async with httpx.AsyncClient(follow_redirects=True) as client:
+        try:
+            r = await client.get(url, timeout=8.0, headers={"User-Agent": "Mozilla/5.0"})
+            r.raise_for_status()
+        except Exception:
+            raise HTTPException(status_code=502, detail="Upstream webcam unavailable")
+    return Response(content=r.content, media_type=r.headers.get("content-type", "image/jpeg"),
+                    headers={"Cache-Control": "public, max-age=30"})
 
 
 @router.get("/resorts/{resort_id}/parking")

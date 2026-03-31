@@ -1,4 +1,5 @@
 # app/scrapers/liftie.py
+import asyncio
 import logging
 from datetime import datetime, timezone
 
@@ -36,13 +37,16 @@ class LiftieScraper(BaseScraper):
             logger.warning("Liftie scrape failed for %s: %s", resort.name, exc)
             self.db.query(LiftStatus).filter_by(resort_id=resort.id).update({"is_stale": True})
             self.db.commit()
+            await asyncio.sleep(5)
             return
 
         lifts_raw: dict = data.get("lifts", {})
         now = datetime.now(timezone.utc)
         self.db.query(LiftStatus).filter_by(resort_id=resort.id).delete()
         for lift_name, raw_status in lifts_raw.items():
-            status = _STATUS_MAP.get(raw_status.lower(), "closed")
+            if isinstance(raw_status, dict):
+                raw_status = raw_status.get("status", "closed")
+            status = _STATUS_MAP.get(str(raw_status).lower(), "closed")
             self.db.add(LiftStatus(
                 resort_id=resort.id,
                 lift_name=lift_name,
@@ -52,9 +56,11 @@ class LiftieScraper(BaseScraper):
             ))
         self.db.commit()
         self._record_success()
+        await asyncio.sleep(5)  # rate limit: hold semaphore slot for 5s → max ~12 req/min
 
     async def scrape_all(self) -> None:
+        from app.scrapers.base import run_concurrently
         resorts = self.db.query(Resort).all()
-        for resort in resorts:
-            await self.scrape_resort(resort)
+        # concurrency=1 + 5s inter-request delay = ~12 requests/min, very conservative rate limit
+        await run_concurrently([lambda r=r: self.scrape_resort(r) for r in resorts], concurrency=1)
         await self.close()

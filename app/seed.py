@@ -1,12 +1,13 @@
 """
 Resort seed data — 20 Epic + 25 Ikon North American resorts.
 
-NOTE: liftie_id values are slugs used by liftie.info/api/resort/{slug}.
-NOTE: onthesnow_slug values are URL path segments from onthesnow.com.
-Verify both before going to production.
+NOTE: liftie_id values verified against liftie.info/resort/{slug}.
+NOTE: onthesnow_slug values verified against onthesnow.com/{slug}/ski-resort.
+NOTE: webcam URLs sourced from opensnow.com/location/{slug}/cams and official resort sites.
 """
 from sqlalchemy.orm import Session
 from app.models.resort import Resort
+from app.models.webcam import Webcam
 
 RESORTS: list[dict] = [
     # ── EPIC PASS (20 resorts) ────────────────────────────────────────────
@@ -16,7 +17,7 @@ RESORTS: list[dict] = [
         "latitude": 39.6061, "longitude": -106.3550,
         "summit_elevation_ft": 11570, "vertical_drop_ft": 3450,
         "website": "https://www.vail.com", "timezone": "America/Denver",
-        "liftie_id": "vail", "onthesnow_slug": "colorado/vail-ski-resort",
+        "liftie_id": "vail", "onthesnow_slug": "colorado/vail",
     },
     {
         "id": "beaver-creek", "name": "Beaver Creek", "pass_type": "epic",
@@ -24,7 +25,7 @@ RESORTS: list[dict] = [
         "latitude": 39.6042, "longitude": -106.5165,
         "summit_elevation_ft": 11440, "vertical_drop_ft": 4040,
         "website": "https://www.beavercreek.com", "timezone": "America/Denver",
-        "liftie_id": "beaver-creek", "onthesnow_slug": "colorado/beaver-creek-ski-resort",
+        "liftie_id": "beavercreek", "onthesnow_slug": "colorado/beaver-creek",
     },
     {
         "id": "breckenridge", "name": "Breckenridge", "pass_type": "epic",
@@ -32,7 +33,7 @@ RESORTS: list[dict] = [
         "latitude": 39.4817, "longitude": -106.0384,
         "summit_elevation_ft": 12998, "vertical_drop_ft": 3398,
         "website": "https://www.breckenridge.com", "timezone": "America/Denver",
-        "liftie_id": "breckenridge", "onthesnow_slug": "colorado/breckenridge-ski-resort",
+        "liftie_id": "breck", "onthesnow_slug": "colorado/breckenridge",
     },
     {
         "id": "keystone", "name": "Keystone", "pass_type": "epic",
@@ -40,7 +41,7 @@ RESORTS: list[dict] = [
         "latitude": 39.6086, "longitude": -105.9537,
         "summit_elevation_ft": 12408, "vertical_drop_ft": 2900,
         "website": "https://www.keystoneresort.com", "timezone": "America/Denver",
-        "liftie_id": "keystone", "onthesnow_slug": "colorado/keystone-ski-resort",
+        "liftie_id": "keystone", "onthesnow_slug": "colorado/keystone",
     },
     {
         "id": "park-city", "name": "Park City", "pass_type": "epic",
@@ -48,7 +49,7 @@ RESORTS: list[dict] = [
         "latitude": 40.6514, "longitude": -111.5080,
         "summit_elevation_ft": 10026, "vertical_drop_ft": 3226,
         "website": "https://www.parkcitymountain.com", "timezone": "America/Denver",
-        "liftie_id": "park-city", "onthesnow_slug": "utah/park-city-mountain-resort",
+        "liftie_id": "parkcity", "onthesnow_slug": "utah/park-city-mountain-resort",
     },
     {
         "id": "crested-butte", "name": "Crested Butte", "pass_type": "epic",
@@ -64,7 +65,7 @@ RESORTS: list[dict] = [
         "latitude": 47.7448, "longitude": -121.0900,
         "summit_elevation_ft": 5845, "vertical_drop_ft": 1800,
         "website": "https://www.stevenspass.com", "timezone": "America/Los_Angeles",
-        "liftie_id": "stevens-pass", "onthesnow_slug": "washington/stevens-pass-ski-area",
+        "liftie_id": "stevens-pass", "onthesnow_slug": "washington/stevens-pass-resort",
     },
     {
         "id": "stowe", "name": "Stowe", "pass_type": "epic",
@@ -112,7 +113,7 @@ RESORTS: list[dict] = [
         "latitude": 44.0796, "longitude": -71.2293,
         "summit_elevation_ft": 2350, "vertical_drop_ft": 1750,
         "website": "https://www.attitash.com", "timezone": "America/New_York",
-        "liftie_id": "attitash", "onthesnow_slug": "new-hampshire/attitash-mountain-resort",
+        "liftie_id": "attitash", "onthesnow_slug": "new-hampshire/attitash",
     },
     {
         "id": "hunter-mountain", "name": "Hunter Mountain", "pass_type": "epic",
@@ -120,7 +121,7 @@ RESORTS: list[dict] = [
         "latitude": 42.1810, "longitude": -74.2268,
         "summit_elevation_ft": 3200, "vertical_drop_ft": 1600,
         "website": "https://www.huntermtn.com", "timezone": "America/New_York",
-        "liftie_id": "hunter-mountain", "onthesnow_slug": "new-york/hunter-mountain",
+        "liftie_id": "hunter", "onthesnow_slug": "new-york/hunter-mountain",
     },
     {
         "id": "jack-frost", "name": "Jack Frost", "pass_type": "epic",
@@ -144,7 +145,7 @@ RESORTS: list[dict] = [
         "latitude": 39.8198, "longitude": -77.3597,
         "summit_elevation_ft": 1560, "vertical_drop_ft": 620,
         "website": "https://www.libertymountainresort.com", "timezone": "America/New_York",
-        "liftie_id": "liberty-mountain", "onthesnow_slug": "pennsylvania/liberty-mountain-resort",
+        "liftie_id": "liberty-mountain", "onthesnow_slug": "pennsylvania/liberty",
     },
     {
         "id": "roundtop", "name": "Roundtop Mountain", "pass_type": "epic",
@@ -177,7 +178,7 @@ RESORTS: list[dict] = [
         "latitude": 39.2084, "longitude": -106.9498,
         "summit_elevation_ft": 12510, "vertical_drop_ft": 4406,
         "website": "https://www.aspensnowmass.com", "timezone": "America/Denver",
-        "liftie_id": "aspen-snowmass", "onthesnow_slug": "colorado/aspen-snowmass",
+        "liftie_id": "aspen-mountain", "onthesnow_slug": "colorado/aspen-snowmass",
     },
     {
         "id": "mammoth", "name": "Mammoth Mountain", "pass_type": "ikon",
@@ -185,7 +186,7 @@ RESORTS: list[dict] = [
         "latitude": 37.6308, "longitude": -119.0326,
         "summit_elevation_ft": 11053, "vertical_drop_ft": 3100,
         "website": "https://www.mammothmountain.com", "timezone": "America/Los_Angeles",
-        "liftie_id": "mammoth", "onthesnow_slug": "california/mammoth-mountain-ski-area",
+        "liftie_id": "mammoth-lakes", "onthesnow_slug": "california/mammoth-mountain-ski-area",
     },
     {
         "id": "jackson-hole", "name": "Jackson Hole", "pass_type": "ikon",
@@ -193,7 +194,7 @@ RESORTS: list[dict] = [
         "latitude": 43.5875, "longitude": -110.8279,
         "summit_elevation_ft": 10450, "vertical_drop_ft": 4139,
         "website": "https://www.jacksonhole.com", "timezone": "America/Denver",
-        "liftie_id": "jackson-hole", "onthesnow_slug": "wyoming/jackson-hole-mountain-resort",
+        "liftie_id": "jackson-hole", "onthesnow_slug": "wyoming/jackson-hole",
     },
     {
         "id": "big-sky", "name": "Big Sky", "pass_type": "ikon",
@@ -209,7 +210,7 @@ RESORTS: list[dict] = [
         "latitude": 40.4572, "longitude": -106.8045,
         "summit_elevation_ft": 10568, "vertical_drop_ft": 3668,
         "website": "https://www.steamboat.com", "timezone": "America/Denver",
-        "liftie_id": "steamboat", "onthesnow_slug": "colorado/steamboat-ski-resort",
+        "liftie_id": "steamboat", "onthesnow_slug": "colorado/steamboat",
     },
     {
         "id": "winter-park", "name": "Winter Park", "pass_type": "ikon",
@@ -225,7 +226,7 @@ RESORTS: list[dict] = [
         "latitude": 39.1970, "longitude": -120.2358,
         "summit_elevation_ft": 9050, "vertical_drop_ft": 2600,
         "website": "https://www.palisadestahoe.com", "timezone": "America/Los_Angeles",
-        "liftie_id": "palisades-tahoe", "onthesnow_slug": "california/palisades-tahoe",
+        "liftie_id": "palisades", "onthesnow_slug": "california/palisades-tahoe",
     },
     {
         "id": "alta", "name": "Alta", "pass_type": "ikon",
@@ -249,7 +250,7 @@ RESORTS: list[dict] = [
         "latitude": 39.4997, "longitude": -106.1497,
         "summit_elevation_ft": 12313, "vertical_drop_ft": 2601,
         "website": "https://www.coppercolorado.com", "timezone": "America/Denver",
-        "liftie_id": "copper-mountain", "onthesnow_slug": "colorado/copper-mountain-resort",
+        "liftie_id": "copper", "onthesnow_slug": "colorado/copper-mountain-resort",
     },
     {
         "id": "arapahoe-basin", "name": "Arapahoe Basin", "pass_type": "ikon",
@@ -273,7 +274,7 @@ RESORTS: list[dict] = [
         "latitude": 43.1121, "longitude": -72.9076,
         "summit_elevation_ft": 3875, "vertical_drop_ft": 2003,
         "website": "https://www.stratton.com", "timezone": "America/New_York",
-        "liftie_id": "stratton", "onthesnow_slug": "vermont/stratton-mountain-resort",
+        "liftie_id": "stratton", "onthesnow_slug": "vermont/stratton-mountain",
     },
     {
         "id": "sugarbush", "name": "Sugarbush", "pass_type": "ikon",
@@ -281,7 +282,7 @@ RESORTS: list[dict] = [
         "latitude": 44.1370, "longitude": -72.8986,
         "summit_elevation_ft": 4083, "vertical_drop_ft": 2600,
         "website": "https://www.sugarbush.com", "timezone": "America/New_York",
-        "liftie_id": "sugarbush", "onthesnow_slug": "vermont/sugarbush-resort",
+        "liftie_id": "sugarbush", "onthesnow_slug": "vermont/sugarbush",
     },
     {
         "id": "loon-mountain", "name": "Loon Mountain", "pass_type": "ikon",
@@ -289,7 +290,7 @@ RESORTS: list[dict] = [
         "latitude": 44.0341, "longitude": -71.6237,
         "summit_elevation_ft": 3050, "vertical_drop_ft": 2100,
         "website": "https://www.loonmtn.com", "timezone": "America/New_York",
-        "liftie_id": "loon-mountain", "onthesnow_slug": "new-hampshire/loon-mountain-resort",
+        "liftie_id": "loon", "onthesnow_slug": "new-hampshire/loon-mountain",
     },
     {
         "id": "killington", "name": "Killington", "pass_type": "ikon",
@@ -321,7 +322,7 @@ RESORTS: list[dict] = [
         "latitude": 46.9336, "longitude": -121.4748,
         "summit_elevation_ft": 7002, "vertical_drop_ft": 3100,
         "website": "https://www.crystalmountainresort.com", "timezone": "America/Los_Angeles",
-        "liftie_id": "crystal-mountain", "onthesnow_slug": "washington/crystal-mountain-resort",
+        "liftie_id": "crystal-mountain", "onthesnow_slug": "washington/crystal-mountain-wa",
     },
     {
         "id": "revelstoke", "name": "Revelstoke Mountain", "pass_type": "ikon",
@@ -329,7 +330,7 @@ RESORTS: list[dict] = [
         "latitude": 51.0592, "longitude": -118.1773,
         "summit_elevation_ft": 7300, "vertical_drop_ft": 5620,
         "website": "https://www.revelstokemountainresort.com", "timezone": "America/Vancouver",
-        "liftie_id": "revelstoke", "onthesnow_slug": "british-columbia/revelstoke-mountain-resort",
+        "liftie_id": "revelstoke", "onthesnow_slug": "british-columbia/revelstoke-mountain",
     },
     {
         "id": "tremblant", "name": "Mont-Tremblant", "pass_type": "ikon",
@@ -337,7 +338,7 @@ RESORTS: list[dict] = [
         "latitude": 46.2154, "longitude": -74.5840,
         "summit_elevation_ft": 3001, "vertical_drop_ft": 2116,
         "website": "https://www.tremblant.ca", "timezone": "America/Toronto",
-        "liftie_id": "tremblant", "onthesnow_slug": "quebec/mont-tremblant",
+        "liftie_id": "tremblant", "onthesnow_slug": "quebec/tremblant",
     },
     {
         "id": "deer-valley", "name": "Deer Valley", "pass_type": "ikon",
@@ -369,15 +370,295 @@ RESORTS: list[dict] = [
         "latitude": 48.3586, "longitude": -116.6224,
         "summit_elevation_ft": 6393, "vertical_drop_ft": 2400,
         "website": "https://www.schweitzer.com", "timezone": "America/Los_Angeles",
-        "liftie_id": "schweitzer", "onthesnow_slug": "idaho/schweitzer-mountain-resort",
+        "liftie_id": "schweitzer", "onthesnow_slug": "idaho/schweitzer",
     },
 ]
 
 
+WEBCAMS: list[dict] = [
+    # ── VAIL ──────────────────────────────────────────────────────────────
+    {"resort_id": "vail", "label": "Snow Stake Mid-Mountain", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/2452.jpg"},
+    {"resort_id": "vail", "label": "Snow Stake Blue Sky Basin", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/608.jpg"},
+    {"resort_id": "vail", "label": "China Bowl", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/3379.jpg"},
+    {"resort_id": "vail", "label": "Sun Up Bowl", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/3380.jpg"},
+    {"resort_id": "vail", "label": "Gore Range", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/3381.jpg"},
+    {"resort_id": "vail", "label": "Eagle's Nest", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/3382.jpg"},
+    {"resort_id": "vail", "label": "Lionshead", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/1746.jpg"},
+    # ── BEAVER CREEK ──────────────────────────────────────────────────────
+    {"resort_id": "beaver-creek", "label": "Snow Stake", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/609.jpg"},
+    {"resort_id": "beaver-creek", "label": "Red Buffalo", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/18.jpg"},
+    {"resort_id": "beaver-creek", "label": "Spruce Saddle", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/19.jpg"},
+    {"resort_id": "beaver-creek", "label": "Talons Restaurant", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/3174.jpg"},
+    {"resort_id": "beaver-creek", "label": "McCoy Park", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/3173.jpg"},
+    {"resort_id": "beaver-creek", "label": "Arrowhead Village", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/3176.jpg"},
+    {"resort_id": "beaver-creek", "label": "Beaver Creek Village", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/3175.jpg"},
+    {"resort_id": "beaver-creek", "label": "Village Ice Rink", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/4205.jpg"},
+    # ── BRECKENRIDGE ──────────────────────────────────────────────────────
+    {"resort_id": "breckenridge", "label": "Snow Stake", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/607.jpg"},
+    {"resort_id": "breckenridge", "label": "Peak 8 from Peak 9", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/3781.jpg"},
+    {"resort_id": "breckenridge", "label": "Peak 7", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/3913.jpg"},
+    {"resort_id": "breckenridge", "label": "Peak 9", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/4160.jpg"},
+    {"resort_id": "breckenridge", "label": "Looking South", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/1964.jpg"},
+    # ── KEYSTONE ──────────────────────────────────────────────────────────
+    {"resort_id": "keystone", "label": "Snow Stake", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/606.jpg"},
+    {"resort_id": "keystone", "label": "North Peak", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/2288.jpg"},
+    {"resort_id": "keystone", "label": "Dercum Mountain", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/3406.jpg"},
+    {"resort_id": "keystone", "label": "Lakeside Village", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/2289.jpg"},
+    {"resort_id": "keystone", "label": "River Run", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/2290.jpg"},
+    # ── PARK CITY ─────────────────────────────────────────────────────────
+    {"resort_id": "park-city", "label": "Park City Snow Stake", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/1808.jpg"},
+    {"resort_id": "park-city", "label": "Canyons Snow Stake", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/2150.jpg"},
+    {"resort_id": "park-city", "label": "Mountain Village", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/2088.jpg"},
+    {"resort_id": "park-city", "label": "Top of Crescent", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/2089.jpg"},
+    {"resort_id": "park-city", "label": "High Meadow", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/4202.jpg"},
+    {"resort_id": "park-city", "label": "Crescent Ridge", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/3410.jpg"},
+    {"resort_id": "park-city", "label": "Top of OBX", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/4126.jpg"},
+    {"resort_id": "park-city", "label": "Lookout Cabin Overlook", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/3409.jpg"},
+    {"resort_id": "park-city", "label": "Canyons Ski Beach", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/3928.jpg"},
+    # ── CRESTED BUTTE ─────────────────────────────────────────────────────
+    {"resort_id": "crested-butte", "label": "Snow Stake", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/2536.jpg"},
+    {"resort_id": "crested-butte", "label": "Paradise", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/2468.jpg"},
+    {"resort_id": "crested-butte", "label": "Ten Peaks", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/2469.jpg"},
+    {"resort_id": "crested-butte", "label": "Base Area", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/2470.jpg"},
+    # ── STEVENS PASS ──────────────────────────────────────────────────────
+    {"resort_id": "stevens-pass", "label": "Snow Stake", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/2538.jpg"},
+    {"resort_id": "stevens-pass", "label": "Base Area", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/3297.jpg"},
+    {"resort_id": "stevens-pass", "label": "Skyline", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/4001.jpg"},
+    {"resort_id": "stevens-pass", "label": "Jupiter", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/3559.jpg"},
+    {"resort_id": "stevens-pass", "label": "Ski and Snowboard School", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/3950.jpg"},
+    # ── STOWE ─────────────────────────────────────────────────────────────
+    {"resort_id": "stowe", "label": "Snow Stake", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/2614.jpg"},
+    {"resort_id": "stowe", "label": "Main Mountain", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/3943.jpg"},
+    {"resort_id": "stowe", "label": "Spruce Peak Village", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/944.jpg"},
+    {"resort_id": "stowe", "label": "Gondola Base", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/2235.jpg"},
+    # ── WHISTLER BLACKCOMB ────────────────────────────────────────────────
+    {"resort_id": "whistler-blackcomb", "label": "Whistler Peak", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/2482.jpg"},
+    {"resort_id": "whistler-blackcomb", "label": "Whistler Roundhouse", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/2485.jpg"},
+    {"resort_id": "whistler-blackcomb", "label": "Blackcomb 7th Heaven", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/2490.jpg"},
+    {"resort_id": "whistler-blackcomb", "label": "Blackcomb Glacier Express", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/3869.jpg"},
+    {"resort_id": "whistler-blackcomb", "label": "Blackcomb Rendezvous", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/4127.jpg"},
+    {"resort_id": "whistler-blackcomb", "label": "Whistler Village Base", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/2498.jpg"},
+    {"resort_id": "whistler-blackcomb", "label": "Blackcomb Gondola Base", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/2497.jpg"},
+    {"resort_id": "whistler-blackcomb", "label": "Snow Stake", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/2238.jpg"},
+    # ── MOUNT SNOW ────────────────────────────────────────────────────────
+    {"resort_id": "mount-snow", "label": "Snow Stake Summit", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/2478.jpg"},
+    {"resort_id": "mount-snow", "label": "Summit", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/2479.jpg"},
+    {"resort_id": "mount-snow", "label": "Somerset", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/940.jpg"},
+    {"resort_id": "mount-snow", "label": "Main Base", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/2480.jpg"},
+    {"resort_id": "mount-snow", "label": "Carinthia Base", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/2481.jpg"},
+    # ── WILDCAT ───────────────────────────────────────────────────────────
+    {"resort_id": "wildcat", "label": "Snow Stake", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/3994.jpg"},
+    {"resort_id": "wildcat", "label": "Base", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/2692.jpg"},
+    {"resort_id": "wildcat", "label": "Base Lodge", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/4179.jpg"},
+    # ── ATTITASH ──────────────────────────────────────────────────────────
+    {"resort_id": "attitash", "label": "Snow Stake", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/4176.jpg"},
+    # ── HUNTER MOUNTAIN ───────────────────────────────────────────────────
+    {"resort_id": "hunter-mountain", "label": "Base Area", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/2466.jpg"},
+    {"resort_id": "hunter-mountain", "label": "Mid Station", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/1028.jpg"},
+    {"resort_id": "hunter-mountain", "label": "Summit", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/2465.jpg"},
+    {"resort_id": "hunter-mountain", "label": "Hunter East", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/3424.jpg"},
+    # ── JACK FROST ────────────────────────────────────────────────────────
+    {"resort_id": "jack-frost", "label": "Discovery Cam", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/3426.jpg"},
+    {"resort_id": "jack-frost", "label": "Big Boulder Discovery", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/4350.jpg"},
+    {"resort_id": "jack-frost", "label": "Big Boulder Tannenbaum", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/4351.jpg"},
+    # ── BIG BOULDER ───────────────────────────────────────────────────────
+    {"resort_id": "big-boulder", "label": "Tannenbaum", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/3427.jpg"},
+    {"resort_id": "big-boulder", "label": "Discovery", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/3885.jpg"},
+    {"resort_id": "big-boulder", "label": "Jack Frost Discovery", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/4352.jpg"},
+    # ── LIBERTY MOUNTAIN ──────────────────────────────────────────────────
+    {"resort_id": "liberty-mountain", "label": "Summit", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/3430.jpg"},
+    {"resort_id": "liberty-mountain", "label": "Learning Area", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/3429.jpg"},
+    {"resort_id": "liberty-mountain", "label": "Tubing", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/2796.jpg"},
+    {"resort_id": "liberty-mountain", "label": "Base", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/2798.jpg"},
+    {"resort_id": "liberty-mountain", "label": "Courtyard", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/3428.jpg"},
+    {"resort_id": "liberty-mountain", "label": "Backside", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/2800.jpg"},
+    # ── WHITETAIL ─────────────────────────────────────────────────────────
+    {"resort_id": "whitetail", "label": "Base Area", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/3495.jpg"},
+    {"resort_id": "whitetail", "label": "Expert's Choice", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/3496.jpg"},
+    # ── ASPEN SNOWMASS ────────────────────────────────────────────────────
+    {"resort_id": "aspen-snowmass", "label": "Aspen Mountain Summit", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/2877.jpg"},
+    {"resort_id": "aspen-snowmass", "label": "Aspen Mountain Downtown View", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/2579.jpg"},
+    {"resort_id": "aspen-snowmass", "label": "Aspen Mountain Snow Stake", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/2698.jpg"},
+    {"resort_id": "aspen-snowmass", "label": "Highlands Loge Peak", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/2577.jpg"},
+    {"resort_id": "aspen-snowmass", "label": "Highlands Base", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/3021.jpg"},
+    {"resort_id": "aspen-snowmass", "label": "Snowmass Sam's Knob", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/1253.jpg"},
+    {"resort_id": "aspen-snowmass", "label": "Snowmass Base", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/3022.jpg"},
+    {"resort_id": "aspen-snowmass", "label": "Snowmass Snow Stake", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/2697.jpg"},
+    # ── MAMMOTH MOUNTAIN ──────────────────────────────────────────────────
+    {"resort_id": "mammoth", "label": "Top of Sierra", "cam_type": "jpeg", "url": "https://media.mammothresorts.com/mmsa/mammoth/cams/Top_Of_Sierra_1_1280x720.jpg"},
+    {"resort_id": "mammoth", "label": "McCoy Station", "cam_type": "jpeg", "url": "https://media.mammothresorts.com/mmsa/mammoth/cams/McCoy_Chair_23_Top_1280x720.jpg"},
+    {"resort_id": "mammoth", "label": "The Outpost", "cam_type": "jpeg", "url": "https://media.mammothresorts.com/mmsa/mammoth/cams/Outpost_Arriba_1280x720.jpg"},
+    {"resort_id": "mammoth", "label": "The Village Plaza", "cam_type": "jpeg", "url": "https://media.mammothresorts.com/mmsa/mammoth/cams/Village_Village_1280x720.jpg"},
+    {"resort_id": "mammoth", "label": "Main Lodge", "cam_type": "jpeg", "url": "https://media.mammothresorts.com/mmsa/mammoth/cams/Main_Broadway_1280x720.jpg"},
+    {"resort_id": "mammoth", "label": "Eagle Lodge", "cam_type": "jpeg", "url": "https://media.mammothresorts.com/mmsa/mammoth/cams/Eagle_Home_1280x720.jpg"},
+    {"resort_id": "mammoth", "label": "Canyon Lincoln", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/1148.jpg"},
+    # ── JACKSON HOLE ──────────────────────────────────────────────────────
+    {"resort_id": "jackson-hole", "label": "Summit Cam", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/3785.jpg"},
+    {"resort_id": "jackson-hole", "label": "Cody Bowl", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/474.jpg"},
+    {"resort_id": "jackson-hole", "label": "Rendezvous Lodge", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/3786.jpg"},
+    {"resort_id": "jackson-hole", "label": "Tram Station", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/4124.jpg"},
+    {"resort_id": "jackson-hole", "label": "Gondola Base", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/1820.jpg"},
+    {"resort_id": "jackson-hole", "label": "Teton Village", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/781.jpg"},
+    # ── BIG SKY ───────────────────────────────────────────────────────────
+    {"resort_id": "big-sky", "label": "Resort View", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/3940.jpg"},
+    {"resort_id": "big-sky", "label": "Resort View 2", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/3941.jpg"},
+    {"resort_id": "big-sky", "label": "Lone Peak Tram", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/4203.jpg"},
+    {"resort_id": "big-sky", "label": "Everett's 8800", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/2340.jpg"},
+    {"resort_id": "big-sky", "label": "Golf Course", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/3939.jpg"},
+    {"resort_id": "big-sky", "label": "Moonlight Basin", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/2574.jpg"},
+    {"resort_id": "big-sky", "label": "Town Center", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/2575.jpg"},
+    {"resort_id": "big-sky", "label": "Spanish Peaks", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/2576.jpg"},
+    # ── STEAMBOAT ─────────────────────────────────────────────────────────
+    {"resort_id": "steamboat", "label": "Snow Stake Mid-Mountain", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/2780.jpg"},
+    {"resort_id": "steamboat", "label": "Snow Stake Summit", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/3402.jpg"},
+    {"resort_id": "steamboat", "label": "Thunderhead", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/1985.jpg"},
+    {"resort_id": "steamboat", "label": "Four Points", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/3588.jpg"},
+    {"resort_id": "steamboat", "label": "Gondola Square Base", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/3403.jpg"},
+    {"resort_id": "steamboat", "label": "Christie Peak & Wild Blue Gondola", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/3914.jpg"},
+    # ── WINTER PARK ───────────────────────────────────────────────────────
+    {"resort_id": "winter-park", "label": "Snow Stake", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/2506.jpg"},
+    {"resort_id": "winter-park", "label": "Lunch Rock", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/2872.jpg"},
+    {"resort_id": "winter-park", "label": "Snoasis", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/2871.jpg"},
+    {"resort_id": "winter-park", "label": "Tubing Hill", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/2508.jpg"},
+    {"resort_id": "winter-park", "label": "Base Area", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/2507.jpg"},
+    {"resort_id": "winter-park", "label": "Mary Jane Looking West", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/2935.jpg"},
+    {"resort_id": "winter-park", "label": "Mary Jane Looking East", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/2936.jpg"},
+    # ── PALISADES TAHOE ───────────────────────────────────────────────────
+    {"resort_id": "palisades-tahoe", "label": "High Camp", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/1833.jpg"},
+    {"resort_id": "palisades-tahoe", "label": "Siberia", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/2627.jpg"},
+    {"resort_id": "palisades-tahoe", "label": "Palisades Base", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/4201.jpg"},
+    {"resort_id": "palisades-tahoe", "label": "Top of Far East", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/3929.jpg"},
+    {"resort_id": "palisades-tahoe", "label": "Alpine Chalet", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/4200.jpg"},
+    {"resort_id": "palisades-tahoe", "label": "Base Area", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/2628.jpg"},
+    # ── ALTA ──────────────────────────────────────────────────────────────
+    {"resort_id": "alta", "label": "Snow Stake", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/2826.jpg"},
+    {"resort_id": "alta", "label": "Albion Basin", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/2287.jpg"},
+    {"resort_id": "alta", "label": "Mount Baldy", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/3233.jpg"},
+    {"resort_id": "alta", "label": "Mount Superior", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/2344.jpg"},
+    {"resort_id": "alta", "label": "High Rustler", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/2345.jpg"},
+    {"resort_id": "alta", "label": "East Greeley", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/2346.jpg"},
+    {"resort_id": "alta", "label": "Devil's Castle", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/2347.jpg"},
+    {"resort_id": "alta", "label": "Sugarloaf Peak", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/91.jpg"},
+    # ── SNOWBIRD ──────────────────────────────────────────────────────────
+    {"resort_id": "snowbird", "label": "Snow Stake", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/2600.jpg"},
+    {"resort_id": "snowbird", "label": "Mineral Basin", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/2599.jpg"},
+    {"resort_id": "snowbird", "label": "Little Cloud Bowl", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/2651.jpg"},
+    {"resort_id": "snowbird", "label": "Tram Bullpen", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/2598.jpg"},
+    {"resort_id": "snowbird", "label": "Cliff Lodge - Peruvian Gulch", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/3915.jpg"},
+    # ── COPPER MOUNTAIN ───────────────────────────────────────────────────
+    {"resort_id": "copper-mountain", "label": "Snow Stake", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/1960.jpg"},
+    {"resort_id": "copper-mountain", "label": "Woodward Terrain Park", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/2034.jpg"},
+    {"resort_id": "copper-mountain", "label": "Excelerator", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/2260.jpg"},
+    {"resort_id": "copper-mountain", "label": "Union Peak", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/3164.jpg"},
+    {"resort_id": "copper-mountain", "label": "Center Village Base", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/1954.jpg"},
+    {"resort_id": "copper-mountain", "label": "Aerie", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/3925.jpg"},
+    {"resort_id": "copper-mountain", "label": "Superbee Base", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/1953.jpg"},
+    # ── ARAPAHOE BASIN ────────────────────────────────────────────────────
+    {"resort_id": "arapahoe-basin", "label": "Snow Stake", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/2017.jpg"},
+    {"resort_id": "arapahoe-basin", "label": "Montezuma Bowl", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/3132.jpg"},
+    {"resort_id": "arapahoe-basin", "label": "East Wall", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/3870.jpg"},
+    {"resort_id": "arapahoe-basin", "label": "Mid-Mountain", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/472.jpg"},
+    {"resort_id": "arapahoe-basin", "label": "Base Area - Pali & Molly Hogan", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/3133.jpg"},
+    {"resort_id": "arapahoe-basin", "label": "Base Area - Mountain Goat Plaza", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/527.jpg"},
+    # ── TAOS ──────────────────────────────────────────────────────────────
+    {"resort_id": "taos", "label": "Snow Stake", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/2523.jpg"},
+    {"resort_id": "taos", "label": "Kachina Basin", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/2516.jpg"},
+    {"resort_id": "taos", "label": "Kachina Peak", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/2639.jpg"},
+    {"resort_id": "taos", "label": "Highline", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/2217.jpg"},
+    {"resort_id": "taos", "label": "Base", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/2215.jpg"},
+    {"resort_id": "taos", "label": "The Blake Hotel", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/2517.jpg"},
+    # ── STRATTON ──────────────────────────────────────────────────────────
+    {"resort_id": "stratton", "label": "Mid-Mountain", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/2171.jpg"},
+    {"resort_id": "stratton", "label": "Summit", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/2172.jpg"},
+    {"resort_id": "stratton", "label": "Snow Bowl", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/3951.jpg"},
+    {"resort_id": "stratton", "label": "Main Lodge", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/3952.jpg"},
+    {"resort_id": "stratton", "label": "Golf Course", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/3953.jpg"},
+    {"resort_id": "stratton", "label": "Tube Park", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/4239.jpg"},
+    # ── SUGARBUSH ─────────────────────────────────────────────────────────
+    {"resort_id": "sugarbush", "label": "Snow Stake Summit", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/2371.jpg"},
+    {"resort_id": "sugarbush", "label": "Snow Stake Mid-Mountain", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/2372.jpg"},
+    {"resort_id": "sugarbush", "label": "Base Area", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/947.jpg"},
+    {"resort_id": "sugarbush", "label": "Gadd Peak", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/3069.jpg"},
+    {"resort_id": "sugarbush", "label": "Mt. Ellen Base", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/4134.jpg"},
+    # ── KILLINGTON ────────────────────────────────────────────────────────
+    {"resort_id": "killington", "label": "Superstar", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/2296.jpg"},
+    {"resort_id": "killington", "label": "North Ridge", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/2297.jpg"},
+    {"resort_id": "killington", "label": "Mountain View", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/2298.jpg"},
+    {"resort_id": "killington", "label": "Snowshed", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/3231.jpg"},
+    {"resort_id": "killington", "label": "Horizon", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/3954.jpg"},
+    {"resort_id": "killington", "label": "Pico", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/2300.jpg"},
+    {"resort_id": "killington", "label": "Tubing Park", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/4229.jpg"},
+    {"resort_id": "killington", "label": "Bear Mountain", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/3232.jpg"},
+    # ── SUNDAY RIVER ──────────────────────────────────────────────────────
+    {"resort_id": "sunday-river", "label": "Mountain Cam", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/926.jpg"},
+    {"resort_id": "sunday-river", "label": "Peak Lodge", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/3980.jpg"},
+    {"resort_id": "sunday-river", "label": "Baker 6", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/4174.jpg"},
+    {"resort_id": "sunday-river", "label": "Golf Course", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/4175.jpg"},
+    # ── SUGARLOAF ─────────────────────────────────────────────────────────
+    {"resort_id": "sugarloaf", "label": "The Beach", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/3933.jpg"},
+    {"resort_id": "sugarloaf", "label": "Top of Skyline", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/3934.jpg"},
+    {"resort_id": "sugarloaf", "label": "Narrow Gauge", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/3982.jpg"},
+    {"resort_id": "sugarloaf", "label": "Bullwinkle's", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/3981.jpg"},
+    # ── DEER VALLEY ───────────────────────────────────────────────────────
+    {"resort_id": "deer-valley", "label": "Snow Stake", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/2689.jpg"},
+    {"resort_id": "deer-valley", "label": "Scenic View", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/2648.jpg"},
+    {"resort_id": "deer-valley", "label": "Silver Lake", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/101.jpg"},
+    {"resort_id": "deer-valley", "label": "Snow Park", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/102.jpg"},
+    {"resort_id": "deer-valley", "label": "Empire Canyon Lodge", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/3238.jpg"},
+    {"resort_id": "deer-valley", "label": "Top of Ruby", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/3890.jpg"},
+    {"resort_id": "deer-valley", "label": "Hoodoo Express", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/4208.jpg"},
+    # ── SOLITUDE ──────────────────────────────────────────────────────────
+    {"resort_id": "solitude", "label": "Snow Stake", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/3364.jpg"},
+    {"resort_id": "solitude", "label": "Link Lift Line", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/4209.jpg"},
+    {"resort_id": "solitude", "label": "Moonbeam Express Base", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/1854.jpg"},
+    {"resort_id": "solitude", "label": "Powderhorn Top", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/2352.jpg"},
+    {"resort_id": "solitude", "label": "Summit Express Bottom", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/3787.jpg"},
+    {"resort_id": "solitude", "label": "Powderhorn Bottom", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/2114.jpg"},
+    {"resort_id": "solitude", "label": "Sunshine Bowl", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/2115.jpg"},
+    {"resort_id": "solitude", "label": "Moonbeam Parking", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/3365.jpg"},
+    {"resort_id": "solitude", "label": "Big Cottonwood Canyon", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/1982.jpg"},
+    # ── SCHWEITZER ────────────────────────────────────────────────────────
+    {"resort_id": "schweitzer", "label": "Village", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/2355.jpg"},
+    {"resort_id": "schweitzer", "label": "Basin Express Summit", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/2356.jpg"},
+    {"resort_id": "schweitzer", "label": "Lakeview Triple Summit", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/3383.jpg"},
+    {"resort_id": "schweitzer", "label": "Colburn Triple Summit", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/901.jpg"},
+    {"resort_id": "schweitzer", "label": "Outback", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/3876.jpg"},
+    # ── REVELSTOKE ────────────────────────────────────────────────────────
+    {"resort_id": "revelstoke", "label": "Snow Stake", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/1508.jpg"},
+    {"resort_id": "revelstoke", "label": "Top of Stoke (7,300ft)", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/1506.jpg"},
+    {"resort_id": "revelstoke", "label": "Top of Ripper", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/2163.jpg"},
+    {"resort_id": "revelstoke", "label": "Top of Stellar", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/2623.jpg"},
+    {"resort_id": "revelstoke", "label": "Top of Upper Gondola", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/2162.jpg"},
+    {"resort_id": "revelstoke", "label": "Village", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/2161.jpg"},
+    {"resort_id": "revelstoke", "label": "Revelstoke Town", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/1509.jpg"},
+    # ── MONT-TREMBLANT ────────────────────────────────────────────────────
+    {"resort_id": "tremblant", "label": "Summit", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/1688.jpg"},
+    {"resort_id": "tremblant", "label": "Place St-Bernard", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/1687.jpg"},
+    {"resort_id": "tremblant", "label": "Place Des Voyageurs", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/1689.jpg"},
+    {"resort_id": "tremblant", "label": "South Base", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/1690.jpg"},
+    {"resort_id": "tremblant", "label": "North Side", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/1691.jpg"},
+    # NOTE: Loon Mountain, Crystal Mountain WA, Afton Alps, Roundtop,
+    #       Wilmot Mountain, and Blue Mountain Ontario have no embedded
+    #       webcam feeds on OpenSnow — they link to resort-hosted pages.
+]
+
+
 def seed_resorts(db: Session) -> None:
-    """Insert all resorts if they don't already exist (idempotent)."""
+    """Upsert all resorts (updates slugs if they changed)."""
     for data in RESORTS:
         existing = db.query(Resort).filter_by(id=data["id"]).first()
-        if not existing:
+        if existing:
+            for k, v in data.items():
+                setattr(existing, k, v)
+        else:
             db.add(Resort(**data))
+    db.commit()
+
+
+def seed_webcams(db: Session) -> None:
+    """Insert webcam rows — skips any URL already in the table."""
+    existing_urls = {url for (url,) in db.query(Webcam.url).all()}
+    for data in WEBCAMS:
+        if data["url"] not in existing_urls:
+            db.add(Webcam(**data))
     db.commit()
