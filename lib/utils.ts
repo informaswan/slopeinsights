@@ -1,5 +1,5 @@
 // lib/utils.ts
-import { Colors } from '../constants/theme';
+import type { ThemeColors } from '../constants/theme';
 
 export function formatAgo(isoString: string | null): string | null {
   if (!isoString) return null;
@@ -10,12 +10,12 @@ export function formatAgo(isoString: string | null): string | null {
   return `${Math.floor(diffMin / 60)}h ago`;
 }
 
-export function crowdColor(level: string | null): string {
+export function crowdColor(level: string | null, colors: ThemeColors): string {
   switch (level) {
-    case 'low':    return Colors.crowdLow;
-    case 'medium': return Colors.crowdMedium;
-    case 'high':   return Colors.crowdHigh;
-    default:       return Colors.textMuted;
+    case 'low':    return colors.crowdLow;
+    case 'medium': return colors.crowdMedium;
+    case 'high':   return colors.crowdHigh;
+    default:       return colors.textMuted;
   }
 }
 

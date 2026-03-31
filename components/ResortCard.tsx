@@ -74,9 +74,9 @@ export function ResortCard({ resort }: Props) {
         ) : (
           <View />
         )}
-        <View style={[styles.crowdPill, { backgroundColor: crowdColor(level) + '22' }]}>
-          <View style={[styles.crowdDot, { backgroundColor: crowdColor(level) }]} />
-          <Text style={[styles.crowdText, { color: crowdColor(level) }]}>{crowdLabel(level)}</Text>
+        <View style={[styles.crowdPill, { backgroundColor: crowdColor(level, colors) + '22' }]}>
+          <View style={[styles.crowdDot, { backgroundColor: crowdColor(level, colors) }]} />
+          <Text style={[styles.crowdText, { color: crowdColor(level, colors) }]}>{crowdLabel(level)}</Text>
         </View>
       </View>
     </Pressable>
