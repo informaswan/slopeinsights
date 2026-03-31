@@ -3,63 +3,65 @@ import { View, Text, Pressable, StyleSheet } from 'react-native';
 import { useRouter } from 'expo-router';
 import type { ResortSummary } from '../lib/types';
 import { crowdColor, crowdLabel, formatAgo } from '../lib/utils';
-import { Colors, Spacing, FontSize, Radius } from '../constants/theme';
+import { Spacing, FontSize, Radius } from '../constants/theme';
+import { useTheme } from '../contexts/ThemeContext';
 
 interface Props { resort: ResortSummary; }
 
 export function ResortCard({ resort }: Props) {
   const router = useRouter();
-  const passColor = resort.pass_type === 'epic' ? Colors.epic : Colors.ikon;
+  const { colors } = useTheme();
+  const passColor = resort.pass_type === 'epic' ? colors.epic : colors.ikon;
   const passLabel = resort.pass_type === 'epic' ? 'EPIC' : 'IKON';
   const level = resort.crowd?.current_level ?? null;
 
   return (
     <Pressable
-      style={({ pressed }) => [styles.card, { borderLeftColor: passColor }, pressed && styles.cardPressed]}
+      style={({ pressed }) => [styles.card, { backgroundColor: colors.surface, borderLeftColor: passColor }, pressed && styles.cardPressed]}
       onPress={() => router.push(`/resort/${resort.id}`)}
     >
       {/* Top section: name + pass badge */}
       <View style={styles.header}>
         <View style={styles.titleRow}>
-          <Text style={styles.name} numberOfLines={1}>{resort.name}</Text>
+          <Text style={[styles.name, { color: colors.text }]} numberOfLines={1}>{resort.name}</Text>
           <View style={[styles.passBadge, { backgroundColor: passColor }]}>
             <Text style={styles.passLabel}>{passLabel}</Text>
           </View>
         </View>
         {/* Render state as its own Text so getByText('CO') matches */}
-        <Text style={styles.location}>
+        <Text style={[styles.location, { color: colors.textMuted }]}>
           {resort.state ?? resort.region ?? ''}
         </Text>
       </View>
 
       {/* Divider */}
-      <View style={styles.divider} />
+      <View style={[styles.divider, { backgroundColor: colors.border }]} />
 
       {/* Snow hero metrics */}
       {resort.snow ? (
         <View style={styles.snowRow}>
           <View style={styles.snowMetric}>
             {/* Single Text wrapping number+"  so getByText('42"') works */}
-            <Text style={styles.snowNumber}>
+            <Text style={[styles.snowNumber, { color: colors.textSecondary }]}>
               {resort.snow.base_in ?? '—'}
-              <Text style={styles.snowUnit}>"</Text>
+              <Text style={[styles.snowUnit, { color: colors.textSecondary }]}>"</Text>
             </Text>
-            <Text style={styles.snowLabel}>BASE</Text>
+            <Text style={[styles.snowLabel, { color: colors.textMuted }]}>BASE</Text>
           </View>
-          <View style={styles.snowDivider} />
+          <View style={[styles.snowDivider, { backgroundColor: colors.border }]} />
           <View style={styles.snowMetric}>
-            <Text style={[styles.snowNumber, styles.snowNew]}>
+            <Text style={[styles.snowNumber, { color: colors.snowBlue }]}>
               {resort.snow.new_24h_in ?? '—'}
-              <Text style={[styles.snowUnit, styles.snowNew]}>"</Text>
+              <Text style={[styles.snowUnit, { color: colors.snowBlue }]}>"</Text>
             </Text>
-            <Text style={styles.snowLabel}>24H NEW</Text>
+            <Text style={[styles.snowLabel, { color: colors.textMuted }]}>24H NEW</Text>
           </View>
           {resort.snow.is_stale && (
-            <Text style={styles.stale}>Updated {formatAgo(resort.snow.scraped_at)}</Text>
+            <Text style={[styles.stale, { color: colors.warning }]}>Updated {formatAgo(resort.snow.scraped_at)}</Text>
           )}
         </View>
       ) : (
-        <Text style={styles.unavailable}>Snow data unavailable</Text>
+        <Text style={[styles.unavailable, { color: colors.textMuted }]}>Snow data unavailable</Text>
       )}
 
       {/* Footer: lifts + crowd */}
@@ -67,7 +69,7 @@ export function ResortCard({ resort }: Props) {
         {resort.lifts != null ? (
           <View style={styles.liftsRow}>
             {/* Single text node so getByText('18/31 lifts') matches */}
-            <Text style={styles.liftsText}>{resort.lifts.open}/{resort.lifts.total} lifts</Text>
+            <Text style={[styles.liftsText, { color: colors.textSecondary }]}>{resort.lifts.open}/{resort.lifts.total} lifts</Text>
           </View>
         ) : (
           <View />
@@ -83,7 +85,6 @@ export function ResortCard({ resort }: Props) {
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: Colors.surface,
     borderRadius: Radius.md,
     borderLeftWidth: 5,
     marginHorizontal: Spacing.md,
@@ -111,7 +112,6 @@ const styles = StyleSheet.create({
   name: {
     fontSize: FontSize.lg,
     fontWeight: '800',
-    color: Colors.text,
     flex: 1,
     letterSpacing: -0.3,
   },
@@ -128,13 +128,11 @@ const styles = StyleSheet.create({
   },
   location: {
     fontSize: FontSize.xs,
-    color: Colors.textMuted,
     fontWeight: '500',
     letterSpacing: 0.3,
   },
   divider: {
     height: 1,
-    backgroundColor: Colors.border,
     marginHorizontal: Spacing.md,
   },
   snowRow: {
@@ -152,16 +150,11 @@ const styles = StyleSheet.create({
   snowNumber: {
     fontSize: FontSize.xl,
     fontWeight: '800',
-    color: Colors.textSecondary,
     lineHeight: FontSize.xl + 4,
-  },
-  snowNew: {
-    color: Colors.snowBlue,
   },
   snowUnit: {
     fontSize: FontSize.md,
     fontWeight: '700',
-    color: Colors.textSecondary,
     lineHeight: FontSize.xl + 4,
   },
   snowLabel: {
@@ -170,25 +163,21 @@ const styles = StyleSheet.create({
     left: 0,
     fontSize: 9,
     fontWeight: '700',
-    color: Colors.textMuted,
     letterSpacing: 0.5,
   },
   snowDivider: {
     width: 1,
     height: 28,
-    backgroundColor: Colors.border,
     marginHorizontal: Spacing.xs,
   },
   stale: {
     fontSize: FontSize.xs,
-    color: Colors.warning,
     flex: 1,
     textAlign: 'right',
     fontStyle: 'italic',
   },
   unavailable: {
     fontSize: FontSize.sm,
-    color: Colors.textMuted,
     paddingHorizontal: Spacing.md,
     paddingVertical: Spacing.sm,
     fontStyle: 'italic',
@@ -209,7 +198,6 @@ const styles = StyleSheet.create({
   liftsText: {
     fontSize: FontSize.sm,
     fontWeight: '600',
-    color: Colors.textSecondary,
     letterSpacing: 0.2,
   },
   crowdPill: {
