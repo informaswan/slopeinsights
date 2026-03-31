@@ -1,5 +1,5 @@
 // __tests__/hooks/useResorts.test.ts
-import { renderHook, waitFor } from '@testing-library/react-native';
+import { renderHook, waitFor, act } from '@testing-library/react-native';
 import { useResorts } from '../../hooks/useResorts';
 
 const mockResorts = [
@@ -47,7 +47,6 @@ it('refresh reloads data from the API', async () => {
   await waitFor(() => expect(result.current.loading).toBe(false));
   expect(result.current.resorts).toHaveLength(2);
 
-  await result.current.refresh();
-  await waitFor(() => expect(result.current.loading).toBe(false));
-  expect(result.current.resorts).toHaveLength(1);
+  await act(async () => { await result.current.refresh(); });
+  await waitFor(() => expect(result.current.resorts).toHaveLength(1));
 });

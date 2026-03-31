@@ -1,5 +1,5 @@
 // __tests__/hooks/useResortDetail.test.ts
-import { renderHook, waitFor } from '@testing-library/react-native';
+import { renderHook, waitFor, act } from '@testing-library/react-native';
 import { useResortDetail } from '../../hooks/useResortDetail';
 
 const mockDetail = {
@@ -42,7 +42,6 @@ it('refresh reloads detail from the API', async () => {
   await waitFor(() => expect(result.current.loading).toBe(false));
   expect(result.current.resort?.name).toBe('Vail');
 
-  await result.current.refresh();
-  await waitFor(() => expect(result.current.loading).toBe(false));
-  expect(result.current.resort?.name).toBe('Vail Updated');
+  await act(async () => { await result.current.refresh(); });
+  await waitFor(() => expect(result.current.resort?.name).toBe('Vail Updated'));
 });

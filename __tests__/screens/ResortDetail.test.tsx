@@ -19,9 +19,11 @@ jest.mock('expo-video', () => ({
   useVideoPlayer: jest.fn(() => ({ play: jest.fn(), addListener: jest.fn(() => ({ remove: jest.fn() })) })),
 }));
 jest.mock('expo-linking', () => ({ openURL: jest.fn() }));
-jest.mock('react-native/Libraries/Utilities/Platform', () => ({
-  OS: 'ios',
-  select: (obj: Record<string, unknown>) => obj['ios'] ?? obj['default'],
+jest.mock('../../components/WebcamViewer', () => ({
+  WebcamViewer: ({ webcams }: any) => {
+    const { View, Text } = require('react-native');
+    return <View testID="webcam-viewer"><Text>{webcams?.length ?? 0} cams</Text></View>;
+  },
 }));
 jest.mock('../../hooks/useResortDetail', () => ({ useResortDetail: jest.fn() }));
 
