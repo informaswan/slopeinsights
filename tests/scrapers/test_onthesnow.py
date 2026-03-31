@@ -12,14 +12,19 @@ from app.models.snow import SnowCondition
 SAMPLE_NEXT_DATA = {
     "props": {
         "pageProps": {
-            "resort": {
-                "snowDepthBase": 91.44,
-                "snowfall24Hours": 15.24,
-                "snowfall48Hours": 25.4,
-                "snowfall7Days": 45.72,
-                "surfaceConditions": "Packed Powder",
-                "openTrails": 150,
-                "totalTrails": 195,
+            "fullResort": {
+                "snow": {
+                    "base": 91.44,
+                    "last24": 15.24,
+                    "last48": 25.4,
+                    "last72": 45.72,
+                },
+                "surfaceType": "Packed Powder",
+                "runs": {
+                    "open": 150,
+                    "total": 195,
+                },
+                "lifts": {},
             }
         }
     }
@@ -46,7 +51,7 @@ def resort(db):
 @pytest.mark.asyncio
 async def test_scrape_resort_creates_snow_condition(db, resort):
     async with respx.mock(using="httpx") as respx_mock:
-        respx_mock.get("https://www.onthesnow.com/colorado/vail-ski-resort").mock(
+        respx_mock.get("https://www.onthesnow.com/colorado/vail-ski-resort/skireport").mock(
             return_value=httpx.Response(200, text=SAMPLE_HTML)
         )
         scraper = OnTheSnowScraper(db)
@@ -62,15 +67,15 @@ async def test_scrape_resort_creates_snow_condition(db, resort):
 @pytest.mark.asyncio
 async def test_scrape_resort_updates_existing(db, resort):
     async with respx.mock(using="httpx") as respx_mock:
-        respx_mock.get("https://www.onthesnow.com/colorado/vail-ski-resort").mock(
+        respx_mock.get("https://www.onthesnow.com/colorado/vail-ski-resort/skireport").mock(
             return_value=httpx.Response(200, text=SAMPLE_HTML)
         )
         scraper = OnTheSnowScraper(db)
         await scraper.scrape_resort(resort)
         updated_data = json.loads(SAMPLE_HTML.split('application/json">')[1].split("</script>")[0])
-        updated_data["props"]["pageProps"]["resort"]["snowDepthBase"] = 101.6
+        updated_data["props"]["pageProps"]["fullResort"]["snow"]["base"] = 101.6
         updated_html = f'<html><script id="__NEXT_DATA__" type="application/json">{json.dumps(updated_data)}</script></html>'
-        respx_mock.get("https://www.onthesnow.com/colorado/vail-ski-resort").mock(
+        respx_mock.get("https://www.onthesnow.com/colorado/vail-ski-resort/skireport").mock(
             return_value=httpx.Response(200, text=updated_html)
         )
         await scraper.scrape_resort(resort)

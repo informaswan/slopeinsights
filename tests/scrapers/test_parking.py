@@ -37,7 +37,7 @@ async def test_vail_scraper_creates_live_lot_rows(db, vail_resort):
             return_value=httpx.Response(200, text=VAIL_PARKING_HTML)
         )
         scraper = VailParkingScraper(db)
-        await scraper.scrape()
+        await scraper._scrape_impl()
         lots = db.query(ParkingLot).filter_by(resort_id="vail", is_live=True).all()
         assert len(lots) == 3
         statuses = {l.lot_name: l.status for l in lots}
@@ -53,8 +53,8 @@ async def test_vail_scraper_updates_existing_rows(db, vail_resort):
             return_value=httpx.Response(200, text=VAIL_PARKING_HTML)
         )
         scraper = VailParkingScraper(db)
-        await scraper.scrape()
-        await scraper.scrape()
+        await scraper._scrape_impl()
+        await scraper._scrape_impl()
         count = db.query(ParkingLot).filter_by(resort_id="vail", is_live=True).count()
         assert count == 3
 

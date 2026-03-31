@@ -24,7 +24,9 @@ def test_get_resorts_returns_list(client, db):
     assert len(data) == 45
 
 
-def test_get_resorts_requires_api_key(client):
+def test_get_resorts_requires_api_key(client, monkeypatch):
+    from app.config import settings
+    monkeypatch.setattr(settings, "environment", "production")
     response = client.get("/api/resorts")
     assert response.status_code == 401
 
