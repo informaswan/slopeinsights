@@ -4,7 +4,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useRouter } from 'expo-router';
 import { Colors, Spacing, FontSize, Radius } from '../constants/theme';
 
-const PURCHASE_KEY = 'powderpass_purchased';
+const PURCHASE_KEY = 'slopeinsights_purchased';
 
 /** Returns true if the user has purchased, or if the dev skip flag is set. */
 export async function checkPurchased(): Promise<boolean> {
@@ -30,7 +30,7 @@ export default function PaywallScreen() {
   async function handleUnlock() {
     // TODO: Replace with real IAP before App Store submission.
     // Use expo-in-app-purchases (or RevenueCat) to purchase product
-    // `com.yourcompany.powderpass.fullaccess`. Only call markPurchased()
+    // `com.slopeinsights.app.fullaccess`. Only call markPurchased()
     // after a confirmed successful transaction.
     await markPurchased();
     router.replace('/');
@@ -41,7 +41,7 @@ export default function PaywallScreen() {
       {/* Header wordmark */}
       <View style={styles.wordmark}>
         <View style={styles.wordmarkAccent} />
-        <Text style={styles.appName}>PowderPass</Text>
+        <Text style={styles.appName}>SlopeInsights</Text>
       </View>
 
       {/* Tagline */}

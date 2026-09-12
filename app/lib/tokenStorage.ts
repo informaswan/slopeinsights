@@ -1,7 +1,7 @@
 import { Platform } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const TOKEN_KEY = 'powderpass_jwt';
+const TOKEN_KEY = 'slopeinsights_jwt';
 
 let SecureStore: typeof import('expo-secure-store') | null = null;
 

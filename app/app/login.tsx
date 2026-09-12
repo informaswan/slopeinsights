@@ -68,7 +68,7 @@ export default function LoginScreen() {
     >
       <View style={styles.logoArea}>
         <MountainLogo size={64} color="#fff" snowColor="#BAE6FD" />
-        <Text style={styles.wordmark}>PowderPass</Text>
+        <Text style={styles.wordmark}>SlopeInsights</Text>
         <Text style={styles.tagline}>Real-time ski conditions at a glance</Text>
       </View>
 
@@ -108,7 +108,7 @@ export default function LoginScreen() {
       </View>
 
       <Text style={styles.terms}>
-        By continuing, you agree to PowderPass Terms of Service and Privacy Policy
+        By continuing, you agree to SlopeInsights Terms of Service and Privacy Policy
       </Text>
     </LinearGradient>
   );

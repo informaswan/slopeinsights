@@ -12,7 +12,7 @@ from app.scrapers.base import BaseScraper, ScraperError
 logger = logging.getLogger(__name__)
 
 NOAA_HEADERS = {
-    "User-Agent": "PowderPass/1.0 (ski conditions app; contact: admin@powderpass.app)",
+    "User-Agent": "SlopeInsights/1.0 (ski conditions app; contact: admin@slopeinsights.com)",
     "Accept": "application/geo+json",
 }
 

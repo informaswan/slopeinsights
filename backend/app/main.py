@@ -27,7 +27,7 @@ async def lifespan(app: FastAPI):
     scheduler.shutdown(wait=False)
 
 
-app = FastAPI(title="PowderPass API", lifespan=lifespan)
+app = FastAPI(title="SlopeInsights API", lifespan=lifespan)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],

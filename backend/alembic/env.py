@@ -40,7 +40,7 @@ def run_migrations_offline() -> None:
     script output.
 
     """
-    url = os.environ.get("DATABASE_URL", "sqlite:///./powderpass.db")
+    url = os.environ.get("DATABASE_URL", "sqlite:///./slopeinsights.db")
     context.configure(
         url=url,
         target_metadata=target_metadata,
@@ -60,7 +60,7 @@ def run_migrations_online() -> None:
 
     """
     from sqlalchemy import create_engine
-    url = os.environ.get("DATABASE_URL", "sqlite:///./powderpass.db")
+    url = os.environ.get("DATABASE_URL", "sqlite:///./slopeinsights.db")
     connectable = create_engine(url)
 
     with connectable.connect() as connection:

@@ -35,7 +35,7 @@ class BaseScraper(ABC):
             self._client = httpx.AsyncClient(
                 timeout=30.0,
                 follow_redirects=True,
-                headers={"User-Agent": "Mozilla/5.0 (PowderPass/1.0; ski conditions app)"},
+                headers={"User-Agent": "Mozilla/5.0 (SlopeInsights/1.0; ski conditions app)"},
             )
         return self._client
 

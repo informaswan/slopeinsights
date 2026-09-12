@@ -71,7 +71,7 @@ describe('RootLayout', () => {
   });
 
   it('renders index Stack.Screen (not paywall) when already purchased', async () => {
-    await AsyncStorage.setItem('powderpass_purchased', 'true');
+    await AsyncStorage.setItem('slopeinsights_purchased', 'true');
     const RootLayout = require('../../app/_layout').default;
     render(<RootLayout />);
     await waitFor(() => expect(screen.queryByTestId('layout-loading')).toBeNull());

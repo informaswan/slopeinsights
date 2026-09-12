@@ -33,7 +33,7 @@ describe('Paywall screen', () => {
   it('renders app name, tagline, unlock button, and fine print', () => {
     const PaywallScreen = require('../../app/paywall').default;
     render(<PaywallScreen />);
-    expect(screen.getByText('PowderPass')).toBeTruthy();
+    expect(screen.getByText('SlopeInsights')).toBeTruthy();
     expect(screen.getByText('45 Epic & Ikon resorts — snow, lifts, crowds, cams')).toBeTruthy();
     expect(screen.getByText('Unlock Full Access — $4.99')).toBeTruthy();
     expect(screen.getByText('One-time purchase. No subscription.')).toBeTruthy();
@@ -46,7 +46,7 @@ describe('Paywall screen', () => {
     const PaywallScreen = require('../../app/paywall').default;
     render(<PaywallScreen />);
     await act(async () => { fireEvent.press(screen.getByText('Unlock Full Access — $4.99')); });
-    expect(await AsyncStorage.getItem('powderpass_purchased')).toBe('true');
+    expect(await AsyncStorage.getItem('slopeinsights_purchased')).toBe('true');
     expect(mockReplace).toHaveBeenCalledWith('/');
   });
 });

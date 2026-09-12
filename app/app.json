@@ -1,22 +1,22 @@
 {
   "expo": {
-    "name": "PowderPass",
-    "slug": "powderpass",
+    "name": "SlopeInsights",
+    "slug": "slopeinsights",
     "version": "1.0.0",
-    "scheme": "powderpass",
+    "scheme": "slopeinsights",
     "orientation": "portrait",
     "userInterfaceStyle": "light",
     "ios": {
-      "bundleIdentifier": "com.yourcompany.powderpass",
+      "bundleIdentifier": "com.slopeinsights.app",
       "supportsTablet": false,
       "iap": {
         "products": [
-          "com.yourcompany.powderpass.fullaccess"
+          "com.slopeinsights.app.fullaccess"
         ]
       }
     },
     "android": {
-      "package": "com.yourcompany.powderpass",
+      "package": "com.slopeinsights.app",
       "adaptiveIcon": {
         "backgroundColor": "#1d4ed8"
       }

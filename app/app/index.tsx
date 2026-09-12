@@ -86,7 +86,7 @@ export default function HomeScreen() {
       >
         <View style={styles.headerLeft}>
           <MountainLogo size={28} color={colors.headerText} snowColor={colors.headerTextSecondary} />
-          <Text style={[styles.headerTitle, { color: colors.headerText }]}>PowderPass</Text>
+          <Text style={[styles.headerTitle, { color: colors.headerText }]}>SlopeInsights</Text>
         </View>
         <View style={styles.headerRight}>
           <Pressable onPress={() => router.push('/explore')}>

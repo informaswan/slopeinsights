@@ -2,7 +2,7 @@ import React, { createContext, useContext, useState, useEffect, useMemo } from '
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { LightColors, DarkColors, type ThemeColors } from '../constants/theme';
 
-const STORAGE_KEY = 'powderpass_dark_mode';
+const STORAGE_KEY = 'slopeinsights_dark_mode';
 
 interface ThemeContextValue {
   colors: ThemeColors;
