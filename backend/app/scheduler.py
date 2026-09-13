@@ -2,11 +2,18 @@
 """
 Scraping schedule (all times are approximate — APScheduler may drift slightly):
 
-  Every 15 min : Liftie lift status + parking (9 resorts)
+  Every 15 min : Parking (9 resorts)
   Every 30 min : OnTheSnow snow + trails  ← also triggers cache refresh
   Every 1 hr   : NOAA weather forecasts + cache invalidation (current_pct changes hourly)
   Every 2 hrs  : Webcam health check
   Daily 3am    : BestTime.app crowd patterns
+
+Lift status (Liftie) is disabled: liftie.info now sits behind a Cloudflare
+Managed Challenge that blocks plain HTTP scraping outright (confirmed via a
+direct request returning a 403 "Just a moment..." interstitial, not a rate
+limit). LiftieScraper and its tests are left in place in case a replacement
+data source (a self-hosted Liftie instance, or per-resort scraping) is worth
+building later — see app/scrapers/liftie.py.
 
 Each job creates a fresh DB session and fresh scraper instance per invocation.
 Circuit breakers and health logging are handled inside each scraper.
@@ -117,7 +124,7 @@ def create_scheduler() -> AsyncIOScheduler:
     # misfire_grace_time=300 gives each job 5 minutes to start before being skipped.
     scheduler = AsyncIOScheduler(job_defaults={"misfire_grace_time": 300})
     scheduler.add_job(_job_crowd_patterns,  CronTrigger(hour=3, minute=0),   id="crowd_patterns",  next_run_time=now)
-    scheduler.add_job(_job_lift_status,     IntervalTrigger(minutes=15),      id="lift_status",     next_run_time=now + timedelta(seconds=5))
+    # lift_status (Liftie) disabled — see module docstring above
     scheduler.add_job(_job_parking,         IntervalTrigger(minutes=15),      id="parking",         next_run_time=now + timedelta(seconds=10))
     scheduler.add_job(_job_snow_conditions, IntervalTrigger(minutes=30),      id="snow_conditions", next_run_time=now + timedelta(seconds=15))
     scheduler.add_job(_job_weather,         IntervalTrigger(hours=1),         id="weather",         next_run_time=now + timedelta(seconds=20))
