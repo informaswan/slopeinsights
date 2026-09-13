@@ -1,7 +1,9 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, Pressable, StyleSheet } from 'react-native';
+import * as Linking from 'expo-linking';
 import type { LiftDetail, LiftItem } from '../lib/types';
 import { Spacing, FontSize, Radius } from '../constants/theme';
+import { DONATION_URL } from '../constants/links';
 import { useTheme } from '../contexts/ThemeContext';
 import type { ThemeColors } from '../constants/theme';
 
@@ -25,7 +27,16 @@ export function LiftList({ lifts }: Props) {
   const { colors } = useTheme();
 
   if (!lifts) {
-    return <Text style={[styles.unavailable, { color: colors.textMuted }]}>Lift data unavailable</Text>;
+    return (
+      <View>
+        <Text style={[styles.unavailable, { color: colors.textMuted }]}>Lift data unavailable</Text>
+        <Pressable onPress={() => Linking.openURL(DONATION_URL)}>
+          <Text style={[styles.donateLink, { color: colors.epic }]}>
+            ☕ Help us bring back live lift status
+          </Text>
+        </Pressable>
+      </View>
+    );
   }
 
   const sorted = [...lifts.items].sort((a, b) => {
@@ -55,6 +66,7 @@ export function LiftList({ lifts }: Props) {
 const styles = StyleSheet.create({
   container: { borderRadius: Radius.md, padding: Spacing.md },
   unavailable: { fontSize: FontSize.md, padding: Spacing.md },
+  donateLink: { fontSize: FontSize.sm, fontWeight: '600', paddingHorizontal: Spacing.md },
   header: { flexDirection: 'row', alignItems: 'center', marginBottom: Spacing.sm, gap: Spacing.sm },
   headerText: { fontSize: FontSize.md, fontWeight: '700' },
   stale: { fontSize: FontSize.xs },

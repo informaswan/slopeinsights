@@ -1,8 +1,10 @@
 import React from 'react';
-import { render } from '@testing-library/react-native';
+import { render, fireEvent } from '@testing-library/react-native';
 import { LiftList } from '../../components/LiftList';
 import type { LiftDetail } from '../../lib/types';
 import { TestWrapper } from '../test-utils';
+
+jest.mock('expo-linking', () => ({ openURL: jest.fn() }));
 
 const lifts: LiftDetail = {
   open: 13,
@@ -21,6 +23,13 @@ const lifts: LiftDetail = {
 it('renders "Lift data unavailable" when lifts is null', () => {
   const { getByText } = render(<LiftList lifts={null} />, { wrapper: TestWrapper });
   expect(getByText('Lift data unavailable')).toBeTruthy();
+});
+
+it('opens the donation link when the coffee button is pressed', () => {
+  const Linking = require('expo-linking');
+  const { getByText } = render(<LiftList lifts={null} />, { wrapper: TestWrapper });
+  fireEvent.press(getByText(/Help us bring back live lift status/));
+  expect(Linking.openURL).toHaveBeenCalledWith('https://buymeacoffee.com/slopeinsights');
 });
 
 it('renders open/total count in section header', () => {

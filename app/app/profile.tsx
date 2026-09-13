@@ -1,10 +1,12 @@
 import React from 'react';
 import { View, Text, Pressable, Switch, Alert, StyleSheet } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+import * as Linking from 'expo-linking';
 import { useRouter } from 'expo-router';
 import { useAuth } from '../contexts/AuthContext';
 import { useTheme } from '../contexts/ThemeContext';
 import { Spacing, FontSize, Radius } from '../constants/theme';
+import { DONATION_URL } from '../constants/links';
 
 export default function ProfileScreen() {
   const { colors, isDark, toggleTheme } = useTheme();
@@ -71,6 +73,23 @@ export default function ProfileScreen() {
           <Text style={[styles.settingsValue, { color: colors.textMuted }]}>›</Text>
         </Pressable>
       </View>
+
+      <View style={[styles.aboutSection, { backgroundColor: colors.surface }]}>
+        <Text style={[styles.aboutTitle, { color: colors.text }]}>About SlopeInsights</Text>
+        <Text style={[styles.aboutBody, { color: colors.textMuted }]}>
+          My brothers and I built SlopeInsights to put everything you need for deciding where to
+          ski or ride — snow, weather, crowds, lifts — in one place, no matter if you're Ikon,
+          Epic, or independent. We're actively adding more mountains and features. If you want to
+          help us get there faster,{' '}
+          <Text
+            style={[styles.aboutLink, { color: colors.epic }]}
+            onPress={() => Linking.openURL(DONATION_URL)}
+          >
+            buy us a coffee ☕
+          </Text>
+          .
+        </Text>
+      </View>
     </View>
   );
 }
@@ -97,4 +116,8 @@ const styles = StyleSheet.create({
   rowLast: { borderBottomLeftRadius: Radius.lg, borderBottomRightRadius: Radius.lg, borderBottomWidth: 0 },
   settingsLabel: { fontSize: FontSize.md, fontWeight: '600' },
   settingsValue: { fontSize: FontSize.sm },
+  aboutSection: { margin: Spacing.md, marginTop: 0, padding: Spacing.md, borderRadius: Radius.lg },
+  aboutTitle: { fontSize: FontSize.md, fontWeight: '700', marginBottom: Spacing.xs },
+  aboutBody: { fontSize: FontSize.sm, lineHeight: 20 },
+  aboutLink: { fontWeight: '700' },
 });
