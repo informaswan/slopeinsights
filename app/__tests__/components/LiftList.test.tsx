@@ -32,6 +32,13 @@ it('opens the donation link when the coffee button is pressed', () => {
   expect(Linking.openURL).toHaveBeenCalledWith('https://buymeacoffee.com/slopeinsights');
 });
 
+it('opens the Venmo link when the Venmo button is pressed', () => {
+  const Linking = require('expo-linking');
+  const { getByText } = render(<LiftList lifts={null} />, { wrapper: TestWrapper });
+  fireEvent.press(getByText(/Or send a tip via Venmo/));
+  expect(Linking.openURL).toHaveBeenCalledWith('https://venmo.com/u/Michael-Swanson-61');
+});
+
 it('renders open/total count in section header', () => {
   const { getByText } = render(<LiftList lifts={lifts} />, { wrapper: TestWrapper });
   expect(getByText('13/18 lifts open')).toBeTruthy();

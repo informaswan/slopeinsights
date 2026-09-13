@@ -41,4 +41,12 @@ describe('Profile screen About section', () => {
     fireEvent.press(getByText(/buy us a coffee/));
     expect(Linking.openURL).toHaveBeenCalledWith('https://buymeacoffee.com/slopeinsights');
   });
+
+  it('opens the Venmo link when "send a tip on Venmo" is pressed', () => {
+    const Linking = require('expo-linking');
+    const ProfileScreen = require('../../app/profile').default;
+    const { getByText } = render(<ProfileScreen />);
+    fireEvent.press(getByText(/send a tip on Venmo/));
+    expect(Linking.openURL).toHaveBeenCalledWith('https://venmo.com/u/Michael-Swanson-61');
+  });
 });

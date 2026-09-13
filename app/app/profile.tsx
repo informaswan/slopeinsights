@@ -6,7 +6,7 @@ import { useRouter } from 'expo-router';
 import { useAuth } from '../contexts/AuthContext';
 import { useTheme } from '../contexts/ThemeContext';
 import { Spacing, FontSize, Radius } from '../constants/theme';
-import { DONATION_URL } from '../constants/links';
+import { DONATION_URL, VENMO_URL } from '../constants/links';
 
 export default function ProfileScreen() {
   const { colors, isDark, toggleTheme } = useTheme();
@@ -80,12 +80,19 @@ export default function ProfileScreen() {
           My brothers and I built SlopeInsights to put everything you need for deciding where to
           ski or ride — snow, weather, crowds, lifts — in one place, no matter if you're Ikon,
           Epic, or independent. We're actively adding more mountains and features. If you want to
-          help us get there faster,{' '}
+          help us get there faster, you can{' '}
           <Text
             style={[styles.aboutLink, { color: colors.epic }]}
             onPress={() => Linking.openURL(DONATION_URL)}
           >
             buy us a coffee ☕
+          </Text>
+          {' '}or{' '}
+          <Text
+            style={[styles.aboutLink, { color: colors.epic }]}
+            onPress={() => Linking.openURL(VENMO_URL)}
+          >
+            send a tip on Venmo 💵
           </Text>
           .
         </Text>

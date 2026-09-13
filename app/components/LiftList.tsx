@@ -3,7 +3,7 @@ import { View, Text, Pressable, StyleSheet } from 'react-native';
 import * as Linking from 'expo-linking';
 import type { LiftDetail, LiftItem } from '../lib/types';
 import { Spacing, FontSize, Radius } from '../constants/theme';
-import { DONATION_URL } from '../constants/links';
+import { DONATION_URL, VENMO_URL } from '../constants/links';
 import { useTheme } from '../contexts/ThemeContext';
 import type { ThemeColors } from '../constants/theme';
 
@@ -33,6 +33,11 @@ export function LiftList({ lifts }: Props) {
         <Pressable onPress={() => Linking.openURL(DONATION_URL)}>
           <Text style={[styles.donateLink, { color: colors.epic }]}>
             ☕ Help us bring back live lift status
+          </Text>
+        </Pressable>
+        <Pressable onPress={() => Linking.openURL(VENMO_URL)}>
+          <Text style={[styles.donateLink, { color: colors.epic }]}>
+            💵 Or send a tip via Venmo
           </Text>
         </Pressable>
       </View>
