@@ -21,7 +21,8 @@ export EXPO_PUBLIC_API_URL="${EXPO_PUBLIC_API_URL:-https://api.slopeinsights.com
 cd "$(dirname "$0")/../app"
 
 echo "==> Building Expo web export (API: $EXPO_PUBLIC_API_URL)"
-npx expo export --platform web
+# --clear: Metro caches inlined EXPO_PUBLIC_* values, so a stale cache can bake the wrong API URL.
+npx expo export --platform web --clear
 
 echo "==> Syncing to s3://$S3_BUCKET"
 aws s3 sync dist/ "s3://$S3_BUCKET" --delete

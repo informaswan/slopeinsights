@@ -6,6 +6,11 @@ import { TestWrapper } from '../test-utils';
 
 const mockPush = jest.fn();
 jest.mock('expo-router', () => ({ useRouter: () => ({ push: mockPush }) }));
+const mockToggleFavorite = jest.fn();
+let mockFavoriteIds: string[] = [];
+jest.mock('../../contexts/FavoritesContext', () => ({
+  useFavorites: () => ({ favoriteIds: mockFavoriteIds, isLoaded: true, toggleFavorite: mockToggleFavorite }),
+}));
 
 const base: ResortSummary = {
   id: 'vail', name: 'Vail', pass_type: 'epic', region: 'Colorado', state: 'CO',
@@ -14,7 +19,11 @@ const base: ResortSummary = {
   crowd: { current_level: 'medium', current_pct: 50, source: 'historical_pattern' },
 };
 
-beforeEach(() => mockPush.mockReset());
+beforeEach(() => {
+  mockPush.mockReset();
+  mockToggleFavorite.mockReset();
+  mockFavoriteIds = [];
+});
 
 it('renders resort name and state', () => {
   const { getByText } = render(<ResortCard resort={base} />, { wrapper: TestWrapper });
@@ -22,15 +31,15 @@ it('renders resort name and state', () => {
   expect(getByText('CO')).toBeTruthy();
 });
 
-it('renders EPIC pass badge for epic resorts', () => {
+it('renders the Epic pass label for epic resorts', () => {
   const { getByText } = render(<ResortCard resort={base} />, { wrapper: TestWrapper });
-  expect(getByText('EPIC')).toBeTruthy();
+  expect(getByText('Epic')).toBeTruthy();
 });
 
-it('renders IKON pass badge for ikon resorts', () => {
+it('renders the Ikon pass label for ikon resorts', () => {
   const ikon = { ...base, pass_type: 'ikon' as const };
   const { getByText } = render(<ResortCard resort={ikon} />, { wrapper: TestWrapper });
-  expect(getByText('IKON')).toBeTruthy();
+  expect(getByText('Ikon')).toBeTruthy();
 });
 
 it('renders snow data when available', () => {
@@ -45,15 +54,23 @@ it('renders "Snow data unavailable" when snow is null', () => {
   expect(getByText('Snow data unavailable')).toBeTruthy();
 });
 
-it('renders lift counts when lifts are available', () => {
-  const { getByText } = render(<ResortCard resort={base} />, { wrapper: TestWrapper });
-  expect(getByText('18/31 lifts')).toBeTruthy();
+it('does not show lift counts, even when the API returns them', () => {
+  const { queryByText } = render(<ResortCard resort={base} />, { wrapper: TestWrapper });
+  expect(queryByText(/lifts/i)).toBeNull();
 });
 
-it('omits lift counts when lifts is null', () => {
-  const noLifts = { ...base, lifts: null };
-  const { queryByText } = render(<ResortCard resort={noLifts} />, { wrapper: TestWrapper });
-  expect(queryByText(/\d+\/\d+/)).toBeNull();
+it('offers to save a mountain that is not saved yet', () => {
+  const { getByLabelText } = render(<ResortCard resort={base} />, { wrapper: TestWrapper });
+  fireEvent.press(getByLabelText('Save Vail to My mountains'));
+  expect(mockToggleFavorite).toHaveBeenCalledWith('vail');
+  expect(mockPush).not.toHaveBeenCalled();
+});
+
+it('offers to remove a mountain that is already saved', () => {
+  mockFavoriteIds = ['vail'];
+  const { getByLabelText } = render(<ResortCard resort={base} />, { wrapper: TestWrapper });
+  fireEvent.press(getByLabelText('Remove Vail from My mountains'));
+  expect(mockToggleFavorite).toHaveBeenCalledWith('vail');
 });
 
 it('renders crowd pill with label', () => {
@@ -61,10 +78,17 @@ it('renders crowd pill with label', () => {
   expect(getByText('Medium')).toBeTruthy();
 });
 
-it('renders em-dash crowd pill when crowd is null', () => {
+it('hides the crowd pill when there is no crowd data', () => {
   const noCrowd = { ...base, crowd: null };
-  const { getByText } = render(<ResortCard resort={noCrowd} />, { wrapper: TestWrapper });
-  expect(getByText('—')).toBeTruthy();
+  const { queryByText } = render(<ResortCard resort={noCrowd} />, { wrapper: TestWrapper });
+  expect(queryByText('Medium')).toBeNull();
+  expect(queryByText('—')).toBeNull();
+});
+
+it('hides the crowd pill when the resort is closed (no meaningful level)', () => {
+  const closed = { ...base, crowd: { ...base.crowd!, current_level: 'closed' as any } };
+  const { queryByText } = render(<ResortCard resort={closed} />, { wrapper: TestWrapper });
+  expect(queryByText('—')).toBeNull();
 });
 
 it('shows stale indicator when snow.is_stale is true', () => {

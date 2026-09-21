@@ -14,7 +14,7 @@ const CAM_HEIGHT = 360; // fallback for RN styles only
 function UnavailablePlaceholder() {
   return (
     <View style={styles.placeholder}>
-      <Text style={styles.placeholderText}>📷 Camera temporarily unavailable</Text>
+      <Text style={styles.placeholderText}>Camera temporarily unavailable</Text>
     </View>
   );
 }
@@ -26,7 +26,7 @@ function JpegCam({ url }: { url: string }) {
     return () => clearInterval(id);
   }, []);
   return (
-    <div style={{ width: '100%', height: 'calc(100vh - 120px)', overflow: 'hidden', flexShrink: 0 }}>
+    <div style={{ width: '100%', height: 'min(56vh, 440px)', overflow: 'hidden', flexShrink: 0 }}>
       <img
         alt=""
         src={`${proxied(url)}&t=${ts}`}
@@ -79,7 +79,7 @@ export function WebcamViewer({ webcams }: { webcams: WebcamItem[] }) {
 
 const styles = StyleSheet.create({
   container: { backgroundColor: '#000', overflow: 'hidden', position: 'relative' },
-  placeholder: { flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: '#1e293b' },
+  placeholder: { flex: 1, minHeight: 160, alignItems: 'center', justifyContent: 'center', backgroundColor: '#1e293b' },
   placeholderText: { color: Colors.textMuted, fontSize: FontSize.sm },
   media: { flex: 1, width: '100%' },
   tabBar: { position: 'absolute', top: 0, left: 0, right: 0, zIndex: 10, maxHeight: 36 },

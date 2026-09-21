@@ -26,7 +26,7 @@ function ForecastCard({ period, index, colors }: { period: WeatherPeriod; index:
       </View>
       <Text style={[styles.precip, { color: colors.snowBlue }]}>{period.precip_pct ?? '—'}%</Text>
       <Text style={[styles.wind, { color: colors.textMuted }]}>{period.wind_mph ?? '—'} mph</Text>
-      {period.snow_in_forecast && <Text style={[styles.snowIcon, { color: colors.snowBlue }]}>❄</Text>}
+      {period.snow_in_forecast && <Text style={[styles.snowIcon, { color: colors.snowBlue }]}>Snow</Text>}
     </View>
   );
 }

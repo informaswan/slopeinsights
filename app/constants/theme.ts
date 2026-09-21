@@ -25,6 +25,12 @@ export const LightColors = {
   warning: '#d97706',
   headerText: '#ffffff',
   headerTextSecondary: '#a8d4f0',
+  sidebar: '#12304d',
+  sidebarText: '#e6eef6',
+  sidebarMuted: '#8fb0cc',
+  sidebarBorder: 'rgba(255,255,255,0.12)',
+  sidebarActive: 'rgba(255,255,255,0.10)',
+  sidebarAccent: '#7cb8f7',
 };
 
 export const DarkColors = {
@@ -52,6 +58,12 @@ export const DarkColors = {
   warning: '#fcd34d',
   headerText: '#c8dff0',
   headerTextSecondary: '#5a9bc4',
+  sidebar: '#091827',
+  sidebarText: '#dbe7f2',
+  sidebarMuted: '#6a94b8',
+  sidebarBorder: 'rgba(255,255,255,0.08)',
+  sidebarActive: 'rgba(255,255,255,0.08)',
+  sidebarAccent: '#7cb8f7',
 };
 
 export type ThemeColors = typeof LightColors;

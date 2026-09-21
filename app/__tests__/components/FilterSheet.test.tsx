@@ -17,11 +17,11 @@ jest.mock('@gorhom/bottom-sheet', () => {
 const defaultFilter: FilterState = { selectedRegions: new Set<string>(), sort: 'snow' };
 
 it('renders sort options', () => {
-  const { getByText } = render(<FilterSheet ref={createRef()} filterState={defaultFilter} onApply={jest.fn()} filteredCount={10} />, { wrapper: TestWrapper });
+  const { getByText, queryByText } = render(<FilterSheet ref={createRef()} filterState={defaultFilter} onApply={jest.fn()} filteredCount={10} />, { wrapper: TestWrapper });
   expect(getByText('Most fresh snow')).toBeTruthy();
   expect(getByText('Deepest base')).toBeTruthy();
   expect(getByText('Least crowded')).toBeTruthy();
-  expect(getByText('Most lifts open')).toBeTruthy();
+  expect(queryByText('Most lifts open')).toBeNull();
 });
 
 it('renders all 9 region options', () => {

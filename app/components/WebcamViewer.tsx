@@ -10,7 +10,7 @@ const CAM_HEIGHT = 220;
 function UnavailablePlaceholder() {
   return (
     <View style={styles.placeholder}>
-      <Text style={styles.placeholderText}>📷 Camera temporarily unavailable</Text>
+      <Text style={styles.placeholderText}>Camera temporarily unavailable</Text>
     </View>
   );
 }

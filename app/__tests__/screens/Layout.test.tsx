@@ -23,22 +23,27 @@ jest.mock('../../contexts/ThemeContext', () => {
 jest.mock('../../contexts/FavoritesContext', () => ({
   FavoritesProvider: ({ children }: any) => children,
 }));
+jest.mock('../../components/AppShell', () => {
+  const { View } = require('react-native');
+  return { AppShell: ({ children }: any) => <View testID="app-shell">{children}</View> };
+});
 
 describe('RootLayout', () => {
-  it('renders the app screens immediately, with no paywall or login gate', () => {
+  it('renders every screen inside the shared app shell', () => {
     const RootLayout = require('../../app/_layout').default;
     render(<RootLayout />);
-    expect(screen.getByTestId('screen-index')).toBeTruthy();
-    expect(screen.getByTestId('screen-resort/[id]')).toBeTruthy();
-    expect(screen.getByTestId('screen-explore')).toBeTruthy();
-    expect(screen.getByTestId('screen-about')).toBeTruthy();
+    const shell = screen.getByTestId('app-shell');
+    expect(shell).toBeTruthy();
+    for (const name of ['index', 'mine', 'resort/[id]', 'about']) {
+      expect(screen.getByTestId(`screen-${name}`)).toBeTruthy();
+    }
   });
 
-  it('does not register paywall, login or onboarding screens', () => {
+  it('does not register paywall, login, onboarding or explore screens', () => {
     const RootLayout = require('../../app/_layout').default;
     render(<RootLayout />);
-    expect(screen.queryByTestId('screen-paywall')).toBeNull();
-    expect(screen.queryByTestId('screen-login')).toBeNull();
-    expect(screen.queryByTestId('screen-onboarding')).toBeNull();
+    for (const name of ['paywall', 'login', 'onboarding', 'explore']) {
+      expect(screen.queryByTestId(`screen-${name}`)).toBeNull();
+    }
   });
 });

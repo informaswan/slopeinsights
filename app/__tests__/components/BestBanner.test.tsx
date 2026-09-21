@@ -13,9 +13,9 @@ const resort: ResortSummary = {
   crowd: { current_level: 'low', current_pct: 15, source: 'historical_pattern' },
 };
 
-it('renders "Best Conditions Today" heading', () => {
+it('renders "Best conditions today" heading', () => {
   const { getByText } = render(<BestBanner resorts={[resort]} />, { wrapper: TestWrapper });
-  expect(getByText('Best Conditions Today')).toBeTruthy();
+  expect(getByText('Best conditions today')).toBeTruthy();
 });
 
 it('renders resort name in banner card', () => {
@@ -30,7 +30,7 @@ it('renders snowfall in banner card', () => {
 
 it('renders pass type label in banner card', () => {
   const { getByText } = render(<BestBanner resorts={[resort]} />, { wrapper: TestWrapper });
-  expect(getByText('IKON')).toBeTruthy();
+  expect(getByText('Ikon')).toBeTruthy();
 });
 
 it('renders "No snow data" when new_24h_in is null', () => {

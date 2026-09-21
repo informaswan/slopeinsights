@@ -36,7 +36,7 @@ export function SnowStats({ snow, trails }: Props) {
         ))}
       </View>
       {snow.is_stale && (
-        <Text style={[styles.stale, { color: colors.warning }]}>❄ Updated {formatAgo(snow.scraped_at) ?? 'recently'}</Text>
+        <Text style={[styles.stale, { color: colors.warning }]}>Updated {formatAgo(snow.scraped_at) ?? 'recently'}</Text>
       )}
       {trails != null && trails.open != null && trails.total != null && (
         <Text style={[styles.trails, { color: colors.textSecondary }]}>{trails.open}/{trails.total} trails open</Text>
@@ -49,7 +49,7 @@ const styles = StyleSheet.create({
   container: { padding: Spacing.md, borderRadius: Radius.md },
   row: { flexDirection: 'row', justifyContent: 'space-around' },
   statCol: { alignItems: 'center', flex: 1 },
-  value: { fontSize: FontSize.xl, fontWeight: '700' },
+  value: { fontSize: FontSize.lg + 2, fontWeight: '700', fontVariant: ['tabular-nums'] },
   label: { fontSize: FontSize.xs, marginTop: 2 },
   stale: { fontSize: FontSize.xs, marginTop: Spacing.sm, textAlign: 'center' },
   unavailable: { fontSize: FontSize.md, padding: Spacing.md },

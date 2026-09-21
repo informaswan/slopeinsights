@@ -23,7 +23,6 @@ const SORT_OPTIONS: { value: SortOption; label: string }[] = [
   { value: 'snow',  label: 'Most fresh snow' },
   { value: 'base',  label: 'Deepest base' },
   { value: 'crowd', label: 'Least crowded' },
-  { value: 'lifts', label: 'Most lifts open' },
 ];
 
 export const FilterSheet = forwardRef<any, Props>(
@@ -64,7 +63,7 @@ export const FilterSheet = forwardRef<any, Props>(
             <View style={[styles.header, { borderBottomColor: colors.border }]}>
               <Text style={[styles.title, { color: colors.text }]}>Filter & Sort</Text>
               <Pressable onPress={() => setVisible(false)} style={styles.closeBtn}>
-                <Text style={[styles.closeText, { color: colors.textMuted }]}>✕</Text>
+                <Text style={[styles.closeText, { color: colors.textMuted }]}>Close</Text>
               </Pressable>
             </View>
             <ScrollView contentContainerStyle={styles.content}>

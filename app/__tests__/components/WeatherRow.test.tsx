@@ -38,9 +38,9 @@ it('renders wind speeds', () => {
   expect(getByText('25 mph')).toBeTruthy();
 });
 
-it('renders snow icon ❄ only on days with snow in forecast', () => {
+it('flags only the days with snow in the forecast', () => {
   const { getAllByText } = render(<WeatherRow weather={weather} />, { wrapper: TestWrapper });
-  expect(getAllByText('❄')).toHaveLength(1);
+  expect(getAllByText('Snow')).toHaveLength(1);
 });
 
 it('renders "Today" label for the first forecast card', () => {

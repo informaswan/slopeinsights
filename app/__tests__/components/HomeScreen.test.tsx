@@ -1,6 +1,7 @@
 import React from 'react';
 import { render, fireEvent } from '@testing-library/react-native';
 import HomeScreen from '../../app/index';
+import MyMountainsScreen from '../../app/mine';
 
 const mockPush = jest.fn();
 jest.mock('expo-router', () => ({ useRouter: () => ({ push: mockPush }) }));
@@ -56,23 +57,23 @@ it('renders resort names after loading', async () => {
   expect(await findByText('Mammoth')).toBeTruthy();
 });
 
-it('renders Best Conditions Today banner', async () => {
+it('renders the Best conditions today banner', async () => {
   const { findByText } = render(<HomeScreen />);
-  expect(await findByText('Best Conditions Today')).toBeTruthy();
+  expect(await findByText('Best conditions today')).toBeTruthy();
 });
 
 it('filters to Epic resorts when Epic tab is pressed', async () => {
-  const { findByText, queryByText } = render(<HomeScreen />);
-  const epicTab = await findByText('Epic');
-  fireEvent.press(epicTab);
+  const { findByText, queryByText, getByLabelText } = render(<HomeScreen />);
+  await findByText('Vail');
+  fireEvent.press(getByLabelText('Filter by Epic'));
   expect(queryByText('Mammoth')).toBeNull();
   expect(queryByText('Vail')).toBeTruthy();
 });
 
 it('filters to Ikon resorts when Ikon tab is pressed', async () => {
-  const { findByText, queryByText } = render(<HomeScreen />);
-  const ikonTab = await findByText('Ikon');
-  fireEvent.press(ikonTab);
+  const { findByText, queryByText, getByLabelText } = render(<HomeScreen />);
+  await findByText('Vail');
+  fireEvent.press(getByLabelText('Filter by Ikon'));
   expect(queryByText('Vail')).toBeNull();
   expect(queryByText('Mammoth')).toBeTruthy();
 });
@@ -84,23 +85,33 @@ it('shows error state with retry on fetch failure', async () => {
   expect(await findByText('Tap to retry')).toBeTruthy();
 });
 
-it('shows every resort when nothing is starred', async () => {
+it('titles the page All mountains and shows every resort even when some are starred', async () => {
+  mockFavoriteIds = ['mammoth'];
   const { findByText } = render(<HomeScreen />);
+  expect(await findByText('All mountains')).toBeTruthy();
   expect(await findByText('Vail')).toBeTruthy();
   expect(await findByText('Mammoth')).toBeTruthy();
 });
 
-it('shows only starred resorts once the visitor has favorites', async () => {
-  mockFavoriteIds = ['mammoth'];
+it('has no account UI and no lift information', async () => {
   const { findByText, queryByText } = render(<HomeScreen />);
-  expect(await findByText('Mammoth')).toBeTruthy();
-  expect(queryByText('Vail')).toBeNull();
-});
-
-it('has no sign-in avatar and links to the About screen instead', async () => {
-  const { findByText, queryByText, getByLabelText } = render(<HomeScreen />);
   await findByText('Vail');
   expect(queryByText('??')).toBeNull();
-  fireEvent.press(getByLabelText('About'));
-  expect(mockPush).toHaveBeenCalledWith('/about');
+  expect(queryByText(/lift/i)).toBeNull();
+});
+
+describe('My mountains', () => {
+  it('shows only starred resorts', async () => {
+    mockFavoriteIds = ['mammoth'];
+    const { findByText, queryByText } = render(<MyMountainsScreen />);
+    expect(await findByText('My mountains')).toBeTruthy();
+    expect(await findByText('Mammoth')).toBeTruthy();
+    expect(queryByText('Vail')).toBeNull();
+  });
+
+  it('explains how to save mountains when none are saved', async () => {
+    const { findByText, queryByText } = render(<MyMountainsScreen />);
+    expect(await findByText('No saved mountains yet')).toBeTruthy();
+    expect(queryByText('Vail')).toBeNull();
+  });
 });

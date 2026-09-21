@@ -26,12 +26,12 @@ const deadCam: WebcamItem = { label: 'Village', cam_type: 'jpeg', url: 'https://
 describe('WebcamViewer — unavailable states', () => {
   it('shows placeholder when webcams array is empty', () => {
     render(<WebcamViewer webcams={[]} />, { wrapper: TestWrapper });
-    expect(screen.getByText('📷 Camera temporarily unavailable')).toBeTruthy();
+    expect(screen.getByText('Camera temporarily unavailable')).toBeTruthy();
   });
 
   it('shows placeholder when all cams have is_alive=false', () => {
     render(<WebcamViewer webcams={[deadCam]} />, { wrapper: TestWrapper });
-    expect(screen.getByText('📷 Camera temporarily unavailable')).toBeTruthy();
+    expect(screen.getByText('Camera temporarily unavailable')).toBeTruthy();
   });
 });
 

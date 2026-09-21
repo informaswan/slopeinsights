@@ -1,11 +1,15 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react-native';
 
+const mockPush = jest.fn();
 jest.mock('expo-router', () => ({
   useLocalSearchParams: jest.fn(() => ({ id: 'jackson-hole' })),
-  useRouter: jest.fn(() => ({ back: jest.fn() })),
-  useNavigation: jest.fn(() => ({ setOptions: jest.fn() })),
-  Stack: { Screen: () => null },
+  useRouter: jest.fn(() => ({ push: mockPush })),
+}));
+const mockToggleFavorite = jest.fn();
+let mockFavoriteIds: string[] = [];
+jest.mock('../../contexts/FavoritesContext', () => ({
+  useFavorites: () => ({ favoriteIds: mockFavoriteIds, isLoaded: true, toggleFavorite: mockToggleFavorite }),
 }));
 jest.mock('../../contexts/ThemeContext', () => {
   const { LightColors } = require('../../constants/theme');
@@ -78,9 +82,31 @@ describe('ResortDetail screen — loaded', () => {
     expect(screen.getByTestId('weather-row')).toBeTruthy();
   });
 
-  it('renders lift list section', () => {
+  it('does not show any lift information yet', () => {
     render(<ResortDetail />);
-    expect(screen.getByTestId('lift-list')).toBeTruthy();
+    expect(screen.queryByTestId('lift-list')).toBeNull();
+    expect(screen.queryByText(/lift/i)).toBeNull();
+  });
+
+  it('links back to all mountains', () => {
+    render(<ResortDetail />);
+    fireEvent.press(screen.getByLabelText('Back to all mountains'));
+    expect(mockPush).toHaveBeenCalledWith('/');
+  });
+
+  it('saves the resort to My mountains', () => {
+    mockFavoriteIds = [];
+    render(<ResortDetail />);
+    fireEvent.press(screen.getByLabelText('Save Jackson Hole to My mountains'));
+    expect(mockToggleFavorite).toHaveBeenCalledWith('jackson-hole');
+  });
+
+  it('shows Saved and offers removal when already saved', () => {
+    mockFavoriteIds = ['jackson-hole'];
+    render(<ResortDetail />);
+    expect(screen.getByText('Saved')).toBeTruthy();
+    expect(screen.getByLabelText('Remove Jackson Hole from My mountains')).toBeTruthy();
+    mockFavoriteIds = [];
   });
 
   it('renders parking section', () => {

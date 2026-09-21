@@ -4,24 +4,25 @@ import { Stack } from 'expo-router';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { ThemeProvider, useTheme } from '../contexts/ThemeContext';
 import { FavoritesProvider } from '../contexts/FavoritesContext';
+import { AppShell } from '../components/AppShell';
 
 function AppNavigator() {
   const { colors } = useTheme();
 
   return (
-    <Stack
-      screenOptions={{
-        headerStyle: { backgroundColor: colors.headerGradientStart },
-        headerTintColor: colors.headerText,
-        headerTitleStyle: { fontWeight: '700' },
-        contentStyle: { backgroundColor: colors.background },
-      }}
-    >
-      <Stack.Screen name="index" options={{ headerShown: false }} />
-      <Stack.Screen name="resort/[id]" options={{ title: '', headerBackTitle: 'Home' }} />
-      <Stack.Screen name="explore" options={{ title: 'Explore Resorts' }} />
-      <Stack.Screen name="about" options={{ title: 'About' }} />
-    </Stack>
+    <AppShell>
+      <Stack
+        screenOptions={{
+          headerShown: false,
+          contentStyle: { backgroundColor: colors.background },
+        }}
+      >
+        <Stack.Screen name="index" />
+        <Stack.Screen name="mine" />
+        <Stack.Screen name="resort/[id]" />
+        <Stack.Screen name="about" />
+      </Stack>
+    </AppShell>
   );
 }
 
