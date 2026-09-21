@@ -3,7 +3,7 @@ import { View, ScrollView, Pressable, Text, ActivityIndicator, RefreshControl, S
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import { useResorts } from '../hooks/useResorts';
-import { useAuth } from '../contexts/AuthContext';
+import { useFavorites } from '../contexts/FavoritesContext';
 import { useTheme } from '../contexts/ThemeContext';
 import { ResortCard } from '../components/ResortCard';
 import { BestBanner } from '../components/BestBanner';
@@ -22,7 +22,7 @@ const PASS_TABS: { label: string; value: PassFilter }[] = [
 
 export default function HomeScreen() {
   const { colors } = useTheme();
-  const { user, savedResortIds } = useAuth();
+  const { favoriteIds, isLoaded: favoritesLoaded } = useFavorites();
   const router = useRouter();
   const { resorts, best, loading, error, refresh } = useResorts();
   const [passFilter, setPassFilter] = useState<PassFilter>('all');
@@ -30,15 +30,17 @@ export default function HomeScreen() {
   const [refreshing, setRefreshing] = useState(false);
   const sheetRef = useRef<any>(null);
 
-  const savedSet = useMemo(() => new Set(savedResortIds), [savedResortIds]);
+  const favoriteSet = useMemo(() => new Set(favoriteIds), [favoriteIds]);
+  const hasFavorites = favoriteIds.length > 0;
+  const inScope = (id: string) => !hasFavorites || favoriteSet.has(id);
   const bestIds = useMemo(() => new Set(best.map(r => r.id)), [best]);
 
   const displayed = useMemo(() => {
-    const saved = resorts.filter((r) => savedSet.has(r.id));
-    const filtered = applyFilters(saved, passFilter, filterState.selectedRegions);
+    const scoped = resorts.filter((r) => inScope(r.id));
+    const filtered = applyFilters(scoped, passFilter, filterState.selectedRegions);
     const sorted = sortResorts(filtered, filterState.sort);
     return sorted.filter(r => !bestIds.has(r.id));
-  }, [resorts, savedSet, passFilter, filterState, bestIds]);
+  }, [resorts, favoriteSet, hasFavorites, passFilter, filterState, bestIds]);
 
   const handleRefresh = async () => {
     setRefreshing(true);
@@ -47,14 +49,10 @@ export default function HomeScreen() {
   };
 
   const freshPowderCount = useMemo(() => {
-    return resorts.filter((r) => savedSet.has(r.id) && r.snow && (r.snow.new_24h_in ?? 0) > 0).length;
-  }, [resorts, savedSet]);
+    return resorts.filter((r) => inScope(r.id) && r.snow && (r.snow.new_24h_in ?? 0) > 0).length;
+  }, [resorts, favoriteSet, hasFavorites]);
 
-  const initials = user
-    ? user.name.split(' ').map((n) => n[0]).join('').toUpperCase().slice(0, 2)
-    : '??';
-
-  if (loading && resorts.length === 0) {
+  if (!favoritesLoaded || (loading && resorts.length === 0)) {
     return (
       <View style={[styles.center, { backgroundColor: colors.background }]}>
         <ActivityIndicator testID="loading-spinner" size="large" color={colors.snowBlue} />
@@ -75,8 +73,8 @@ export default function HomeScreen() {
   }
 
   const filteredBest = passFilter === 'all'
-    ? best.filter((r) => savedSet.has(r.id))
-    : best.filter((r) => savedSet.has(r.id) && r.pass_type === passFilter);
+    ? best.filter((r) => inScope(r.id))
+    : best.filter((r) => inScope(r.id) && r.pass_type === passFilter);
 
   return (
     <View style={[styles.root, { backgroundColor: colors.background }]}>
@@ -92,17 +90,21 @@ export default function HomeScreen() {
           <Pressable onPress={() => router.push('/explore')}>
             <Text style={{ color: colors.headerTextSecondary, fontSize: 20 }}>🔍</Text>
           </Pressable>
-          <Pressable onPress={() => router.push('/profile')} style={[styles.avatarSmall, { backgroundColor: 'rgba(255,255,255,0.2)' }]}>
-            <Text style={{ color: colors.headerText, fontWeight: '700', fontSize: FontSize.sm }}>{initials}</Text>
+          <Pressable
+            accessibilityLabel="About"
+            onPress={() => router.push('/about')}
+            style={[styles.avatarSmall, { backgroundColor: 'rgba(255,255,255,0.2)' }]}
+          >
+            <Text style={{ color: colors.headerText, fontWeight: '700', fontSize: FontSize.md }}>ⓘ</Text>
           </Pressable>
         </View>
       </LinearGradient>
 
       <View style={[styles.greeting, { backgroundColor: colors.background }]}>
         <Text style={[styles.greetingText, { color: colors.text }]}>
-          Hey {user?.name?.split(' ')[0] ?? 'there'}
+          Today's conditions
           {freshPowderCount > 0
-            ? ` — ${freshPowderCount} of your mountains got fresh powder overnight`
+            ? ` — ${freshPowderCount} ${freshPowderCount === 1 ? 'mountain' : 'mountains'} got fresh powder overnight`
             : ''}
         </Text>
       </View>

@@ -1,53 +1,31 @@
 import React from 'react';
-import { View, Text, Pressable, Switch, Alert, StyleSheet } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
+import { View, Text, Pressable, Switch, StyleSheet } from 'react-native';
 import * as Linking from 'expo-linking';
 import { useRouter } from 'expo-router';
-import { useAuth } from '../contexts/AuthContext';
+import { useFavorites } from '../contexts/FavoritesContext';
 import { useTheme } from '../contexts/ThemeContext';
 import { Spacing, FontSize, Radius } from '../constants/theme';
 import { DONATION_URL, VENMO_URL } from '../constants/links';
 
-export default function ProfileScreen() {
+export default function AboutScreen() {
   const { colors, isDark, toggleTheme } = useTheme();
-  const { user, savedResortIds, signOut } = useAuth();
+  const { favoriteIds } = useFavorites();
   const router = useRouter();
-
-  const initials = user
-    ? user.name.split(' ').map((n) => n[0]).join('').toUpperCase().slice(0, 2)
-    : '??';
-
-  const handleSignOut = async () => {
-    await signOut();
-  };
 
   return (
     <View style={[styles.root, { backgroundColor: colors.background }]}>
-      <LinearGradient
-        colors={[colors.headerGradientStart, colors.headerGradientEnd]}
-        style={styles.profileHeader}
-      >
-        <View style={styles.avatar}>
-          <Text style={styles.avatarText}>{initials}</Text>
-        </View>
-        <View>
-          <Text style={styles.userName}>{user?.name ?? 'Unknown'}</Text>
-          <Text style={styles.userEmail}>{user?.email ?? ''}</Text>
-        </View>
-      </LinearGradient>
-
       <View style={styles.settingsList}>
         <Pressable
           style={[styles.settingsRow, styles.rowFirst, { backgroundColor: colors.surface, borderBottomColor: colors.background }]}
           onPress={() => router.push('/explore')}
         >
-          <Text style={[styles.settingsLabel, { color: colors.text }]}>My Resorts</Text>
+          <Text style={[styles.settingsLabel, { color: colors.text }]}>My Mountains</Text>
           <Text style={[styles.settingsValue, { color: colors.textMuted }]}>
-            {savedResortIds.length} selected ›
+            {favoriteIds.length > 0 ? `${favoriteIds.length} starred ›` : 'Showing all ›'}
           </Text>
         </Pressable>
 
-        <View style={[styles.settingsRow, { backgroundColor: colors.surface, borderBottomColor: colors.background }]}>
+        <View style={[styles.settingsRow, styles.rowLast, { backgroundColor: colors.surface }]}>
           <Text style={[styles.settingsLabel, { color: colors.text }]}>Dark Mode</Text>
           <Switch
             value={isDark}
@@ -56,22 +34,6 @@ export default function ProfileScreen() {
             thumbColor="#fff"
           />
         </View>
-
-        <Pressable
-          style={[styles.settingsRow, { backgroundColor: colors.surface, borderBottomColor: colors.background }]}
-          onPress={() => Alert.alert('Coming Soon', 'Notifications will be available in a future update.')}
-        >
-          <Text style={[styles.settingsLabel, { color: colors.text }]}>Notifications</Text>
-          <Text style={[styles.settingsValue, { color: colors.textMuted }]}>›</Text>
-        </Pressable>
-
-        <Pressable
-          style={[styles.settingsRow, styles.rowLast, { backgroundColor: colors.surface }]}
-          onPress={handleSignOut}
-        >
-          <Text style={[styles.settingsLabel, { color: '#ef4444' }]}>Sign Out</Text>
-          <Text style={[styles.settingsValue, { color: colors.textMuted }]}>›</Text>
-        </Pressable>
       </View>
 
       <View style={[styles.aboutSection, { backgroundColor: colors.surface }]}>
@@ -103,17 +65,6 @@ export default function ProfileScreen() {
 
 const styles = StyleSheet.create({
   root: { flex: 1 },
-  profileHeader: {
-    padding: Spacing.lg, flexDirection: 'row', alignItems: 'center', gap: Spacing.md,
-  },
-  avatar: {
-    width: 48, height: 48, borderRadius: 999,
-    backgroundColor: 'rgba(255,255,255,0.2)',
-    alignItems: 'center', justifyContent: 'center',
-  },
-  avatarText: { color: '#fff', fontWeight: '800', fontSize: FontSize.lg },
-  userName: { color: '#fff', fontWeight: '800', fontSize: FontSize.lg },
-  userEmail: { color: '#a8d4f0', fontSize: FontSize.sm },
   settingsList: { padding: Spacing.md },
   settingsRow: {
     flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',

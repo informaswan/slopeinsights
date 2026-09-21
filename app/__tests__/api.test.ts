@@ -40,3 +40,10 @@ it('throws on non-ok HTTP response', async () => {
   (global.fetch as jest.Mock).mockResolvedValueOnce({ ok: false, status: 401 });
   await expect(api.getResorts()).rejects.toThrow('API error 401');
 });
+
+it('never sends an Authorization header (the site has no accounts)', async () => {
+  (global.fetch as jest.Mock).mockResolvedValueOnce({ ok: true, json: async () => [] });
+  await api.getResorts();
+  const [, opts] = (global.fetch as jest.Mock).mock.calls[0];
+  expect((opts as RequestInit).headers).not.toHaveProperty('Authorization');
+});

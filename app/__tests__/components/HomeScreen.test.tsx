@@ -2,7 +2,8 @@ import React from 'react';
 import { render, fireEvent } from '@testing-library/react-native';
 import HomeScreen from '../../app/index';
 
-jest.mock('expo-router', () => ({ useRouter: () => ({ push: jest.fn() }) }));
+const mockPush = jest.fn();
+jest.mock('expo-router', () => ({ useRouter: () => ({ push: mockPush }) }));
 jest.mock('@gorhom/bottom-sheet', () => {
   const React = require('react');
   const { View } = require('react-native');
@@ -21,16 +22,9 @@ jest.mock('../../contexts/ThemeContext', () => {
     ThemeProvider: ({ children }: any) => children,
   };
 });
-jest.mock('../../contexts/AuthContext', () => ({
-  useAuth: () => ({
-    user: { id: '1', name: 'Test', email: 'test@test.com', avatar_url: null },
-    isAuthenticated: true,
-    isLoading: false,
-    savedResortIds: ['vail', 'mammoth'],
-    signOut: jest.fn(),
-    refreshResorts: jest.fn(),
-    updateResorts: jest.fn(),
-  }),
+let mockFavoriteIds: string[] = [];
+jest.mock('../../contexts/FavoritesContext', () => ({
+  useFavorites: () => ({ favoriteIds: mockFavoriteIds, isLoaded: true, toggleFavorite: jest.fn() }),
 }));
 
 const mockResorts = [
@@ -43,6 +37,8 @@ const mockResorts = [
 const mockBest = { resorts: [mockResorts[0]], generated_at: '' };
 
 beforeEach(() => {
+  mockFavoriteIds = [];
+  mockPush.mockClear();
   (global.fetch as jest.Mock).mockReset();
   (global.fetch as jest.Mock)
     .mockResolvedValueOnce({ ok: true, json: async () => mockResorts })
@@ -86,4 +82,25 @@ it('shows error state with retry on fetch failure', async () => {
   (global.fetch as jest.Mock).mockRejectedValue(new Error('Network error'));
   const { findByText } = render(<HomeScreen />);
   expect(await findByText('Tap to retry')).toBeTruthy();
+});
+
+it('shows every resort when nothing is starred', async () => {
+  const { findByText } = render(<HomeScreen />);
+  expect(await findByText('Vail')).toBeTruthy();
+  expect(await findByText('Mammoth')).toBeTruthy();
+});
+
+it('shows only starred resorts once the visitor has favorites', async () => {
+  mockFavoriteIds = ['mammoth'];
+  const { findByText, queryByText } = render(<HomeScreen />);
+  expect(await findByText('Mammoth')).toBeTruthy();
+  expect(queryByText('Vail')).toBeNull();
+});
+
+it('has no sign-in avatar and links to the About screen instead', async () => {
+  const { findByText, queryByText, getByLabelText } = render(<HomeScreen />);
+  await findByText('Vail');
+  expect(queryByText('??')).toBeNull();
+  fireEvent.press(getByLabelText('About'));
+  expect(mockPush).toHaveBeenCalledWith('/about');
 });

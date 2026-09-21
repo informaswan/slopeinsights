@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { View, Text, TextInput, ScrollView, Pressable, StyleSheet } from 'react-native';
 import { useResorts } from '../hooks/useResorts';
-import { useAuth } from '../contexts/AuthContext';
+import { useFavorites } from '../contexts/FavoritesContext';
 import { useTheme } from '../contexts/ThemeContext';
 import { Spacing, FontSize, Radius } from '../constants/theme';
 
@@ -10,11 +10,11 @@ type PassTab = 'all' | 'epic' | 'ikon';
 export default function ExploreScreen() {
   const { colors } = useTheme();
   const { resorts } = useResorts();
-  const { savedResortIds, updateResorts } = useAuth();
+  const { favoriteIds, toggleFavorite } = useFavorites();
   const [search, setSearch] = useState('');
   const [passTab, setPassTab] = useState<PassTab>('all');
 
-  const savedSet = useMemo(() => new Set(savedResortIds), [savedResortIds]);
+  const savedSet = useMemo(() => new Set(favoriteIds), [favoriteIds]);
 
   const grouped = useMemo(() => {
     let filtered = resorts;
@@ -31,13 +31,6 @@ export default function ExploreScreen() {
     }
     return Object.entries(groups).sort(([a], [b]) => a.localeCompare(b));
   }, [resorts, passTab, search]);
-
-  const handleToggle = async (resortId: string) => {
-    const next = savedSet.has(resortId)
-      ? savedResortIds.filter((id) => id !== resortId)
-      : [...savedResortIds, resortId];
-    await updateResorts(next);
-  };
 
   return (
     <View style={[styles.root, { backgroundColor: colors.background }]}>
@@ -100,7 +93,7 @@ export default function ExploreScreen() {
                       styles.actionButton,
                       isSaved ? { backgroundColor: '#fee2e2' } : { backgroundColor: '#1e3a5f' },
                     ]}
-                    onPress={() => handleToggle(resort.id)}
+                    onPress={() => toggleFavorite(resort.id)}
                   >
                     <Text style={[styles.actionText, { color: isSaved ? '#ef4444' : '#fff' }]}>
                       {isSaved ? 'Remove' : '+ Add'}

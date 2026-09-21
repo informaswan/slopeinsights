@@ -1,14 +1,13 @@
 import React from 'react';
-import { render, screen, waitFor } from '@testing-library/react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { render, screen } from '@testing-library/react-native';
 
 jest.mock('expo-router', () => {
   const Stack = ({ children }: { children: React.ReactNode }) => <>{children}</>;
-  Stack.Screen = ({ testID }: { testID?: string }) => {
+  Stack.Screen = ({ name }: { name: string }) => {
     const { View } = require('react-native');
-    return testID ? <View testID={testID} /> : null;
+    return <View testID={`screen-${name}`} />;
   };
-  return { Stack, useRouter: jest.fn(() => ({ replace: jest.fn() })) };
+  return { Stack };
 });
 jest.mock('react-native-gesture-handler', () => {
   const { View } = require('react-native');
@@ -21,61 +20,25 @@ jest.mock('../../contexts/ThemeContext', () => {
     ThemeProvider: ({ children }: any) => children,
   };
 });
-
-let mockAuthState = {
-  isAuthenticated: true,
-  isLoading: false,
-  savedResortIds: ['vail'],
-  user: { id: '1', name: 'Test', email: 'test@test.com', avatar_url: null },
-  signInWithGoogle: jest.fn(),
-  signInWithApple: jest.fn(),
-  signOut: jest.fn(),
-  refreshResorts: jest.fn(),
-  updateResorts: jest.fn(),
-};
-
-jest.mock('../../contexts/AuthContext', () => ({
-  useAuth: () => mockAuthState,
-  AuthProvider: ({ children }: any) => children,
+jest.mock('../../contexts/FavoritesContext', () => ({
+  FavoritesProvider: ({ children }: any) => children,
 }));
 
-beforeEach(() => {
-  jest.resetModules();
-  AsyncStorage.clear();
-  mockAuthState = {
-    isAuthenticated: true,
-    isLoading: false,
-    savedResortIds: ['vail'],
-    user: { id: '1', name: 'Test', email: 'test@test.com', avatar_url: null },
-    signInWithGoogle: jest.fn(),
-    signInWithApple: jest.fn(),
-    signOut: jest.fn(),
-    refreshResorts: jest.fn(),
-    updateResorts: jest.fn(),
-  };
-});
-
 describe('RootLayout', () => {
-  it('shows a loading spinner before purchase check resolves', () => {
+  it('renders the app screens immediately, with no paywall or login gate', () => {
     const RootLayout = require('../../app/_layout').default;
     render(<RootLayout />);
-    expect(screen.getByTestId('layout-loading')).toBeTruthy();
+    expect(screen.getByTestId('screen-index')).toBeTruthy();
+    expect(screen.getByTestId('screen-resort/[id]')).toBeTruthy();
+    expect(screen.getByTestId('screen-explore')).toBeTruthy();
+    expect(screen.getByTestId('screen-about')).toBeTruthy();
   });
 
-  it('renders paywall Stack.Screen (not index) when not purchased', async () => {
+  it('does not register paywall, login or onboarding screens', () => {
     const RootLayout = require('../../app/_layout').default;
     render(<RootLayout />);
-    await waitFor(() => expect(screen.queryByTestId('layout-loading')).toBeNull());
-    expect(screen.getByTestId('stack-paywall')).toBeTruthy();
-    expect(screen.queryByTestId('stack-index')).toBeNull();
-  });
-
-  it('renders index Stack.Screen (not paywall) when already purchased', async () => {
-    await AsyncStorage.setItem('slopeinsights_purchased', 'true');
-    const RootLayout = require('../../app/_layout').default;
-    render(<RootLayout />);
-    await waitFor(() => expect(screen.queryByTestId('layout-loading')).toBeNull());
-    expect(screen.getByTestId('stack-index')).toBeTruthy();
-    expect(screen.queryByTestId('stack-paywall')).toBeNull();
+    expect(screen.queryByTestId('screen-paywall')).toBeNull();
+    expect(screen.queryByTestId('screen-login')).toBeNull();
+    expect(screen.queryByTestId('screen-onboarding')).toBeNull();
   });
 });
