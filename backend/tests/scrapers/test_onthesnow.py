@@ -9,32 +9,38 @@ from app.models.resort import Resort
 from app.models.snow import SnowCondition
 
 
-SAMPLE_NEXT_DATA = {
-    "props": {
-        "pageProps": {
-            "fullResort": {
-                "snow": {
-                    "base": 91.44,
-                    "last24": 15.24,
-                    "last48": 25.4,
-                    "last72": 45.72,
-                },
-                "surfaceType": "Packed Powder",
-                "runs": {
-                    "open": 150,
-                    "total": 195,
-                },
-                "lifts": {},
-            }
-        }
-    }
+SAMPLE_FULL_RESORT = {
+    "snow": {
+        "base": 91.44,
+        "last24": 15.24,
+        "last48": 25.4,
+        "last72": 45.72,
+    },
+    "surfaceType": "Packed Powder",
+    "runs": {
+        "open": 150,
+        "total": 195,
+    },
+    "lifts": {},
 }
 
-SAMPLE_HTML = f"""
-<html><body>
-<script id="__NEXT_DATA__" type="application/json">{json.dumps(SAMPLE_NEXT_DATA)}</script>
-</body></html>
-"""
+
+def flight_html(full_resort: dict, split_chunks: bool = False) -> str:
+    """Mimic OnTheSnow's Next.js App Router page: data is streamed as
+    self.__next_f.push([1, "<json string>"]) chunks, not __NEXT_DATA__."""
+    payload = '0:["$","div",null,{"resort":"$1","fullResort":' + json.dumps(full_resort) + ',"x":1}]\n'
+    if split_chunks:
+        mid = len(payload) // 2
+        parts = [payload[:mid], payload[mid:]]
+    else:
+        parts = [payload]
+    scripts = "".join(
+        f"<script>self.__next_f.push([1,{json.dumps(part)}])</script>" for part in parts
+    )
+    return f"<html><body><script>self.__next_f.push([2,null])</script>{scripts}</body></html>"
+
+
+SAMPLE_HTML = flight_html(SAMPLE_FULL_RESORT)
 
 
 @pytest.fixture
@@ -72,9 +78,8 @@ async def test_scrape_resort_updates_existing(db, resort):
         )
         scraper = OnTheSnowScraper(db)
         await scraper.scrape_resort(resort)
-        updated_data = json.loads(SAMPLE_HTML.split('application/json">')[1].split("</script>")[0])
-        updated_data["props"]["pageProps"]["fullResort"]["snow"]["base"] = 101.6
-        updated_html = f'<html><script id="__NEXT_DATA__" type="application/json">{json.dumps(updated_data)}</script></html>'
+        updated = {**SAMPLE_FULL_RESORT, "snow": {**SAMPLE_FULL_RESORT["snow"], "base": 101.6}}
+        updated_html = flight_html(updated)
         respx_mock.get("https://www.onthesnow.com/colorado/vail-ski-resort/skireport").mock(
             return_value=httpx.Response(200, text=updated_html)
         )
@@ -104,3 +109,27 @@ async def test_scrape_all_resorts(db):
         scraper = OnTheSnowScraper(db)
         await scraper.scrape_all()
         assert db.query(SnowCondition).count() == 2
+
+
+@pytest.mark.asyncio
+async def test_scrape_resort_handles_payload_split_across_chunks(db, resort):
+    async with respx.mock(using="httpx") as respx_mock:
+        respx_mock.get("https://www.onthesnow.com/colorado/vail-ski-resort/skireport").mock(
+            return_value=httpx.Response(200, text=flight_html(SAMPLE_FULL_RESORT, split_chunks=True))
+        )
+        scraper = OnTheSnowScraper(db)
+        await scraper.scrape_resort(resort)
+        snow = db.query(SnowCondition).filter_by(resort_id="vail").first()
+        assert snow is not None
+        assert snow.trails_open == 150
+
+
+@pytest.mark.asyncio
+async def test_scrape_resort_records_failure_when_page_has_no_resort_data(db, resort):
+    async with respx.mock(using="httpx") as respx_mock:
+        respx_mock.get("https://www.onthesnow.com/colorado/vail-ski-resort/skireport").mock(
+            return_value=httpx.Response(200, text="<html><body>redesigned page</body></html>")
+        )
+        scraper = OnTheSnowScraper(db)
+        await scraper.scrape_resort(resort)
+        assert db.query(SnowCondition).filter_by(resort_id="vail").first() is None

@@ -14,6 +14,8 @@ logger = logging.getLogger(__name__)
 
 BASE_URL = "https://www.onthesnow.com"
 _CM_TO_IN = 0.393701
+_FLIGHT_CHUNK = re.compile(r"self\.__next_f\.push\(\[(\d+),(.*?)\]\)</script>", re.DOTALL)
+_FULL_RESORT_MARKER = '"fullResort":'
 
 
 def _cm_to_in(cm: float | None) -> float | None:
@@ -23,22 +25,23 @@ def _cm_to_in(cm: float | None) -> float | None:
 class OnTheSnowScraper(BaseScraper):
     name = "onthesnow"
 
-    def _extract_next_data(self, html: str) -> dict | None:
-        match = re.search(
-            r'<script id="__NEXT_DATA__"[^>]*>(.*?)</script>', html, re.DOTALL
-        )
-        if not match:
-            return None
+    def _extract_full_resort(self, html: str) -> dict | None:
+        # OnTheSnow uses the Next.js App Router: page data is streamed as
+        # self.__next_f.push([1, "<json string>"]) chunks (there is no __NEXT_DATA__).
+        # A JSON value can be split across chunks, so join them before searching.
         try:
-            return json.loads(match.group(1))
+            payload = "".join(
+                json.loads(body) for kind, body in _FLIGHT_CHUNK.findall(html) if kind == "1"
+            )
+            start = payload.find(_FULL_RESORT_MARKER)
+            if start == -1:
+                return None
+            full_resort, _ = json.JSONDecoder().raw_decode(payload, start + len(_FULL_RESORT_MARKER))
         except json.JSONDecodeError:
             return None
+        return full_resort if isinstance(full_resort, dict) else None
 
-    def _parse_resort_data(self, data: dict) -> dict | None:
-        try:
-            fr = data["props"]["pageProps"]["fullResort"]
-        except (KeyError, TypeError):
-            return None
+    def _parse_resort_data(self, fr: dict) -> dict | None:
         snow = fr.get("snow") or {}
         lifts = fr.get("lifts") or {}
         runs = fr.get("runs") or {}
@@ -59,10 +62,10 @@ class OnTheSnowScraper(BaseScraper):
         url = f"{BASE_URL}/{resort.onthesnow_slug}/skireport"
         try:
             html = await self._fetch_html(url)
-            next_data = self._extract_next_data(html)
-            if not next_data:
-                raise ScraperError(f"No __NEXT_DATA__ found for {resort.name}")
-            parsed = self._parse_resort_data(next_data)
+            full_resort = self._extract_full_resort(html)
+            if not full_resort:
+                raise ScraperError(f"No resort data found in page for {resort.name}")
+            parsed = self._parse_resort_data(full_resort)
             if not parsed:
                 raise ScraperError(f"Could not parse resort data for {resort.name}")
         except ScraperError as exc:
