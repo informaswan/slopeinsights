@@ -4,7 +4,7 @@ from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-from app.main import app
+from app.main import app, limiter
 from app.database import get_db, Base
 from app.cache import invalidate_cache
 
@@ -17,6 +17,7 @@ TestingSessionLocal = sessionmaker(bind=engine)
 def setup_db():
     Base.metadata.create_all(bind=engine)
     invalidate_cache()
+    limiter.reset()
     yield
     Base.metadata.drop_all(bind=engine)
     invalidate_cache()

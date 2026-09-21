@@ -2,6 +2,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from slowapi import Limiter, _rate_limit_exceeded_handler
+from slowapi.middleware import SlowAPIMiddleware
 from slowapi.util import get_remote_address
 from slowapi.errors import RateLimitExceeded
 from app.config import settings
@@ -28,7 +29,13 @@ async def lifespan(app: FastAPI):
     scheduler.shutdown(wait=False)
 
 
+limiter = Limiter(key_func=get_remote_address, default_limits=["60/minute"])
+
 app = FastAPI(title="SlopeInsights API", lifespan=lifespan)
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
+# Added before CORS so CORS is the outer layer and 429 responses still carry CORS headers.
+app.add_middleware(SlowAPIMiddleware)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.cors_origin_list,
@@ -36,9 +43,6 @@ app.add_middleware(
     allow_headers=["*", "Bypass-Tunnel-Reminder"],
     expose_headers=["*"],
 )
-limiter = Limiter(key_func=get_remote_address, default_limits=["60/minute"])
-app.state.limiter = limiter
-app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 app.include_router(resorts_router.router, prefix="/api")
 app.include_router(auth_router.router, prefix="/api")
 app.include_router(user_resorts_router.router, prefix="/api")
