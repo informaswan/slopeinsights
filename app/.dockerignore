@@ -1,0 +1,10 @@
+node_modules
+dist
+.expo
+.git
+.idea
+.superpowers
+__tests__
+__mocks__
+docs
+.env
