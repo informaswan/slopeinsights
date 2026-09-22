@@ -10,6 +10,7 @@ const mockGetRoadCameras = jest.fn();
 jest.mock('../../lib/api', () => ({ api: { getRoadCameras: () => mockGetRoadCameras() } }));
 
 const groups = {
+  note: 'Improvements to road cameras coming soon.',
   groups: [
     { name: 'I-70: Denver to the mountains', note: 'Listed from Denver heading west.', stops: [
       { name: 'Denver metro (I-70 at C-470)', url: 'https://www.cotrip.org/map?lat=39.7&lng=-105.1&zoom=10' },
@@ -63,6 +64,12 @@ it('says where the links go', async () => {
   mockGetRoadCameras.mockResolvedValue(groups);
   const { findByText } = renderScreen();
   expect(await findByText(/COtrip/)).toBeTruthy();
+});
+
+it('shows the coming-soon note', async () => {
+  mockGetRoadCameras.mockResolvedValue(groups);
+  const { findByText } = renderScreen();
+  expect(await findByText('Improvements to road cameras coming soon.')).toBeTruthy();
 });
 
 it('shows a loading indicator, then an error with a retry', async () => {

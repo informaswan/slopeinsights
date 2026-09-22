@@ -119,31 +119,25 @@ def test_each_group_explains_itself():
     assert all(g["note"] for g in road_camera_groups())
 
 
-def test_flags_mountains_that_only_have_the_general_state_link():
+def test_every_mountain_shows_the_same_coming_soon_note():
+    # This feature is still growing everywhere, not just where a link is missing, so
+    # every mountain gets the same line regardless of whether it has a specific link yet.
     from app.traffic_cams import traffic_cams_note
 
-    # Has a road-specific link already: no note.
-    assert traffic_cams_note("vail") is None
-    assert traffic_cams_note("jackson-hole") is None
-    assert traffic_cams_note("afton-alps") is None
-    # Only the state's general camera page so far: note says more are coming.
-    assert traffic_cams_note("big-sky") == "More precise camera links for this mountain are coming soon."
-    assert traffic_cams_note("taos") is not None
-    assert traffic_cams_note("stowe") is not None
-    assert traffic_cams_note("hunter-mountain") is not None
-    assert traffic_cams_note("jack-frost") is not None
-    assert traffic_cams_note("tremblant") is not None
-
-
-def test_every_mountain_without_a_note_has_a_real_specific_link():
+    assert traffic_cams_note("vail") == "Improvements to road cameras coming soon."
+    assert traffic_cams_note("jackson-hole") == "Improvements to road cameras coming soon."
+    assert traffic_cams_note("big-sky") == "Improvements to road cameras coming soon."
     for r in RESORTS:
-        if traffic_cams_note(r["id"]) is None:
-            assert r["id"] in RESORT_LINKS, r["id"]
+        assert traffic_cams_note(r["id"]) == "Improvements to road cameras coming soon."
 
 
-def test_resort_detail_includes_the_note_only_when_it_applies(client, db):
+def test_resort_detail_always_includes_the_note(client, db):
     seed_resorts(db)
-    vail = client.get("/api/resorts/vail", headers={"X-API-Key": "dev-key"}).json()
-    assert vail["traffic_cams_note"] is None
-    big_sky = client.get("/api/resorts/big-sky", headers={"X-API-Key": "dev-key"}).json()
-    assert big_sky["traffic_cams_note"] == "More precise camera links for this mountain are coming soon."
+    for resort_id in ("vail", "big-sky"):
+        detail = client.get(f"/api/resorts/{resort_id}", headers={"X-API-Key": "dev-key"}).json()
+        assert detail["traffic_cams_note"] == "Improvements to road cameras coming soon."
+
+
+def test_road_cameras_response_includes_the_same_note(client):
+    data = client.get("/api/road-cameras", headers={"X-API-Key": "dev-key"}).json()
+    assert data["note"] == "Improvements to road cameras coming soon."

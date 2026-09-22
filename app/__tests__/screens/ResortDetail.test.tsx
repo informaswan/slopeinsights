@@ -53,7 +53,7 @@ const mockResort = {
   traffic_cams: [
     { label: 'WYDOT: web cameras', url: 'https://www.wyoroad.info/highway/webcameras/webcameras.html' },
   ],
-  traffic_cams_note: null,
+  traffic_cams_note: 'Improvements to road cameras coming soon.',
   parking: { has_live_data: true, scraped_at: '2026-03-15T10:10:00Z', is_stale: false,
     live_lots: [{ name: 'Lot A', status: 'open', capacity_pct: null }],
     static_lots: [{ name: 'Lot A', distance_ft: 200, cost: 'Free', directions_url: 'https://maps.google.com/' }] },
@@ -102,18 +102,9 @@ describe('ResortDetail screen — loaded', () => {
     expect(screen.queryByText('Road cameras')).toBeNull();
   });
 
-  it('shows a coming-soon note when this mountain only has a general state link', () => {
-    (useResortDetail as jest.Mock).mockReturnValue({
-      resort: { ...mockResort, traffic_cams_note: 'More precise camera links for this mountain are coming soon.' },
-      loading: false, error: null, refresh: jest.fn(),
-    });
+  it('shows the coming-soon note on every mountain, specific link or not', () => {
     render(<ResortDetail />);
-    expect(screen.getByText('More precise camera links for this mountain are coming soon.')).toBeTruthy();
-  });
-
-  it('shows no coming-soon note once this mountain has a specific link', () => {
-    render(<ResortDetail />);
-    expect(screen.queryByText(/coming soon/i)).toBeNull();
+    expect(screen.getByText('Improvements to road cameras coming soon.')).toBeTruthy();
   });
 
   it('does not show any lift information yet', () => {

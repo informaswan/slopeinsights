@@ -11,11 +11,12 @@ export default function RoadCamerasScreen() {
   const { colors } = useTheme();
   const isWide = useIsWide();
   const [groups, setGroups] = useState<RoadCameraGroup[] | null>(null);
+  const [note, setNote] = useState<string | null>(null);
   const [failed, setFailed] = useState(false);
 
   const load = useCallback(() => {
     setFailed(false);
-    api.getRoadCameras().then((r) => setGroups(r.groups)).catch(() => setFailed(true));
+    api.getRoadCameras().then((r) => { setGroups(r.groups); setNote(r.note); }).catch(() => setFailed(true));
   }, []);
 
   useEffect(load, [load]);
@@ -50,6 +51,7 @@ export default function RoadCamerasScreen() {
           These links open COtrip, Colorado's official traffic site, on a map centered on each stop.
           Cameras are available from the map's layers menu.
         </Text>
+        {note && <Text style={[styles.note, { color: colors.textMuted }]}>{note}</Text>}
       </View>
 
       {groups.map((group) => (
@@ -76,6 +78,7 @@ const styles = StyleSheet.create({
   header: { gap: Spacing.xs },
   title: { fontSize: FontSize.xl, fontWeight: '700', letterSpacing: -0.4 },
   intro: { fontSize: FontSize.sm + 1, lineHeight: 20 },
+  note: { fontSize: FontSize.xs, fontStyle: 'italic' },
   group: { gap: Spacing.sm },
   groupTitle: { fontSize: FontSize.md, fontWeight: '700' },
   note: { fontSize: FontSize.sm, marginTop: 2 },

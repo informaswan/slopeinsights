@@ -133,6 +133,7 @@ class RoadCameraGroup(BaseModel):
 
 class RoadCameraResponse(BaseModel):
     groups: list[RoadCameraGroup]
+    note: str
 
 
 class ResortDetail(BaseModel):

@@ -84,6 +84,7 @@ export interface RoadCameraGroup {
 
 export interface RoadCameraResponse {
   groups: RoadCameraGroup[];
+  note: string;
 }
 
 export interface WeatherDetail {

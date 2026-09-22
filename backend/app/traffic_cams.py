@@ -152,13 +152,14 @@ def traffic_cams_for(resort_id: str, state: str) -> list[dict]:
     return links
 
 
-COMING_SOON_NOTE = "More precise camera links for this mountain are coming soon."
+COMING_SOON_NOTE = "Improvements to road cameras coming soon."
 
 
-def traffic_cams_note(resort_id: str) -> str | None:
-    """A mountain with no road-specific link yet still gets its state's general camera
-    page (see traffic_cams_for) — this says so, rather than silently looking finished."""
-    return None if resort_id in RESORT_LINKS else COMING_SOON_NOTE
+def traffic_cams_note(resort_id: str) -> str:
+    """This feature (and the Colorado corridor page) is still actively growing, so every
+    mountain and the road-cameras page carry the same note, not just the ones missing a
+    specific link yet."""
+    return COMING_SOON_NOTE
 
 
 def _stop(name: str, lat: float, lng: float, zoom: int = 11) -> dict:

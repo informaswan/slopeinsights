@@ -36,6 +36,7 @@ from app.schemas.resort import (
 )
 from app.schemas.errors import ErrorResponse
 from app.traffic_cams import road_camera_groups, traffic_cams_for, traffic_cams_note
+from app.traffic_cams import COMING_SOON_NOTE
 
 logger = logging.getLogger(__name__)
 def _merge_forecast_by_date(rows: list[WeatherForecast]) -> list[dict]:
@@ -81,7 +82,7 @@ def _require_api_key(api_key: str = Security(_api_key_header)):
 
 @router.get("/road-cameras", response_model=RoadCameraResponse)
 def get_road_cameras(_: str = Depends(_require_api_key)):
-    return {"groups": road_camera_groups()}
+    return {"groups": road_camera_groups(), "note": COMING_SOON_NOTE}
 
 
 @router.get("/resorts/best", response_model=BestResortResponse)
