@@ -7,7 +7,9 @@ export function formatAgo(isoString: string | null): string | null {
   const diffMin = Math.floor(diffMs / 60_000);
   if (diffMin < 2) return 'just now';
   if (diffMin < 60) return `${diffMin}m ago`;
-  return `${Math.floor(diffMin / 60)}h ago`;
+  const diffHours = Math.floor(diffMin / 60);
+  if (diffHours < 24) return `${diffHours}h ago`;
+  return `${Math.floor(diffHours / 24)}d ago`;
 }
 
 export function crowdColor(level: string | null, colors: ThemeColors): string {

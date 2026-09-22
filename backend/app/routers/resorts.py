@@ -37,6 +37,30 @@ from app.schemas.resort import (
 from app.schemas.errors import ErrorResponse
 
 logger = logging.getLogger(__name__)
+def _merge_forecast_by_date(rows: list[WeatherForecast]) -> list[dict]:
+    """NOAA gives a separate day and night period per date; serve one entry per date.
+
+    High comes from the day period and low from the night period. Precipitation and
+    wind take the worst of the two, and snow is flagged if either period mentions it.
+    """
+    days: dict[str, dict] = {}
+    for w in rows:
+        day = days.setdefault(w.forecast_date, {
+            "date": w.forecast_date, "high_f": None, "low_f": None,
+            "precip_pct": None, "snow_in_forecast": False, "wind_mph": None,
+        })
+        if w.high_f is not None and day["high_f"] is None:
+            day["high_f"] = w.high_f
+        if w.low_f is not None and day["low_f"] is None:
+            day["low_f"] = w.low_f
+        if w.precip_pct is not None:
+            day["precip_pct"] = max(day["precip_pct"] or 0, w.precip_pct)
+        if w.wind_mph is not None:
+            day["wind_mph"] = max(day["wind_mph"] or 0, w.wind_mph)
+        day["snow_in_forecast"] = day["snow_in_forecast"] or bool(w.snow_in_forecast)
+    return list(days.values())
+
+
 router = APIRouter()
 
 _api_key_header = APIKeyHeader(name="X-API-Key", auto_error=False)
@@ -89,7 +113,10 @@ def get_resort_detail(resort_id: str, db: Session = Depends(get_db), _: str = De
     except Exception:
         today_dow = datetime.now(timezone.utc).weekday()
     crowd_row = db.query(CrowdData).filter_by(resort_id=resort_id, day_of_week=today_dow).first()
-    weather_rows = db.query(WeatherForecast).filter_by(resort_id=resort_id).all()
+    weather_rows = (
+        db.query(WeatherForecast).filter_by(resort_id=resort_id)
+        .order_by(WeatherForecast.forecast_date, WeatherForecast.id).all()
+    )
     webcams = db.query(Webcam).filter_by(resort_id=resort_id).all()
     parking_live = db.query(ParkingLot).filter_by(resort_id=resort_id, is_live=True).all()
     parking_static = db.query(ParkingLot).filter_by(resort_id=resort_id, is_live=False).all()
@@ -134,16 +161,7 @@ def get_resort_detail(resort_id: str, db: Session = Depends(get_db), _: str = De
         weather_detail = {
             "scraped_at": weather_rows[0].scraped_at.isoformat() if weather_rows[0].scraped_at else None,
             "is_stale": is_stale(weather_rows[0].scraped_at, STALE_WEATHER_SECONDS),
-            "forecast": [
-                {
-                    "date": w.forecast_date,
-                    "high_f": w.high_f, "low_f": w.low_f,
-                    "precip_pct": w.precip_pct,
-                    "snow_in_forecast": w.snow_in_forecast or False,
-                    "wind_mph": w.wind_mph,
-                }
-                for w in weather_rows
-            ],
+            "forecast": _merge_forecast_by_date(weather_rows),
         }
 
     has_live = len(parking_live) > 0

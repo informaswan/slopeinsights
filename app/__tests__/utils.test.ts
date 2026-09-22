@@ -18,6 +18,11 @@ describe('formatAgo', () => {
     expect(formatAgo(twoHoursAgo)).toBe('2h ago');
   });
 
+  it('returns days once data is a day or more old', () => {
+    const threeDaysAgo = new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString();
+    expect(formatAgo(threeDaysAgo)).toBe('3d ago');
+  });
+
   it('returns null for null input', () => {
     expect(formatAgo(null)).toBeNull();
   });

@@ -4,8 +4,13 @@ import { WeatherRow } from '../../components/WeatherRow';
 import type { WeatherDetail } from '../../lib/types';
 import { TestWrapper } from '../test-utils';
 
+// Pin "now" to Monday 2026-03-16 noon (local) so date-based labels are deterministic.
+const NOW = new Date(2026, 2, 16, 12, 0, 0);
+beforeEach(() => jest.useFakeTimers({ now: NOW }));
+afterEach(() => jest.useRealTimers());
+
 const weather: WeatherDetail = {
-  scraped_at: '2026-03-16T09:00:00Z',
+  scraped_at: new Date(2026, 2, 16, 11, 35, 0).toISOString(),
   is_stale: false,
   forecast: [
     { date: '2026-03-16', high_f: 28, low_f: 14, precip_pct: 20, snow_in_forecast: false, wind_mph: 12 },
@@ -62,4 +67,43 @@ it('shows stale warning note when is_stale is true', () => {
 it('does not show stale note when is_stale is false', () => {
   const { queryByText } = render(<WeatherRow weather={weather} />, { wrapper: TestWrapper });
   expect(queryByText('Weather data may be outdated')).toBeNull();
+});
+
+it('shows the real date on every forecast day', () => {
+  const { getByText } = render(<WeatherRow weather={weather} />, { wrapper: TestWrapper });
+  expect(getByText('Mar 16')).toBeTruthy();
+  expect(getByText('Mar 17')).toBeTruthy();
+  expect(getByText('Mar 18')).toBeTruthy();
+});
+
+it('uses the weekday for days after tomorrow', () => {
+  const { getByText } = render(<WeatherRow weather={weather} />, { wrapper: TestWrapper });
+  expect(getByText('Wed')).toBeTruthy();
+});
+
+it('never labels an old forecast as Today or Tomorrow', () => {
+  jest.setSystemTime(new Date(2026, 2, 20, 12, 0, 0));
+  const { queryByText, getByText } = render(<WeatherRow weather={weather} />, { wrapper: TestWrapper });
+  expect(queryByText('Today')).toBeNull();
+  expect(queryByText('Tomorrow')).toBeNull();
+  expect(getByText('Mon')).toBeTruthy();
+  expect(getByText('Mar 16')).toBeTruthy();
+});
+
+it('shows when the forecast was last updated', () => {
+  const { getByText } = render(<WeatherRow weather={weather} />, { wrapper: TestWrapper });
+  expect(getByText('Updated 25m ago')).toBeTruthy();
+});
+
+it('shows how old the data is, in days, when it is far out of date', () => {
+  const old = { ...weather, is_stale: true, scraped_at: new Date(2026, 2, 13, 12, 0, 0).toISOString() };
+  const { getByText } = render(<WeatherRow weather={old} />, { wrapper: TestWrapper });
+  expect(getByText('Updated 3d ago')).toBeTruthy();
+  expect(getByText('Weather data may be outdated')).toBeTruthy();
+});
+
+it('says so when the update time is unknown', () => {
+  const unknown = { ...weather, scraped_at: null };
+  const { getByText } = render(<WeatherRow weather={unknown} />, { wrapper: TestWrapper });
+  expect(getByText('Update time unknown')).toBeTruthy();
 });

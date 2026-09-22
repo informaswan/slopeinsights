@@ -1,4 +1,15 @@
 # tests/conftest.py
+import os
+
+# Real environment variables beat the local .env, so the suite behaves the same
+# whatever a developer (or a docker test setup) has in backend/.env.
+os.environ.update({
+    "ENVIRONMENT": "development",
+    "DATABASE_URL": "sqlite:///./test_app.db",
+    "API_KEY": "dev-key",
+    "CORS_ORIGINS": "*",
+})
+
 import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine

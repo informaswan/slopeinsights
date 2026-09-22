@@ -7,6 +7,7 @@ from app.models.lift import LiftStatus
 from app.models.crowd import CrowdData
 from app.models.webcam import Webcam
 from app.models.parking import ParkingLot
+from app.models.weather import WeatherForecast
 
 
 def test_health(client):
@@ -127,3 +128,47 @@ def test_get_best_resorts(client, db):
     data = response.json()
     assert "resorts" in data
     assert len(data["resorts"]) <= 5
+
+
+def _add_period(db, date, high=None, low=None, precip=None, snow=False, wind=None):
+    db.add(WeatherForecast(
+        resort_id="vail", forecast_date=date, high_f=high, low_f=low, precip_pct=precip,
+        snow_in_forecast=snow, wind_mph=wind, scraped_at=datetime.now(timezone.utc), is_stale=False,
+    ))
+
+
+def test_resort_detail_merges_day_and_night_periods_into_one_entry_per_date(client, db):
+    seed_resorts(db)
+    # NOAA returns separate day and night periods; the API must serve one entry per date.
+    _add_period(db, "2026-09-21", high=51, precip=0, wind=0)
+    _add_period(db, "2026-09-21", low=36, precip=1, wind=5)
+    _add_period(db, "2026-09-22", high=53, precip=42, wind=5)
+    _add_period(db, "2026-09-22", low=41, precip=39, wind=0)
+    db.commit()
+    forecast = client.get("/api/resorts/vail", headers={"X-API-Key": "dev-key"}).json()["weather"]["forecast"]
+    assert [f["date"] for f in forecast] == ["2026-09-21", "2026-09-22"]
+    assert (forecast[0]["high_f"], forecast[0]["low_f"]) == (51, 36)
+    assert (forecast[1]["high_f"], forecast[1]["low_f"]) == (53, 41)
+
+
+def test_resort_detail_forecast_uses_worst_precip_and_wind_and_any_snow_of_the_day(client, db):
+    seed_resorts(db)
+    _add_period(db, "2026-09-21", high=30, precip=10, snow=False, wind=8)
+    _add_period(db, "2026-09-21", low=20, precip=70, snow=True, wind=15)
+    db.commit()
+    day = client.get("/api/resorts/vail", headers={"X-API-Key": "dev-key"}).json()["weather"]["forecast"][0]
+    assert day["precip_pct"] == 70
+    assert day["wind_mph"] == 15
+    assert day["snow_in_forecast"] is True
+
+
+def test_resort_detail_forecast_keeps_a_night_only_first_day(client, db):
+    seed_resorts(db)
+    # Fetched in the evening: today only has a night period.
+    _add_period(db, "2026-09-21", low=36, precip=1, wind=5)
+    _add_period(db, "2026-09-22", high=53, precip=42, wind=5)
+    _add_period(db, "2026-09-22", low=41, precip=39, wind=0)
+    db.commit()
+    forecast = client.get("/api/resorts/vail", headers={"X-API-Key": "dev-key"}).json()["weather"]["forecast"]
+    assert len(forecast) == 2
+    assert (forecast[0]["high_f"], forecast[0]["low_f"]) == (None, 36)
