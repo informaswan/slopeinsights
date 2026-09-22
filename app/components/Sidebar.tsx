@@ -47,6 +47,7 @@ export function Sidebar({ onNavigate }: Props) {
   const navItems = [
     { label: 'All mountains', path: '/', count: null as number | null },
     { label: 'My mountains', path: '/mine', count: favoriteIds.length },
+    { label: 'Road cameras', path: '/road-cameras', count: null as number | null },
   ];
 
   return (

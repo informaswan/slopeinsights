@@ -21,6 +21,10 @@ export const SearchIcon = (p: IconProps) => (
 
 export const ChevronLeftIcon = (p: IconProps) => <Icon {...p}><Path d="M15 5l-7 7 7 7" /></Icon>;
 
+export const ExternalLinkIcon = (p: IconProps) => (
+  <Icon {...p}><Path d="M14 4h6v6" /><Path d="M20 4l-9 9" /><Path d="M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5" /></Icon>
+);
+
 export const MenuIcon = (p: IconProps) => <Icon {...p}><Path d="M4 7h16M4 12h16M4 17h16" /></Icon>;
 
 export const CloseIcon = (p: IconProps) => <Icon {...p}><Path d="M6 6l12 12M18 6L6 18" /></Icon>;

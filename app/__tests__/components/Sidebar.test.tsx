@@ -43,6 +43,7 @@ describe('Sidebar', () => {
     expect(getByText('SlopeInsights')).toBeTruthy();
     expect(getByText('All mountains')).toBeTruthy();
     expect(getByText('My mountains')).toBeTruthy();
+    expect(getByText('Road cameras')).toBeTruthy();
     expect(getByText('Buy us a coffee')).toBeTruthy();
     expect(getByText('Tip on Venmo')).toBeTruthy();
     expect(getByLabelText('Dark mode')).toBeTruthy();
@@ -64,9 +65,11 @@ describe('Sidebar', () => {
     expect(mockPush).toHaveBeenCalledWith('/mine');
     fireEvent.press(getByText('All mountains'));
     expect(mockPush).toHaveBeenCalledWith('/');
+    fireEvent.press(getByText('Road cameras'));
+    expect(mockPush).toHaveBeenCalledWith('/road-cameras');
     fireEvent.press(getByText('About'));
     expect(mockPush).toHaveBeenCalledWith('/about');
-    expect(onNavigate).toHaveBeenCalledTimes(3);
+    expect(onNavigate).toHaveBeenCalledTimes(4);
   });
 
   it('searches mountains by name and opens the one you pick', async () => {

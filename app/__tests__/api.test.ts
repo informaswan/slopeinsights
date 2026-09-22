@@ -47,3 +47,11 @@ it('never sends an Authorization header (the site has no accounts)', async () =>
   const [, opts] = (global.fetch as jest.Mock).mock.calls[0];
   expect((opts as RequestInit).headers).not.toHaveProperty('Authorization');
 });
+
+it('getRoadCameras calls the road-cameras endpoint', async () => {
+  (global.fetch as jest.Mock).mockResolvedValueOnce({ ok: true, json: async () => ({ groups: [] }) });
+  const result = await api.getRoadCameras();
+  expect(result.groups).toEqual([]);
+  const [url] = (global.fetch as jest.Mock).mock.calls[0];
+  expect(url).toContain('/api/road-cameras');
+});

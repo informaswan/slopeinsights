@@ -19,6 +19,7 @@ function AppNavigator() {
       >
         <Stack.Screen name="index" />
         <Stack.Screen name="mine" />
+        <Stack.Screen name="road-cameras" />
         <Stack.Screen name="resort/[id]" />
         <Stack.Screen name="about" />
       </Stack>

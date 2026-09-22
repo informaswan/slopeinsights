@@ -8,6 +8,7 @@ import { SnowStats } from '../../components/SnowStats';
 import { CrowdChart } from '../../components/CrowdChart';
 import { WeatherRow } from '../../components/WeatherRow';
 import { ParkingSection } from '../../components/ParkingSection';
+import { CameraLinks } from '../../components/CameraLinks';
 import { useTheme } from '../../contexts/ThemeContext';
 import { useFavorites } from '../../contexts/FavoritesContext';
 import { useIsWide } from '../../hooks/useIsWide';
@@ -107,6 +108,13 @@ export default function ResortDetailScreen() {
         </View>
       </View>
 
+      {resort.traffic_cams && resort.traffic_cams.length > 0 && (
+        <View style={[styles.linkPanel, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+          <Text style={[styles.panelTitle, { color: colors.textSecondary }]}>Road cameras</Text>
+          <CameraLinks links={resort.traffic_cams} />
+        </View>
+      )}
+
       {(resort.summit_elevation_ft != null || resort.vertical_drop_ft != null || resort.website) && (
         <View style={[styles.panel, styles.infoPanel, { backgroundColor: colors.surface, borderColor: colors.border }]}>
           {resort.summit_elevation_ft != null && (
@@ -156,6 +164,7 @@ const styles = StyleSheet.create({
   grid: { flexDirection: 'row', flexWrap: 'wrap', gap: Spacing.md },
   panel: { flexGrow: 1, flexBasis: 340, borderRadius: Radius.md, borderWidth: 1, overflow: 'hidden' },
   panelTitle: { fontSize: FontSize.sm, fontWeight: '600', paddingHorizontal: Spacing.md, paddingTop: Spacing.sm + 2 },
+  linkPanel: { borderRadius: Radius.md, borderWidth: 1, overflow: 'hidden' },
   infoPanel: { padding: Spacing.md, gap: Spacing.sm, flexBasis: 'auto' },
   infoRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   infoLabel: { fontSize: FontSize.sm },

@@ -30,11 +30,12 @@ from app.routers._helpers import (
     STALE_LIFT_SECONDS, STALE_SNOW_SECONDS, STALE_WEATHER_SECONDS, STALE_PARKING_SECONDS,
 )
 from app.schemas.resort import (
-    ResortSummary, ResortDetail, BestResortResponse,
+    ResortSummary, ResortDetail, BestResortResponse, RoadCameraResponse,
     SnowDetail, LiftDetail, LiftItem, WeatherDetail, WeatherPeriod,
     CrowdDetail, WebcamItem, ParkingDetail, LiveLot, StaticLot, TrailSummary,
 )
 from app.schemas.errors import ErrorResponse
+from app.traffic_cams import road_camera_groups, traffic_cams_for
 
 logger = logging.getLogger(__name__)
 def _merge_forecast_by_date(rows: list[WeatherForecast]) -> list[dict]:
@@ -77,6 +78,11 @@ def _require_api_key(api_key: str = Security(_api_key_header)):
 
 # /resorts/best MUST be declared before /resorts/{resort_id} to avoid FastAPI
 # matching the literal string "best" as a resort_id path parameter.
+
+@router.get("/road-cameras", response_model=RoadCameraResponse)
+def get_road_cameras(_: str = Depends(_require_api_key)):
+    return {"groups": road_camera_groups()}
+
 
 @router.get("/resorts/best", response_model=BestResortResponse)
 def get_best_resorts(db: Session = Depends(get_db), _: str = Depends(_require_api_key)):
@@ -191,6 +197,7 @@ def get_resort_detail(resort_id: str, db: Session = Depends(get_db), _: str = De
         "crowd": crowd_detail, "weather": weather_detail,
         "webcams": [{"label": w.label, "cam_type": w.cam_type, "url": w.url, "is_alive": w.is_alive} for w in webcams],
         "parking": parking_detail,
+        "traffic_cams": traffic_cams_for(resort.id, resort.state),
     }
 
 

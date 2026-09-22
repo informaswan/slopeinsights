@@ -66,6 +66,26 @@ export interface WeatherPeriod {
   wind_mph: number | null;
 }
 
+export interface TrafficCamLink {
+  label: string;
+  url: string;
+}
+
+export interface RoadCameraStop {
+  name: string;
+  url: string;
+}
+
+export interface RoadCameraGroup {
+  name: string;
+  note: string | null;
+  stops: RoadCameraStop[];
+}
+
+export interface RoadCameraResponse {
+  groups: RoadCameraGroup[];
+}
+
 export interface WeatherDetail {
   scraped_at: string | null;
   is_stale: boolean;
@@ -126,6 +146,7 @@ export interface ResortDetail {
   weather: WeatherDetail | null;
   webcams: WebcamItem[];
   parking: ParkingDetail;
+  traffic_cams?: TrafficCamLink[];
 }
 
 export interface BestResortResponse {

@@ -115,6 +115,26 @@ class ParkingDetail(BaseModel):
     static_lots: list[StaticLot]
 
 
+class TrafficCamLink(BaseModel):
+    label: str
+    url: str
+
+
+class RoadCameraStop(BaseModel):
+    name: str
+    url: str
+
+
+class RoadCameraGroup(BaseModel):
+    name: str
+    note: str | None = None
+    stops: list[RoadCameraStop]
+
+
+class RoadCameraResponse(BaseModel):
+    groups: list[RoadCameraGroup]
+
+
 class ResortDetail(BaseModel):
     id: str
     name: str
@@ -132,6 +152,7 @@ class ResortDetail(BaseModel):
     weather: WeatherDetail | None
     webcams: list[WebcamItem]
     parking: ParkingDetail
+    traffic_cams: list[TrafficCamLink]
 
 
 class BestResortResponse(BaseModel):

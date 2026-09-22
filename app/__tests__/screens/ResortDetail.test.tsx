@@ -50,6 +50,9 @@ const mockResort = {
   weather: { scraped_at: '2026-03-15T09:00:00Z', is_stale: false,
     forecast: [{ date: '2026-03-15', high_f: 28, low_f: 14, precip_pct: 20, snow_in_forecast: false, wind_mph: 12 }] },
   webcams: [{ label: 'Rendezvous Bowl', cam_type: 'hls' as const, url: 'https://example.com/stream.m3u8', is_alive: true }],
+  traffic_cams: [
+    { label: 'WYDOT: web cameras', url: 'https://www.wyoroad.info/highway/webcameras/webcameras.html' },
+  ],
   parking: { has_live_data: true, scraped_at: '2026-03-15T10:10:00Z', is_stale: false,
     live_lots: [{ name: 'Lot A', status: 'open', capacity_pct: null }],
     static_lots: [{ name: 'Lot A', distance_ft: 200, cost: 'Free', directions_url: 'https://maps.google.com/' }] },
@@ -80,6 +83,22 @@ describe('ResortDetail screen — loaded', () => {
   it('renders weather section', () => {
     render(<ResortDetail />);
     expect(screen.getByTestId('weather-row')).toBeTruthy();
+  });
+
+  it('lists road camera links and opens the official page', () => {
+    const Linking = require('expo-linking');
+    render(<ResortDetail />);
+    expect(screen.getByText('Road cameras')).toBeTruthy();
+    fireEvent.press(screen.getByText('WYDOT: web cameras'));
+    expect(Linking.openURL).toHaveBeenCalledWith('https://www.wyoroad.info/highway/webcameras/webcameras.html');
+  });
+
+  it('hides the road cameras panel when there are no links (or an older API omits them)', () => {
+    (useResortDetail as jest.Mock).mockReturnValue({
+      resort: { ...mockResort, traffic_cams: undefined }, loading: false, error: null, refresh: jest.fn(),
+    });
+    render(<ResortDetail />);
+    expect(screen.queryByText('Road cameras')).toBeNull();
   });
 
   it('does not show any lift information yet', () => {

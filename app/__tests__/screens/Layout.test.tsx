@@ -34,7 +34,7 @@ describe('RootLayout', () => {
     render(<RootLayout />);
     const shell = screen.getByTestId('app-shell');
     expect(shell).toBeTruthy();
-    for (const name of ['index', 'mine', 'resort/[id]', 'about']) {
+    for (const name of ['index', 'mine', 'road-cameras', 'resort/[id]', 'about']) {
       expect(screen.getByTestId(`screen-${name}`)).toBeTruthy();
     }
   });

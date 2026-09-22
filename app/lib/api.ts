@@ -1,5 +1,5 @@
 // lib/api.ts
-import type { ResortSummary, ResortDetail, BestResortResponse } from './types';
+import type { ResortSummary, ResortDetail, BestResortResponse, RoadCameraResponse } from './types';
 
 const BASE_URL = process.env.EXPO_PUBLIC_API_URL ?? 'http://localhost:8000';
 const API_KEY  = process.env.EXPO_PUBLIC_API_KEY  ?? '';
@@ -20,4 +20,5 @@ export const api = {
   getResorts:      ()           => apiFetch<ResortSummary[]>('/api/resorts'),
   getBestResorts:  ()           => apiFetch<BestResortResponse>('/api/resorts/best'),
   getResortDetail: (id: string) => apiFetch<ResortDetail>(`/api/resorts/${id}`),
+  getRoadCameras:  ()           => apiFetch<RoadCameraResponse>('/api/road-cameras'),
 };
