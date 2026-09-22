@@ -14,3 +14,7 @@ sudo docker build -t slopeinsights-web \
 sudo docker rm -f slopeinsights-web 2>/dev/null || true
 sudo docker run -d --name slopeinsights-web --restart unless-stopped \
   -p 127.0.0.1:8080:80 slopeinsights-web
+
+# Old image layers from the previous build become "dangling" once replaced;
+# clean them up so disk usage doesn't creep up with every deploy.
+sudo docker image prune -f
