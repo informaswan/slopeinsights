@@ -38,8 +38,15 @@ def test_specific_links_come_before_the_general_state_site():
 
 
 def test_a_specific_link_is_not_repeated_as_the_state_fallback():
-    # Jackson Hole only has the state's own camera page, so it must appear once.
-    assert len(traffic_cams_for("jackson-hole", "WY")) == 1
+    # Big Sky has no specific link yet, so it must show only the state's own camera page once.
+    assert len(traffic_cams_for("big-sky", "MT")) == 1
+
+
+def test_jackson_hole_has_its_specific_link_plus_the_state_fallback():
+    urls = [link["url"] for link in traffic_cams_for("jackson-hole", "WY")]
+    assert len(urls) == 2
+    assert "SelectedTown=Jackson" in urls[0]
+    assert urls[1] == STATE_SITES["WY"]["url"]
 
 
 def test_every_colorado_mountain_links_to_a_map_near_its_road():
@@ -56,6 +63,12 @@ def test_places_with_their_own_camera_pages_link_to_them():
     assert any("cottonwoodcanyons.udot.utah.gov" in u for u in urls("alta", "UT"))
     assert any("cottonwoodcanyons.udot.utah.gov" in u for u in urls("snowbird", "UT"))
     assert any("drivebc.ca/cameras/" in u for u in urls("whistler-blackcomb", "BC"))
+    # Each of these targets the mountain's actual access road, not just a statewide page:
+    assert any("SelectedTown=Jackson" in u for u in urls("jackson-hole", "WY"))
+    assert any("US-95" in u for u in urls("schweitzer", "ID"))
+    assert any("Highway+26" in u for u in urls("blue-mountain", "ON"))
+    assert any("I-94" in u for u in urls("wilmot-mountain", "WI"))
+    assert any("normalCameras" in u and "-92.7917" in u for u in urls("afton-alps", "MN"))
 
 
 def test_i70_corridor_runs_from_denver_west_to_glenwood_canyon():

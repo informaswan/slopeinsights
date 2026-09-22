@@ -15,6 +15,11 @@ def _link(label: str, url: str) -> dict:
     return {"label": label, "url": url}
 
 
+def _mn511(lng: float, lat: float, zoom: int = 11) -> str:
+    layers = "metroTrafficMap,roadReports,normalCameras,weatherWarningsAreaEvents,stationsAlert,trafficSpeeds,otherStateInfo"
+    return f"https://511mn.org/@{lng},{lat},{zoom}?show={layers}"
+
+
 STATE_SITES: dict[str, dict] = {
     "CO": _link("COtrip: Colorado road conditions and cameras", "https://www.cotrip.org/"),
     "UT": _link("UDOT Traffic: cameras", "https://udottraffic.utah.gov/cctv"),
@@ -107,6 +112,33 @@ RESORT_LINKS: dict[str, list[dict]] = {
     "revelstoke": [
         _link("DriveBC: Highway 1 at Highway 23, Revelstoke", "https://www.drivebc.ca/cameras/585"),
         _link("DriveBC: Rogers Pass (Highway 1)", "https://www.drivebc.ca/cameras/101"),
+    ],
+    # Wyoming: WYDOT's camera-by-town search covers Jackson Hole's actual access roads
+    # (Teton Pass, Hoback Junction, Wilson) far better than a statewide interstate list.
+    "jackson-hole": [
+        _link("WYDOT: Jackson-area cameras (Teton Pass, Hoback Jct)",
+              "https://www.wyoroad.info/pls/Browse/WRR.CameraCityResults?SelectedTown=Jackson"),
+    ],
+    # Idaho, Wisconsin and Ontario's 511 sites support filtering the camera list by the
+    # exact road/highway; use that instead of the unfiltered statewide list.
+    "schweitzer": [
+        _link("Idaho 511: US-95 cameras",
+              "https://511.idaho.gov/cctv?start=0&length=10&filters%5B0%5D%5Bi%5D=2"
+              "&filters%5B0%5D%5Bs%5D=US-95&order%5Bi%5D=1&order%5Bdir%5D=asc"),
+    ],
+    "wilmot-mountain": [
+        _link("511 Wisconsin: I-94 cameras",
+              "https://511wi.gov/cctv?start=0&length=10&filters%5B0%5D%5Bi%5D=4"
+              "&filters%5B0%5D%5Bs%5D=I-94&order%5Bi%5D=1&order%5Bdir%5D=asc"),
+    ],
+    "blue-mountain": [
+        _link("Ontario 511: Highway 26 cameras (Collingwood)",
+              "https://511on.ca/cctv?start=0&length=10&filters%5B0%5D%5Bi%5D=3"
+              "&filters%5B0%5D%5Bs%5D=Highway+26&order%5Bi%5D=1&order%5Bdir%5D=asc"),
+    ],
+    # Minnesota's 511 map accepts a center coordinate and a layer list directly in the URL.
+    "afton-alps": [
+        _link("511MN: cameras near Afton Alps", _mn511(-92.7917, 44.8622)),
     ],
 }
 
