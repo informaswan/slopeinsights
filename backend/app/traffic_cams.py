@@ -152,6 +152,15 @@ def traffic_cams_for(resort_id: str, state: str) -> list[dict]:
     return links
 
 
+COMING_SOON_NOTE = "More precise camera links for this mountain are coming soon."
+
+
+def traffic_cams_note(resort_id: str) -> str | None:
+    """A mountain with no road-specific link yet still gets its state's general camera
+    page (see traffic_cams_for) — this says so, rather than silently looking finished."""
+    return None if resort_id in RESORT_LINKS else COMING_SOON_NOTE
+
+
 def _stop(name: str, lat: float, lng: float, zoom: int = 11) -> dict:
     return {"name": name, "lat": lat, "lng": lng, "url": _cotrip(lat, lng, zoom)}
 

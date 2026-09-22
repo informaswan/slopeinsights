@@ -112,6 +112,9 @@ export default function ResortDetailScreen() {
         <View style={[styles.linkPanel, { backgroundColor: colors.surface, borderColor: colors.border }]}>
           <Text style={[styles.panelTitle, { color: colors.textSecondary }]}>Road cameras</Text>
           <CameraLinks links={resort.traffic_cams} />
+          {resort.traffic_cams_note && (
+            <Text style={[styles.comingSoon, { color: colors.textMuted }]}>{resort.traffic_cams_note}</Text>
+          )}
         </View>
       )}
 
@@ -164,6 +167,7 @@ const styles = StyleSheet.create({
   grid: { flexDirection: 'row', flexWrap: 'wrap', gap: Spacing.md },
   panel: { flexGrow: 1, flexBasis: 340, borderRadius: Radius.md, borderWidth: 1, overflow: 'hidden' },
   panelTitle: { fontSize: FontSize.sm, fontWeight: '600', paddingHorizontal: Spacing.md, paddingTop: Spacing.sm + 2 },
+  comingSoon: { fontSize: FontSize.xs, paddingHorizontal: Spacing.md, paddingBottom: Spacing.sm + 2, fontStyle: 'italic' },
   linkPanel: { borderRadius: Radius.md, borderWidth: 1, overflow: 'hidden' },
   infoPanel: { padding: Spacing.md, gap: Spacing.sm, flexBasis: 'auto' },
   infoRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },

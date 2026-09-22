@@ -147,6 +147,7 @@ export interface ResortDetail {
   webcams: WebcamItem[];
   parking: ParkingDetail;
   traffic_cams?: TrafficCamLink[];
+  traffic_cams_note?: string | null;
 }
 
 export interface BestResortResponse {

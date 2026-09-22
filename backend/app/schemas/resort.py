@@ -153,6 +153,7 @@ class ResortDetail(BaseModel):
     webcams: list[WebcamItem]
     parking: ParkingDetail
     traffic_cams: list[TrafficCamLink]
+    traffic_cams_note: str | None
 
 
 class BestResortResponse(BaseModel):

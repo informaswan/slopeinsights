@@ -35,7 +35,7 @@ from app.schemas.resort import (
     CrowdDetail, WebcamItem, ParkingDetail, LiveLot, StaticLot, TrailSummary,
 )
 from app.schemas.errors import ErrorResponse
-from app.traffic_cams import road_camera_groups, traffic_cams_for
+from app.traffic_cams import road_camera_groups, traffic_cams_for, traffic_cams_note
 
 logger = logging.getLogger(__name__)
 def _merge_forecast_by_date(rows: list[WeatherForecast]) -> list[dict]:
@@ -198,6 +198,7 @@ def get_resort_detail(resort_id: str, db: Session = Depends(get_db), _: str = De
         "webcams": [{"label": w.label, "cam_type": w.cam_type, "url": w.url, "is_alive": w.is_alive} for w in webcams],
         "parking": parking_detail,
         "traffic_cams": traffic_cams_for(resort.id, resort.state),
+        "traffic_cams_note": traffic_cams_note(resort.id),
     }
 
 
