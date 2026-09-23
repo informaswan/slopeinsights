@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text, Pressable, StyleSheet } from 'react-native';
 import { useRouter } from 'expo-router';
 import type { ResortSummary } from '../lib/types';
-import { crowdColor, crowdLabel, formatAgo } from '../lib/utils';
+import { formatAgo, passBadge } from '../lib/utils';
 import { Spacing, FontSize, Radius } from '../constants/theme';
 import { useTheme } from '../contexts/ThemeContext';
 import { useFavorites } from '../contexts/FavoritesContext';
@@ -15,17 +15,7 @@ export function ResortCard({ resort }: Props) {
   const { colors } = useTheme();
   const { favoriteIds, toggleFavorite } = useFavorites();
   const isFavorite = favoriteIds.includes(resort.id);
-  const passColor = resort.pass_type === 'epic' ? colors.epic : colors.ikon;
-  const passLabel = resort.pass_type === 'epic' ? 'Epic' : 'Ikon';
-  const level = resort.crowd?.current_level ?? null;
-  const crowdKnown = crowdLabel(level) !== '—';
-  const crowdPill = !crowdKnown ? null : (
-    <View style={[styles.crowdPill, { backgroundColor: crowdColor(level, colors) + '22' }]}>
-      <View style={[styles.crowdDot, { backgroundColor: crowdColor(level, colors) }]} />
-      <Text style={[styles.crowdText, { color: crowdColor(level, colors) }]}>{crowdLabel(level)}</Text>
-    </View>
-  );
-
+  const { color: passColor, label: passLabel } = passBadge(resort.pass_type, colors);
   return (
     <Pressable
       style={({ pressed, hovered }: any) => [
@@ -68,14 +58,10 @@ export function ResortCard({ resort }: Props) {
             </Text>
             <Text style={[styles.label, { color: colors.textMuted }]}>24h</Text>
           </View>
-          <View style={styles.spacer} />
-          {crowdPill}
         </View>
       ) : (
         <View style={styles.metricsRow}>
           <Text style={[styles.unavailable, { color: colors.textMuted }]}>Snow data unavailable</Text>
-          <View style={styles.spacer} />
-          {crowdPill}
         </View>
       )}
 
@@ -113,10 +99,4 @@ const styles = StyleSheet.create({
   spacer: { flex: 1 },
   unavailable: { fontSize: FontSize.sm },
   stale: { fontSize: FontSize.xs },
-  crowdPill: {
-    flexDirection: 'row', alignItems: 'center', gap: 5,
-    borderRadius: Radius.full, paddingHorizontal: Spacing.sm, paddingVertical: 3,
-  },
-  crowdDot: { width: 6, height: 6, borderRadius: 3 },
-  crowdText: { fontSize: FontSize.xs, fontWeight: '600' },
 });

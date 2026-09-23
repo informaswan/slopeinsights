@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import * as Linking from 'expo-linking';
+import { openExternalLink } from '../lib/openExternalLink';
 import { useTheme } from '../contexts/ThemeContext';
 import { useIsWide } from '../hooks/useIsWide';
 import { Spacing, FontSize } from '../constants/theme';
@@ -16,14 +16,14 @@ export default function AboutScreen() {
         <Text style={[styles.title, { color: colors.text }]}>About SlopeInsights</Text>
         <Text style={[styles.body, { color: colors.textSecondary }]}>
           My brothers and I built SlopeInsights to put everything you need for deciding where to
-          ski or ride, like snow, weather and crowds, in one place, whether you're on Ikon, Epic,
+          ski or ride, like snow, weather and road cameras, in one place, whether you're on Ikon, Epic,
           or neither. We're actively adding more mountains and features. If you want to help us
           get there faster, you can{' '}
-          <Text style={[styles.link, { color: colors.epic }]} onPress={() => Linking.openURL(DONATION_URL)}>
+          <Text style={[styles.link, { color: colors.epic }]} onPress={() => openExternalLink(DONATION_URL)}>
             buy us a coffee
           </Text>
           {' '}or{' '}
-          <Text style={[styles.link, { color: colors.epic }]} onPress={() => Linking.openURL(VENMO_URL)}>
+          <Text style={[styles.link, { color: colors.epic }]} onPress={() => openExternalLink(VENMO_URL)}>
             send a tip on Venmo
           </Text>
           .

@@ -44,7 +44,11 @@ function ForecastCard({ period, colors }: { period: WeatherPeriod; colors: Theme
       </View>
       <Text style={[styles.precip, { color: colors.snowBlue }]}>{period.precip_pct ?? '—'}%</Text>
       <Text style={[styles.wind, { color: colors.textMuted }]}>{period.wind_mph ?? '—'} mph</Text>
-      {period.snow_in_forecast && <Text style={[styles.snowIcon, { color: colors.snowBlue }]}>Snow</Text>}
+      {(period.snow_amount_in ?? 0) > 0 ? (
+        <Text style={[styles.snowIcon, { color: colors.snowBlue }]}>Snow: {period.snow_amount_in}"</Text>
+      ) : period.snow_in_forecast ? (
+        <Text style={[styles.snowIcon, { color: colors.snowBlue }]}>Snow</Text>
+      ) : null}
     </View>
   );
 }

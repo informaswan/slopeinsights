@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, Pressable, StyleSheet } from 'react-native';
 import { useRouter } from 'expo-router';
 import type { ResortSummary } from '../lib/types';
+import { passBadge } from '../lib/utils';
 import { Spacing, FontSize, Radius } from '../constants/theme';
 import { useTheme } from '../contexts/ThemeContext';
 
@@ -17,8 +18,7 @@ export function BestBanner({ resorts }: Props) {
       <Text style={[styles.heading, { color: colors.text }]}>Best conditions today</Text>
       <View style={styles.row}>
         {resorts.map((r) => {
-          const passColor = r.pass_type === 'epic' ? colors.epic : colors.ikon;
-          const passLabel = r.pass_type === 'epic' ? 'Epic' : 'Ikon';
+          const { color: passColor, label: passLabel } = passBadge(r.pass_type, colors);
           const snow24h = r.snow?.new_24h_in;
           const baseIn = r.snow?.base_in;
           return (

@@ -1,0 +1,35 @@
+# Runs the full stack locally for development/testing.
+#   docker compose up --build
+# Backend: http://localhost:8000   Frontend: http://localhost:8080
+#
+# Production deploys the backend the same way (see backend/docker-compose.yml,
+# used as-is on the Lightsail box) but the frontend ships to GitHub Pages
+# instead (see .github/workflows/deploy-frontend.yml) — this file is for
+# local use only, so the two never conflict.
+services:
+  api:
+    build: ./backend
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:8000:8000"
+    environment:
+      DATABASE_URL: sqlite:////data/slopeinsights.db
+      API_KEY: dev-key
+      ENVIRONMENT: development
+      CORS_ORIGINS: "*"
+    volumes:
+      - slopeinsights-data:/data
+
+  web:
+    build:
+      context: ./app
+      args:
+        EXPO_PUBLIC_API_URL: http://localhost:8000
+        EXPO_PUBLIC_API_KEY: dev-key
+    ports:
+      - "127.0.0.1:8080:80"
+    depends_on:
+      - api
+
+volumes:
+  slopeinsights-data:

@@ -20,7 +20,7 @@ it('renders sort options', () => {
   const { getByText, queryByText } = render(<FilterSheet ref={createRef()} filterState={defaultFilter} onApply={jest.fn()} filteredCount={10} />, { wrapper: TestWrapper });
   expect(getByText('Most fresh snow')).toBeTruthy();
   expect(getByText('Deepest base')).toBeTruthy();
-  expect(getByText('Least crowded')).toBeTruthy();
+  expect(queryByText('Least crowded')).toBeNull();
   expect(queryByText('Most lifts open')).toBeNull();
 });
 

@@ -4,7 +4,7 @@ import { ParkingSection } from '../../components/ParkingSection';
 import type { ParkingDetail } from '../../lib/types';
 import { TestWrapper } from '../test-utils';
 
-jest.mock('expo-linking', () => ({ openURL: jest.fn() }));
+jest.mock('../../lib/openExternalLink', () => ({ openExternalLink: jest.fn() }));
 
 const parkingLive: ParkingDetail = {
   has_live_data: true,

@@ -16,7 +16,10 @@ from sqlalchemy.orm import Session
 
 from app.config import settings
 from app.database import get_db
-from app.cache import get_cached_resort_list, set_cached_resort_list
+from app.cache import (
+    get_cached_resort_list, set_cached_resort_list,
+    get_cached_resort_detail, set_cached_resort_detail, CACHE_TTL_SECONDS,
+)
 from app.scoring import rank_resorts
 from app.models.resort import Resort
 from app.models.lift import LiftStatus
@@ -24,15 +27,15 @@ from app.models.weather import WeatherForecast
 from app.models.webcam import Webcam
 from app.models.parking import ParkingLot
 from app.models.snow import SnowCondition
-from app.models.crowd import CrowdData
+from app.models.snow_forecast import SnowForecast
 from app.routers._helpers import (
-    build_resort_summary, crowd_current, crowd_label, is_stale,
+    build_resort_summary, is_stale,
     STALE_LIFT_SECONDS, STALE_SNOW_SECONDS, STALE_WEATHER_SECONDS, STALE_PARKING_SECONDS,
 )
 from app.schemas.resort import (
     ResortSummary, ResortDetail, BestResortResponse, RoadCameraResponse,
     SnowDetail, LiftDetail, LiftItem, WeatherDetail, WeatherPeriod,
-    CrowdDetail, WebcamItem, ParkingDetail, LiveLot, StaticLot, TrailSummary,
+    WebcamItem, ParkingDetail, LiveLot, StaticLot, TrailSummary,
 )
 from app.schemas.errors import ErrorResponse
 from app.traffic_cams import road_camera_groups, traffic_cams_for, traffic_cams_note
@@ -44,12 +47,15 @@ def _merge_forecast_by_date(rows: list[WeatherForecast]) -> list[dict]:
 
     High comes from the day period and low from the night period. Precipitation and
     wind take the worst of the two, and snow is flagged if either period mentions it.
+    snow_amount_in is a daily total the scraper already computed and stored on both
+    periods for that date, so it's taken once rather than summed.
     """
     days: dict[str, dict] = {}
     for w in rows:
         day = days.setdefault(w.forecast_date, {
             "date": w.forecast_date, "high_f": None, "low_f": None,
             "precip_pct": None, "snow_in_forecast": False, "wind_mph": None,
+            "snow_amount_in": None,
         })
         if w.high_f is not None and day["high_f"] is None:
             day["high_f"] = w.high_f
@@ -60,6 +66,8 @@ def _merge_forecast_by_date(rows: list[WeatherForecast]) -> list[dict]:
         if w.wind_mph is not None:
             day["wind_mph"] = max(day["wind_mph"] or 0, w.wind_mph)
         day["snow_in_forecast"] = day["snow_in_forecast"] or bool(w.snow_in_forecast)
+        if w.snow_amount_in is not None and day["snow_amount_in"] is None:
+            day["snow_amount_in"] = w.snow_amount_in
     return list(days.values())
 
 
@@ -97,7 +105,8 @@ def get_best_resorts(db: Session = Depends(get_db), _: str = Depends(_require_ap
 
 
 @router.get("/resorts", response_model=list[ResortSummary])
-def get_resorts(db: Session = Depends(get_db), _: str = Depends(_require_api_key)):
+def get_resorts(response: Response, db: Session = Depends(get_db), _: str = Depends(_require_api_key)):
+    response.headers["Cache-Control"] = f"public, max-age={CACHE_TTL_SECONDS}"
     cached = get_cached_resort_list()
     if cached is not None:
         return cached
@@ -108,23 +117,25 @@ def get_resorts(db: Session = Depends(get_db), _: str = Depends(_require_api_key
 
 
 @router.get("/resorts/{resort_id}", response_model=ResortDetail)
-def get_resort_detail(resort_id: str, db: Session = Depends(get_db), _: str = Depends(_require_api_key)):
+def get_resort_detail(resort_id: str, response: Response, db: Session = Depends(get_db), _: str = Depends(_require_api_key)):
+    response.headers["Cache-Control"] = f"public, max-age={CACHE_TTL_SECONDS}"
+    cached = get_cached_resort_detail(resort_id)
+    if cached is not None:
+        return cached
+
     resort = db.query(Resort).filter_by(id=resort_id).first()
     if not resort:
         raise HTTPException(status_code=404, detail=ErrorResponse(error="Resort not found", code=404).model_dump())
 
     snow = db.query(SnowCondition).filter_by(resort_id=resort_id).first()
+    snow_forecast_row = db.query(SnowForecast).filter_by(resort_id=resort_id).first()
     lifts = db.query(LiftStatus).filter_by(resort_id=resort_id).all()
-    try:
-        today_dow = datetime.now(ZoneInfo(resort.timezone)).weekday()
-    except Exception:
-        today_dow = datetime.now(timezone.utc).weekday()
-    crowd_row = db.query(CrowdData).filter_by(resort_id=resort_id, day_of_week=today_dow).first()
     weather_rows = (
         db.query(WeatherForecast).filter_by(resort_id=resort_id)
         .order_by(WeatherForecast.forecast_date, WeatherForecast.id).all()
     )
-    webcams = db.query(Webcam).filter_by(resort_id=resort_id).all()
+    webcams = db.query(Webcam).filter_by(resort_id=resort_id, category="mountain").all()
+    live_traffic_cams = db.query(Webcam).filter_by(resort_id=resort_id, category="traffic").all()
     parking_live = db.query(ParkingLot).filter_by(resort_id=resort_id, is_live=True).all()
     parking_static = db.query(ParkingLot).filter_by(resort_id=resort_id, is_live=False).all()
 
@@ -136,6 +147,16 @@ def get_resort_detail(resort_id: str, db: Session = Depends(get_db), _: str = De
             "surface": snow.surface,
             "scraped_at": snow.scraped_at.isoformat() if snow.scraped_at else None,
             "is_stale": is_stale(snow.scraped_at, STALE_SNOW_SECONDS),
+        }
+
+    snow_forecast_detail = None
+    if snow_forecast_row:
+        snow_forecast_detail = {
+            "next_24h_in": snow_forecast_row.next_24h_in,
+            "next_48h_in": snow_forecast_row.next_48h_in,
+            "next_72h_in": snow_forecast_row.next_72h_in,
+            "scraped_at": snow_forecast_row.scraped_at.isoformat() if snow_forecast_row.scraped_at else None,
+            "is_stale": is_stale(snow_forecast_row.scraped_at, STALE_WEATHER_SECONDS),
         }
 
     lift_detail = None
@@ -151,17 +172,6 @@ def get_resort_detail(resort_id: str, db: Session = Depends(get_db), _: str = De
     trail_summary = None
     if snow:
         trail_summary = {"open": snow.trails_open, "total": snow.trails_total}
-
-    crowd_detail = None
-    if crowd_row:
-        hourly = json.loads(crowd_row.hourly_json)
-        pct, level = crowd_current(hourly, resort.timezone)
-        label = crowd_label(hourly, today_dow)
-        crowd_detail = {
-            "current_level": level, "current_pct": pct,
-            "source": "historical_pattern", "label": label,
-            "hourly_start": "08:00", "hourly": hourly,
-        }
 
     weather_detail = None
     if weather_rows:
@@ -188,19 +198,27 @@ def get_resort_detail(resort_id: str, db: Session = Depends(get_db), _: str = De
         ],
     }
 
-    return {
+    result = {
         "id": resort.id, "name": resort.name, "pass_type": resort.pass_type,
         "region": resort.region, "state": resort.state, "country": resort.country,
         "summit_elevation_ft": resort.summit_elevation_ft,
         "vertical_drop_ft": resort.vertical_drop_ft,
         "website": resort.website,
-        "snow": snow_detail, "lifts": lift_detail, "trails": trail_summary,
-        "crowd": crowd_detail, "weather": weather_detail,
+        "latitude": resort.latitude,
+        "longitude": resort.longitude,
+        "snow": snow_detail, "snow_forecast": snow_forecast_detail, "lifts": lift_detail, "trails": trail_summary,
+        "weather": weather_detail,
         "webcams": [{"label": w.label, "cam_type": w.cam_type, "url": w.url, "is_alive": w.is_alive} for w in webcams],
         "parking": parking_detail,
         "traffic_cams": traffic_cams_for(resort.id, resort.state),
         "traffic_cams_note": traffic_cams_note(resort.id),
+        "live_traffic_cams": [
+            {"label": w.label, "cam_type": w.cam_type, "url": w.url, "is_alive": w.is_alive}
+            for w in live_traffic_cams
+        ],
     }
+    set_cached_resort_detail(resort_id, result)
+    return result
 
 
 @router.get("/resorts/{resort_id}/lifts")
@@ -225,7 +243,7 @@ def get_resort_webcams(resort_id: str, db: Session = Depends(get_db), _: str = D
     resort = db.query(Resort).filter_by(id=resort_id).first()
     if not resort:
         raise HTTPException(status_code=404, detail=ErrorResponse(error="Resort not found", code=404).model_dump())
-    webcams = db.query(Webcam).filter_by(resort_id=resort_id).all()
+    webcams = db.query(Webcam).filter_by(resort_id=resort_id, category="mountain").all()
     return {
         "resort_id": resort_id,
         "items": [{"label": w.label, "cam_type": w.cam_type, "url": w.url, "is_alive": w.is_alive} for w in webcams],
@@ -235,7 +253,10 @@ def get_resort_webcams(resort_id: str, db: Session = Depends(get_db), _: str = D
 @router.get("/webcam-proxy")
 async def webcam_proxy(url: str = Query(...)):
     """Proxy webcam JPEG images to avoid cross-origin hotlink blocks."""
-    allowed_hosts = {"webcams.opensnow.com", "media.mammothresorts.com", "backend.roundshot.com"}
+    allowed_hosts = {
+        "webcams.opensnow.com", "media.mammothresorts.com", "backend.roundshot.com",
+        "511on.ca", "www.drivebc.ca",
+    }
     from urllib.parse import urlparse
     host = urlparse(url).hostname or ""
     if host not in allowed_hosts:

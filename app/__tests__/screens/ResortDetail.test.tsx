@@ -22,7 +22,7 @@ jest.mock('expo-video', () => ({
   VideoView: () => null,
   useVideoPlayer: jest.fn(() => ({ play: jest.fn(), addListener: jest.fn(() => ({ remove: jest.fn() })) })),
 }));
-jest.mock('expo-linking', () => ({ openURL: jest.fn() }));
+jest.mock('../../lib/openExternalLink', () => ({ openExternalLink: jest.fn() }));
 jest.mock('../../components/WebcamViewer', () => ({
   WebcamViewer: ({ webcams }: any) => {
     const { View, Text } = require('react-native');
@@ -39,16 +39,14 @@ const mockResort = {
   region: 'Wyoming', state: 'WY', country: 'US',
   summit_elevation_ft: 10450, vertical_drop_ft: 4139,
   website: 'https://www.jacksonhole.com',
+  latitude: 43.5875, longitude: -110.8279,
   snow: { base_in: 42, new_24h_in: 12, new_48h_in: 18, new_7d_in: 26,
     surface: 'powder', scraped_at: '2026-03-15T10:00:00Z', is_stale: false },
   lifts: { open: 13, total: 18, scraped_at: '2026-03-15T10:05:00Z', is_stale: false,
     items: [{ name: 'Aerial Tram', status: 'open' as const }, { name: 'Thunder Express', status: 'closed' as const }] },
   trails: { open: 120, total: 131 },
-  crowd: { current_level: 'high', current_pct: 82, source: 'historical_pattern',
-    label: 'Typically busiest 10am–2pm on Saturdays', hourly_start: '08:00',
-    hourly: [10, 5, 40, 90, 100, 82, 70, 50, 30, 15] },
   weather: { scraped_at: '2026-03-15T09:00:00Z', is_stale: false,
-    forecast: [{ date: '2026-03-15', high_f: 28, low_f: 14, precip_pct: 20, snow_in_forecast: false, wind_mph: 12 }] },
+    forecast: [{ date: '2026-03-15', high_f: 28, low_f: 14, precip_pct: 20, snow_in_forecast: false, snow_amount_in: null, wind_mph: 12 }] },
   webcams: [{ label: 'Rendezvous Bowl', cam_type: 'hls' as const, url: 'https://example.com/stream.m3u8', is_alive: true }],
   traffic_cams: [
     { label: 'WYDOT: web cameras', url: 'https://www.wyoroad.info/highway/webcameras/webcameras.html' },
@@ -76,9 +74,13 @@ describe('ResortDetail screen — loaded', () => {
     expect(screen.getByTestId('snow-stats')).toBeTruthy();
   });
 
-  it('renders crowd chart section', () => {
+  it('shows a "feature wanted" note for crowd levels instead of fake data', () => {
+    const { openExternalLink } = require('../../lib/openExternalLink');
     render(<ResortDetail />);
-    expect(screen.getByTestId('crowd-chart')).toBeTruthy();
+    expect(screen.getByTestId('crowds-wanted')).toBeTruthy();
+    expect(screen.getByText('Crowd levels are a feature we want')).toBeTruthy();
+    fireEvent.press(screen.getByText('Help us add it'));
+    expect(openExternalLink).toHaveBeenCalledWith('https://buymeacoffee.com/slopeinsights');
   });
 
   it('renders weather section', () => {
@@ -87,11 +89,11 @@ describe('ResortDetail screen — loaded', () => {
   });
 
   it('lists road camera links and opens the official page', () => {
-    const Linking = require('expo-linking');
+    const { openExternalLink } = require('../../lib/openExternalLink');
     render(<ResortDetail />);
     expect(screen.getByText('Road cameras')).toBeTruthy();
     fireEvent.press(screen.getByText('WYDOT: web cameras'));
-    expect(Linking.openURL).toHaveBeenCalledWith('https://www.wyoroad.info/highway/webcameras/webcameras.html');
+    expect(openExternalLink).toHaveBeenCalledWith('https://www.wyoroad.info/highway/webcameras/webcameras.html');
   });
 
   it('hides the road cameras panel when there are no links (or an older API omits them)', () => {
@@ -144,6 +146,35 @@ describe('ResortDetail screen — loaded', () => {
     expect(screen.getByText(/10,450/)).toBeTruthy();
     expect(screen.getByText(/4,139/)).toBeTruthy();
     expect(screen.getByText(/jacksonhole\.com/)).toBeTruthy();
+  });
+
+  it('shows a Live road cameras section when live_traffic_cams is non-empty', () => {
+    (useResortDetail as jest.Mock).mockReturnValue({
+      resort: {
+        ...mockResort,
+        live_traffic_cams: [{ label: 'I-70 East', cam_type: 'jpeg' as const, url: 'https://images.drivebc.ca/x.jpg', is_alive: true }],
+      },
+      loading: false, error: null, refresh: jest.fn(),
+    });
+    render(<ResortDetail />);
+    expect(screen.getByText('Live road cameras')).toBeTruthy();
+    // Both the mountain webcam viewer (1 cam) and the live-traffic-cam viewer (1 cam) render now.
+    expect(screen.getAllByTestId('webcam-viewer')).toHaveLength(2);
+    expect(screen.getAllByText('1 cams')).toHaveLength(2);
+  });
+
+  it('hides the Live road cameras section when live_traffic_cams is empty or missing', () => {
+    render(<ResortDetail />);
+    expect(screen.queryByText('Live road cameras')).toBeNull();
+  });
+
+  it('opens Google Maps at the resort\'s coordinates when "View on Google Maps" is pressed', () => {
+    const { openExternalLink } = require('../../lib/openExternalLink');
+    render(<ResortDetail />);
+    fireEvent.press(screen.getByText('View on Google Maps'));
+    expect(openExternalLink).toHaveBeenCalledWith(
+      'https://www.google.com/maps/search/?api=1&query=43.5875,-110.8279'
+    );
   });
 });
 

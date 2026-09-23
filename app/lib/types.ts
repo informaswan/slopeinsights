@@ -16,22 +16,15 @@ export interface TrailSummary {
   total: number | null;
 }
 
-export interface CrowdSummary {
-  current_level: 'low' | 'medium' | 'high' | 'closed' | null;
-  current_pct: number | null;
-  source: string;
-}
-
 export interface ResortSummary {
   id: string;
   name: string;
-  pass_type: 'epic' | 'ikon';
+  pass_type: 'epic' | 'ikon' | 'independent';
   region: string;
   state: string;
   snow: SnowSummary | null;
   lifts: LiftSummary | null;
   trails: TrailSummary | null;
-  crowd: CrowdSummary | null;
 }
 
 export interface LiftItem {
@@ -57,12 +50,21 @@ export interface SnowDetail {
   is_stale: boolean;
 }
 
+export interface SnowForecastDetail {
+  next_24h_in: number | null;
+  next_48h_in: number | null;
+  next_72h_in: number | null;
+  scraped_at: string | null;
+  is_stale: boolean;
+}
+
 export interface WeatherPeriod {
   date: string;
   high_f: number | null;
   low_f: number | null;
   precip_pct: number | null;
   snow_in_forecast: boolean;
+  snow_amount_in: number | null;
   wind_mph: number | null;
 }
 
@@ -91,15 +93,6 @@ export interface WeatherDetail {
   scraped_at: string | null;
   is_stale: boolean;
   forecast: WeatherPeriod[];
-}
-
-export interface CrowdDetail {
-  current_level: string | null;
-  current_pct: number | null;
-  source: string;
-  label: string | null;
-  hourly_start: string;
-  hourly: number[];
 }
 
 export interface WebcamItem {
@@ -133,22 +126,25 @@ export interface ParkingDetail {
 export interface ResortDetail {
   id: string;
   name: string;
-  pass_type: 'epic' | 'ikon';
+  pass_type: 'epic' | 'ikon' | 'independent';
   region: string;
   state: string;
   country: string;
   summit_elevation_ft: number | null;
   vertical_drop_ft: number | null;
   website: string | null;
+  latitude: number;
+  longitude: number;
   snow: SnowDetail | null;
+  snow_forecast?: SnowForecastDetail | null;
   lifts: LiftDetail | null;
   trails: TrailSummary | null;
-  crowd: CrowdDetail | null;
   weather: WeatherDetail | null;
   webcams: WebcamItem[];
   parking: ParkingDetail;
   traffic_cams?: TrafficCamLink[];
   traffic_cams_note?: string | null;
+  live_traffic_cams?: WebcamItem[];
 }
 
 export interface BestResortResponse {

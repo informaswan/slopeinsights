@@ -7,10 +7,19 @@ class Settings(BaseSettings):
 
     database_url: str = "sqlite:///./slopeinsights.db"
     api_key: str = "dev-key"
-    besttime_api_key: str = ""
     environment: str = "development"
     jwt_secret: str = "dev-secret-change-in-production"
     cors_origins: str = "*"
+
+    # Optional: email a copy of each feedback submission. Feedback is always saved to the
+    # database; if these are unset, nothing is emailed. (Gmail works with an app password:
+    # smtp.gmail.com, port 587.)
+    feedback_to_email: str = ""
+    smtp_host: str = ""
+    smtp_port: int = 587
+    smtp_user: str = ""
+    smtp_password: str = ""
+    smtp_from: str = ""
 
     @property
     def cors_origin_list(self) -> list[str]:

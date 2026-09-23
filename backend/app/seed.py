@@ -8,6 +8,7 @@ NOTE: webcam URLs sourced from opensnow.com/location/{slug}/cams and official re
 from sqlalchemy.orm import Session
 from app.models.resort import Resort
 from app.models.webcam import Webcam
+from app.models.parking import ParkingLot
 
 RESORTS: list[dict] = [
     # ── EPIC PASS (20 resorts) ────────────────────────────────────────────
@@ -372,6 +373,49 @@ RESORTS: list[dict] = [
         "website": "https://www.schweitzer.com", "timezone": "America/Los_Angeles",
         "liftie_id": "schweitzer", "onthesnow_slug": "idaho/schweitzer",
     },
+    # ── ADDED LATER: partners and independents ─────────────────────────────
+    # Pass types checked against each resort's own/pass-company pages: Mt. Bachelor is on
+    # Ikon; Telluride is an Epic partner; the other three sell their own passes.
+    {
+        "id": "mt-bachelor", "name": "Mt. Bachelor", "pass_type": "ikon",
+        "region": "Pacific Northwest", "state": "OR", "country": "US",
+        "latitude": 44.0036, "longitude": -121.6787,
+        "summit_elevation_ft": 9065, "vertical_drop_ft": 3365,
+        "website": "https://www.mtbachelor.com", "timezone": "America/Los_Angeles",
+        "liftie_id": "mtbachelor", "onthesnow_slug": "oregon/mt-bachelor",
+    },
+    {
+        "id": "telluride", "name": "Telluride", "pass_type": "epic",
+        "region": "Colorado", "state": "CO", "country": "US",
+        "latitude": 37.9330, "longitude": -107.8507,
+        "summit_elevation_ft": 13150, "vertical_drop_ft": 4425,
+        "website": "https://tellurideskiresort.com", "timezone": "America/Denver",
+        "liftie_id": "telluride", "onthesnow_slug": "colorado/telluride",
+    },
+    {
+        "id": "mt-hood-meadows", "name": "Mt. Hood Meadows", "pass_type": "independent",
+        "region": "Pacific Northwest", "state": "OR", "country": "US",
+        "latitude": 45.3319, "longitude": -121.6657,
+        "summit_elevation_ft": 7300, "vertical_drop_ft": 2777,
+        "website": "https://www.skihood.com", "timezone": "America/Los_Angeles",
+        "liftie_id": "mthood", "onthesnow_slug": "oregon/mt-hood-meadows",
+    },
+    {
+        "id": "timberline-lodge", "name": "Timberline Lodge", "pass_type": "independent",
+        "region": "Pacific Northwest", "state": "OR", "country": "US",
+        "latitude": 45.3300, "longitude": -121.7100,
+        "summit_elevation_ft": 8540, "vertical_drop_ft": 4540,
+        "website": "https://timberlinelodge.com", "timezone": "America/Los_Angeles",
+        "liftie_id": "timberline-lodge", "onthesnow_slug": "oregon/timberline-lodge",
+    },
+    {
+        "id": "monarch", "name": "Monarch Mountain", "pass_type": "independent",
+        "region": "Colorado", "state": "CO", "country": "US",
+        "latitude": 38.5127, "longitude": -106.3317,
+        "summit_elevation_ft": 11952, "vertical_drop_ft": 1170,
+        "website": "https://skimonarch.com", "timezone": "America/Denver",
+        "liftie_id": "monarch", "onthesnow_slug": "colorado/monarch-mountain",
+    },
 ]
 
 
@@ -643,6 +687,74 @@ WEBCAMS: list[dict] = [
 ]
 
 
+PARKING_LOTS: list[dict] = [
+    # Static (no live status) lot names, sourced from each resort's own site or local
+    # reporting — not scraped, since none of these publish a live-status API we could
+    # find. Lot names and paid/free status shift season to season; re-verify before
+    # trusting rates or hours.
+    # ── VAIL ──────────────────────────────────────────────────────────────
+    {"resort_id": "vail", "lot_name": "Vail Village Parking Structure"},
+    {"resort_id": "vail", "lot_name": "Lionshead Parking Structure"},
+    # ── BRECKENRIDGE ──────────────────────────────────────────────────────
+    {"resort_id": "breckenridge", "lot_name": "Gold Rush Lot"},
+    {"resort_id": "breckenridge", "lot_name": "North Gondola Lot"},
+    {"resort_id": "breckenridge", "lot_name": "South Gondola Lot"},
+    {"resort_id": "breckenridge", "lot_name": "Miners Lot"},
+    {"resort_id": "breckenridge", "lot_name": "Tailings Lot"},
+    {"resort_id": "breckenridge", "lot_name": "Postal Lot"},
+    {"resort_id": "breckenridge", "lot_name": "Airport Road Lot"},
+    {"resort_id": "breckenridge", "lot_name": "Peak 9 Lot"},
+    {"resort_id": "breckenridge", "lot_name": "Beaver Run Lot"},
+    {"resort_id": "breckenridge", "lot_name": "Stables Lot"},
+    # ── PARK CITY ─────────────────────────────────────────────────────────
+    {"resort_id": "park-city", "lot_name": "Mountain Village Garage"},
+    {"resort_id": "park-city", "lot_name": "China Bridge Garage (Old Town)"},
+    # ── MAMMOTH ───────────────────────────────────────────────────────────
+    {"resort_id": "mammoth", "lot_name": "Main Lodge Lot"},
+    {"resort_id": "mammoth", "lot_name": "Canyon Lodge Lot"},
+    {"resort_id": "mammoth", "lot_name": "Eagle Lodge Lot"},
+    {"resort_id": "mammoth", "lot_name": "Chair 4 Lot"},
+    {"resort_id": "mammoth", "lot_name": "Chair 2 (The Mill) Lot"},
+    {"resort_id": "mammoth", "lot_name": "The Village Lot"},
+    # ── PALISADES TAHOE ───────────────────────────────────────────────────
+    {"resort_id": "palisades-tahoe", "lot_name": "Village Lot"},
+    {"resort_id": "palisades-tahoe", "lot_name": "Ski Way Lot"},
+    {"resort_id": "palisades-tahoe", "lot_name": "Alpine Lodge Lot"},
+    # ── WHISTLER BLACKCOMB ────────────────────────────────────────────────
+    {"resort_id": "whistler-blackcomb", "lot_name": "Day Lot 1"},
+    {"resort_id": "whistler-blackcomb", "lot_name": "Day Lot 2"},
+    {"resort_id": "whistler-blackcomb", "lot_name": "Day Lot 3"},
+    {"resort_id": "whistler-blackcomb", "lot_name": "Day Lot 4"},
+    {"resort_id": "whistler-blackcomb", "lot_name": "Day Lot 5"},
+    {"resort_id": "whistler-blackcomb", "lot_name": "Upper Lot 6"},
+    {"resort_id": "whistler-blackcomb", "lot_name": "Upper Lot 7"},
+    {"resort_id": "whistler-blackcomb", "lot_name": "Blackcomb Day Lot 6"},
+    {"resort_id": "whistler-blackcomb", "lot_name": "Blackcomb Day Lot 7"},
+    {"resort_id": "whistler-blackcomb", "lot_name": "Blackcomb Day Lot 8"},
+    {"resort_id": "whistler-blackcomb", "lot_name": "Creekside Base Parking"},
+    # ── STEAMBOAT ─────────────────────────────────────────────────────────
+    {"resort_id": "steamboat", "lot_name": "Upper Knoll Lot"},
+    {"resort_id": "steamboat", "lot_name": "Meadows Lot"},
+    {"resort_id": "steamboat", "lot_name": "Lower Knoll Lot"},
+    {"resort_id": "steamboat", "lot_name": "Steamboat Square Garage"},
+    {"resort_id": "steamboat", "lot_name": "Torian Plum Parking Garage"},
+    # ── ASPEN SNOWMASS ────────────────────────────────────────────────────
+    {"resort_id": "aspen-snowmass", "lot_name": "Two Creeks Lot"},
+    {"resort_id": "aspen-snowmass", "lot_name": "Lot E"},
+    {"resort_id": "aspen-snowmass", "lot_name": "Base Village Parking Garage"},
+    {"resort_id": "aspen-snowmass", "lot_name": "Brush Creek Park & Ride"},
+    # ── JACKSON HOLE ──────────────────────────────────────────────────────
+    {"resort_id": "jackson-hole", "lot_name": "Lot 1"},
+    {"resort_id": "jackson-hole", "lot_name": "Lot 2"},
+    {"resort_id": "jackson-hole", "lot_name": "Lot 3"},
+    {"resort_id": "jackson-hole", "lot_name": "Lot 4"},
+    {"resort_id": "jackson-hole", "lot_name": "Base Village Lot"},
+    {"resort_id": "jackson-hole", "lot_name": "Stilson Lot (free shuttle)"},
+    # NOTE: every other resort has no distinct named lots we could confirm from an
+    # official source — leave them with no parking data rather than invent names.
+]
+
+
 def seed_resorts(db: Session) -> None:
     """Upsert all resorts (updates slugs if they changed)."""
     for data in RESORTS:
@@ -661,4 +773,17 @@ def seed_webcams(db: Session) -> None:
     for data in WEBCAMS:
         if data["url"] not in existing_urls:
             db.add(Webcam(**data))
+    db.commit()
+
+
+def seed_parking_lots(db: Session) -> None:
+    """Insert static parking-lot rows — skips any (resort_id, lot_name) already present."""
+    existing = {
+        (resort_id, lot_name)
+        for resort_id, lot_name in db.query(ParkingLot.resort_id, ParkingLot.lot_name).all()
+    }
+    for data in PARKING_LOTS:
+        key = (data["resort_id"], data["lot_name"])
+        if key not in existing:
+            db.add(ParkingLot(is_live=False, **data))
     db.commit()

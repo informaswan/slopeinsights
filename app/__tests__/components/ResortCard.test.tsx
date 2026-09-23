@@ -16,7 +16,6 @@ const base: ResortSummary = {
   id: 'vail', name: 'Vail', pass_type: 'epic', region: 'Colorado', state: 'CO',
   snow: { base_in: 42, new_24h_in: 8, scraped_at: '2026-03-16T10:00:00Z', is_stale: false },
   lifts: { open: 18, total: 31 }, trails: { open: 120, total: 195 },
-  crowd: { current_level: 'medium', current_pct: 50, source: 'historical_pattern' },
 };
 
 beforeEach(() => {
@@ -71,24 +70,6 @@ it('offers to remove a mountain that is already saved', () => {
   const { getByLabelText } = render(<ResortCard resort={base} />, { wrapper: TestWrapper });
   fireEvent.press(getByLabelText('Remove Vail from My mountains'));
   expect(mockToggleFavorite).toHaveBeenCalledWith('vail');
-});
-
-it('renders crowd pill with label', () => {
-  const { getByText } = render(<ResortCard resort={base} />, { wrapper: TestWrapper });
-  expect(getByText('Medium')).toBeTruthy();
-});
-
-it('hides the crowd pill when there is no crowd data', () => {
-  const noCrowd = { ...base, crowd: null };
-  const { queryByText } = render(<ResortCard resort={noCrowd} />, { wrapper: TestWrapper });
-  expect(queryByText('Medium')).toBeNull();
-  expect(queryByText('—')).toBeNull();
-});
-
-it('hides the crowd pill when the resort is closed (no meaningful level)', () => {
-  const closed = { ...base, crowd: { ...base.crowd!, current_level: 'closed' as any } };
-  const { queryByText } = render(<ResortCard resort={closed} />, { wrapper: TestWrapper });
-  expect(queryByText('—')).toBeNull();
 });
 
 it('shows stale indicator when snow.is_stale is true', () => {

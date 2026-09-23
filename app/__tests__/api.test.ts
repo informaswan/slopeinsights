@@ -3,7 +3,7 @@ import { api } from '../lib/api';
 
 const mockResort = {
   id: 'vail', name: 'Vail', pass_type: 'epic', region: 'Colorado', state: 'CO',
-  snow: null, lifts: null, trails: null, crowd: null,
+  snow: null, lifts: null, trails: null,
 };
 
 beforeEach(() => (global.fetch as jest.Mock).mockReset());
@@ -27,8 +27,7 @@ it('getBestResorts returns the resorts array from the response envelope', async 
 
 it('getResortDetail constructs correct URL', async () => {
   const mockDetail = { ...mockResort, country: 'US', summit_elevation_ft: null,
-    vertical_drop_ft: null, website: null, snow: null, lifts: null, trails: null,
-    crowd: null, weather: null, webcams: [],
+    vertical_drop_ft: null, website: null, snow: null, lifts: null, trails: null, weather: null, webcams: [],
     parking: { has_live_data: false, scraped_at: null, is_stale: false, live_lots: [], static_lots: [] } };
   (global.fetch as jest.Mock).mockResolvedValueOnce({ ok: true, json: async () => mockDetail });
   await api.getResortDetail('jackson-hole');

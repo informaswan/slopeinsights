@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, Pressable, StyleSheet } from 'react-native';
-import * as Linking from 'expo-linking';
+import { openExternalLink } from '../lib/openExternalLink';
 import type { ParkingDetail, LiveLot, StaticLot } from '../lib/types';
 import { Spacing, FontSize, Radius } from '../constants/theme';
 import { useTheme } from '../contexts/ThemeContext';
@@ -46,7 +46,7 @@ function StaticLotRow({ lot, colors }: { lot: StaticLot; colors: ThemeColors }) 
       {lot.directions_url && (
         <Pressable
           style={[styles.directionsButton, { backgroundColor: colors.epic }]}
-          onPress={() => Linking.openURL(lot.directions_url!)}
+          onPress={() => openExternalLink(lot.directions_url!)}
         >
           <Text style={styles.directionsText}>Get Directions</Text>
         </Pressable>

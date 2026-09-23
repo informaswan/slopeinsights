@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, fireEvent, waitFor } from '@testing-library/react-native';
 
-jest.mock('expo-linking', () => ({ openURL: jest.fn() }));
+jest.mock('../../lib/openExternalLink', () => ({ openExternalLink: jest.fn() }));
 jest.mock('../../contexts/ThemeContext', () => {
   const { LightColors } = require('../../constants/theme');
   return { useTheme: () => ({ colors: LightColors, isDark: false, toggleTheme: jest.fn() }) };
@@ -53,11 +53,11 @@ it('shows the I-70 corridor and the passes, listed from Denver heading west', as
 }, 30000);
 
 it('opens the official map for a stop', async () => {
-  const Linking = require('expo-linking');
+  const { openExternalLink } = require('../../lib/openExternalLink');
   mockGetRoadCameras.mockResolvedValue(groups);
   const { findByText } = renderScreen();
   fireEvent.press(await findByText('Vail'));
-  expect(Linking.openURL).toHaveBeenCalledWith('https://www.cotrip.org/map?lat=39.6&lng=-106.3&zoom=11');
+  expect(openExternalLink).toHaveBeenCalledWith('https://www.cotrip.org/map?lat=39.6&lng=-106.3&zoom=11');
 });
 
 it('says where the links go', async () => {

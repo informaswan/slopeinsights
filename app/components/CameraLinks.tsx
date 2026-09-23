@@ -1,9 +1,9 @@
 import React from 'react';
 import { View, Text, Pressable, StyleSheet } from 'react-native';
-import * as Linking from 'expo-linking';
 import { useTheme } from '../contexts/ThemeContext';
 import { FontSize, Spacing } from '../constants/theme';
 import { ExternalLinkIcon } from './icons';
+import { openExternalLink } from '../lib/openExternalLink';
 
 interface Props {
   links: { label: string; url: string }[];
@@ -24,7 +24,7 @@ export function CameraLinks({ links }: Props) {
             i > 0 && { borderTopWidth: 1, borderTopColor: colors.borderSubtle },
             hovered && { backgroundColor: colors.surfaceAlt },
           ]}
-          onPress={() => Linking.openURL(link.url)}
+          onPress={() => openExternalLink(link.url)}
         >
           <Text style={[styles.label, { color: colors.text }]}>{link.label}</Text>
           <ExternalLinkIcon size={14} color={colors.textMuted} />

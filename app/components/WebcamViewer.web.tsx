@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, ScrollView, StyleSheet } from 'react-native';
-import * as Linking from 'expo-linking';
+import { openExternalLink } from '../lib/openExternalLink';
 import type { WebcamItem } from '../lib/types';
 import { Colors, Spacing, FontSize, Radius } from '../constants/theme';
 
@@ -41,7 +41,7 @@ function CamView({ cam }: { cam: WebcamItem }) {
   if (cam.cam_type === 'hls') {
     return (
       <View style={styles.openCamContainer}>
-        <TouchableOpacity style={styles.openCamButton} onPress={() => Linking.openURL(cam.url)}>
+        <TouchableOpacity style={styles.openCamButton} onPress={() => openExternalLink(cam.url)}>
           <Text style={styles.openCamText}>Open Cam</Text>
         </TouchableOpacity>
       </View>
@@ -82,9 +82,10 @@ const styles = StyleSheet.create({
   placeholder: { flex: 1, minHeight: 160, alignItems: 'center', justifyContent: 'center', backgroundColor: '#1e293b' },
   placeholderText: { color: Colors.textMuted, fontSize: FontSize.sm },
   media: { flex: 1, width: '100%' },
-  tabBar: { position: 'absolute', top: 0, left: 0, right: 0, zIndex: 10, maxHeight: 36 },
-  tabBarContent: { paddingHorizontal: Spacing.sm, paddingTop: Spacing.xs, gap: Spacing.xs },
-  tab: { paddingHorizontal: Spacing.sm, paddingVertical: 4, borderRadius: Radius.sm, backgroundColor: 'rgba(0,0,0,0.5)' },
+  // The tab bar sits above the image in normal flow (not overlaid on it), so it never hides part of the picture.
+  tabBar: { flexGrow: 0, backgroundColor: '#0f172a' },
+  tabBarContent: { paddingHorizontal: Spacing.sm, paddingVertical: Spacing.xs + 2, gap: Spacing.xs },
+  tab: { paddingHorizontal: Spacing.sm, paddingVertical: 4, borderRadius: Radius.sm, backgroundColor: 'rgba(255,255,255,0.12)' },
   tabActive: { backgroundColor: Colors.epic },
   tabText: { color: '#cbd5e1', fontSize: FontSize.xs },
   tabTextActive: { color: '#fff', fontWeight: '600' },

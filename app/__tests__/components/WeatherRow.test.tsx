@@ -13,9 +13,9 @@ const weather: WeatherDetail = {
   scraped_at: new Date(2026, 2, 16, 11, 35, 0).toISOString(),
   is_stale: false,
   forecast: [
-    { date: '2026-03-16', high_f: 28, low_f: 14, precip_pct: 20, snow_in_forecast: false, wind_mph: 12 },
-    { date: '2026-03-17', high_f: 22, low_f: 8,  precip_pct: 80, snow_in_forecast: true,  wind_mph: 25 },
-    { date: '2026-03-18', high_f: 30, low_f: 18, precip_pct: 10, snow_in_forecast: false, wind_mph: 8  },
+    { date: '2026-03-16', high_f: 28, low_f: 14, precip_pct: 20, snow_in_forecast: false, snow_amount_in: null, wind_mph: 12 },
+    { date: '2026-03-17', high_f: 22, low_f: 8,  precip_pct: 80, snow_in_forecast: true,  snow_amount_in: null, wind_mph: 25 },
+    { date: '2026-03-18', high_f: 30, low_f: 18, precip_pct: 10, snow_in_forecast: false, snow_amount_in: null, wind_mph: 8  },
   ],
 };
 
@@ -46,6 +46,22 @@ it('renders wind speeds', () => {
 it('flags only the days with snow in the forecast', () => {
   const { getAllByText } = render(<WeatherRow weather={weather} />, { wrapper: TestWrapper });
   expect(getAllByText('Snow')).toHaveLength(1);
+});
+
+it('shows the plain "Snow" flag when no amount is known yet', () => {
+  const { getByText } = render(<WeatherRow weather={weather} />, { wrapper: TestWrapper });
+  expect(getByText('Snow')).toBeTruthy();
+});
+
+it('shows the expected snow amount in inches when known', () => {
+  const withAmount: WeatherDetail = {
+    ...weather,
+    forecast: [
+      { ...weather.forecast[1], snow_amount_in: 3.5 },
+    ],
+  };
+  const { getByText } = render(<WeatherRow weather={withAmount} />, { wrapper: TestWrapper });
+  expect(getByText('Snow: 3.5"')).toBeTruthy();
 });
 
 it('renders "Today" label for the first forecast card', () => {
@@ -106,4 +122,13 @@ it('says so when the update time is unknown', () => {
   const unknown = { ...weather, scraped_at: null };
   const { getByText } = render(<WeatherRow weather={unknown} />, { wrapper: TestWrapper });
   expect(getByText('Update time unknown')).toBeTruthy();
+});
+
+it('shows the expected amount even when the forecast text never says "snow"', () => {
+  const quiet: WeatherDetail = {
+    ...weather,
+    forecast: [{ ...weather.forecast[0], snow_in_forecast: false, snow_amount_in: 2.5 }],
+  };
+  const { getByText } = render(<WeatherRow weather={quiet} />, { wrapper: TestWrapper });
+  expect(getByText('Snow: 2.5"')).toBeTruthy();
 });

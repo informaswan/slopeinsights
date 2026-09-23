@@ -12,6 +12,7 @@ class WeatherForecast(Base):
     low_f = Column(Float)
     precip_pct = Column(Integer)
     snow_in_forecast = Column(Boolean, default=False)
+    snow_amount_in = Column(Float)  # quantitative forecast snowfall, inches, from NWS gridpoint data
     wind_mph = Column(Float)
     scraped_at = Column(DateTime, nullable=False)
     is_stale = Column(Boolean, default=False)

@@ -1,0 +1,49 @@
+# Nothing here is disallowed — SlopeInsights wants to be indexed and to show
+# up in AI-assisted search, so every crawler gets a plain Allow rather than
+# just relying on the default (no rule = allowed anyway).
+
+User-agent: *
+Allow: /
+
+# OpenAI
+User-agent: GPTBot
+Allow: /
+User-agent: ChatGPT-User
+Allow: /
+User-agent: OAI-SearchBot
+Allow: /
+
+# Anthropic
+User-agent: ClaudeBot
+Allow: /
+User-agent: Claude-Web
+Allow: /
+User-agent: anthropic-ai
+Allow: /
+
+# Perplexity
+User-agent: PerplexityBot
+Allow: /
+User-agent: Perplexity-User
+Allow: /
+
+# Google (separate from the regular Googlebot search-index crawler; this one
+# opts in to Google's AI features specifically)
+User-agent: Google-Extended
+Allow: /
+
+# Common Crawl — widely reused as training data by many AI labs
+User-agent: CCBot
+Allow: /
+
+# Others
+User-agent: Applebot-Extended
+Allow: /
+User-agent: Meta-ExternalAgent
+Allow: /
+User-agent: Amazonbot
+Allow: /
+User-agent: Bytespider
+Allow: /
+
+Sitemap: https://slopeinsights.com/sitemap.xml

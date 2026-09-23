@@ -4,7 +4,6 @@ import json
 from app.models.resort import Resort
 from app.models.snow import SnowCondition
 from app.models.lift import LiftStatus
-from app.models.crowd import CrowdData
 from app.models.weather import WeatherForecast
 from app.models.webcam import Webcam
 from app.models.parking import ParkingLot
@@ -59,23 +58,6 @@ def test_lift_status_model(db):
     result = db.query(LiftStatus).filter_by(resort_id="vail").first()
     assert result.lift_name == "Eagle Bahn Gondola"
     assert result.status == "open"
-
-
-def test_crowd_data_model(db):
-    resort = Resort(id="vail", name="Vail", pass_type="epic", region="Colorado",
-                    state="CO", country="US", latitude=39.6, longitude=-106.3,
-                    timezone="America/Denver", liftie_id="vail",
-                    onthesnow_slug="colorado/vail-ski-resort")
-    db.add(resort)
-    db.flush()
-    crowd = CrowdData(
-        resort_id="vail", day_of_week=5,
-        hourly_json=json.dumps([10, 20, 50, 90, 100, 85, 70, 50, 30, 15]),
-    )
-    db.add(crowd)
-    db.commit()
-    result = db.query(CrowdData).filter_by(resort_id="vail", day_of_week=5).first()
-    assert json.loads(result.hourly_json)[3] == 90
 
 
 def test_webcam_model(db):

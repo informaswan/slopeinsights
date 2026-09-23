@@ -11,3 +11,4 @@ class Webcam(Base):
     cam_type = Column(String, nullable=False)  # "hls" | "jpeg"
     url = Column(String, nullable=False)
     is_alive = Column(Boolean, default=True)
+    category = Column(String, nullable=False, default="mountain")  # "mountain" | "traffic"

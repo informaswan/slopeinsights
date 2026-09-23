@@ -7,7 +7,7 @@ class Resort(Base):
 
     id = Column(String, primary_key=True)
     name = Column(String, nullable=False)
-    pass_type = Column(String, nullable=False)  # "epic" | "ikon"
+    pass_type = Column(String, nullable=False)  # "epic" | "ikon" | "independent"
     region = Column(String, nullable=False)
     state = Column(String, nullable=False)
     country = Column(String, nullable=False, default="US")

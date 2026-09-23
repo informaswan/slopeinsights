@@ -12,20 +12,13 @@ export function formatAgo(isoString: string | null): string | null {
   return `${Math.floor(diffHours / 24)}d ago`;
 }
 
-export function crowdColor(level: string | null, colors: ThemeColors): string {
-  switch (level) {
-    case 'low':    return colors.crowdLow;
-    case 'medium': return colors.crowdMedium;
-    case 'high':   return colors.crowdHigh;
-    default:       return colors.textMuted;
-  }
-}
+export type PassType = 'epic' | 'ikon' | 'independent';
 
-export function crowdLabel(level: string | null): string {
-  switch (level) {
-    case 'low':    return 'Low';
-    case 'medium': return 'Medium';
-    case 'high':   return 'High';
-    default:       return '—';
+/** Label and accent color for a resort's pass type (Epic, Ikon, or an independent mountain). */
+export function passBadge(passType: PassType, colors: ThemeColors): { label: string; color: string } {
+  switch (passType) {
+    case 'epic':        return { label: 'Epic', color: colors.epic };
+    case 'ikon':        return { label: 'Ikon', color: colors.ikon };
+    default:            return { label: 'Independent', color: colors.independent };
   }
 }

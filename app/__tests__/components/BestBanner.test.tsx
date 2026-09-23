@@ -10,7 +10,6 @@ const resort: ResortSummary = {
   id: 'jackson-hole', name: 'Jackson Hole', pass_type: 'ikon', region: 'Wyoming', state: 'WY',
   snow: { base_in: 60, new_24h_in: 14, scraped_at: null, is_stale: false },
   lifts: { open: 13, total: 18 }, trails: null,
-  crowd: { current_level: 'low', current_pct: 15, source: 'historical_pattern' },
 };
 
 it('renders "Best conditions today" heading', () => {

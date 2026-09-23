@@ -25,6 +25,7 @@ STATE_SITES: dict[str, dict] = {
     "UT": _link("UDOT Traffic: cameras", "https://udottraffic.utah.gov/cctv"),
     "CA": _link("Caltrans QuickMap: cameras", "https://quickmap.dot.ca.gov/"),
     "WA": _link("WSDOT: traffic cameras", "https://wsdot.com/traffic/Cameras"),
+    "OR": _link("TripCheck: Oregon road cameras and conditions", "https://tripcheck.com/"),
     "WY": _link("WYDOT: web cameras", "https://www.wyoroad.info/highway/webcameras/webcameras.html"),
     "MT": _link("Montana 511: road report and cameras", "https://www.511mt.net/"),
     "ID": _link("Idaho 511: cameras", "https://511.idaho.gov/cctv"),
@@ -84,6 +85,8 @@ RESORT_LINKS: dict[str, list[dict]] = {
         _link("COtrip map: Crested Butte (CO-135)", _cotrip(38.8697, -106.9878, 10)),
         _link("COtrip map: Gunnison (US-50)", _cotrip(38.5458, -106.9253, 10)),
     ],
+    "telluride": [_link("COtrip map: Telluride and Placerville (CO-145)", _cotrip(37.95, -107.85, 10))],
+    "monarch": [_link("COtrip map: Monarch Pass (US-50)", _cotrip(38.4986, -106.3299))],
     # Utah
     "alta": [_COTTONWOOD],
     "snowbird": [_COTTONWOOD],

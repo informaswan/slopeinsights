@@ -20,12 +20,6 @@ class TrailSummary(BaseModel):
     total: int | None
 
 
-class CrowdSummary(BaseModel):
-    current_level: str | None   # "low" | "medium" | "high" | "closed" | None
-    current_pct: int | None
-    source: str = "historical_pattern"
-
-
 class ResortSummary(BaseModel):
     id: str
     name: str
@@ -35,7 +29,6 @@ class ResortSummary(BaseModel):
     snow: SnowSummary | None
     lifts: LiftSummary | None
     trails: TrailSummary | None
-    crowd: CrowdSummary | None
 
 
 # ── Detail schemas ──────────────────────────────────────────────────────
@@ -63,12 +56,22 @@ class SnowDetail(BaseModel):
     is_stale: bool
 
 
+class SnowForecastDetail(BaseModel):
+    """Expected new snow (inches), rolling from scraped_at. NWS, not the resort."""
+    next_24h_in: float | None
+    next_48h_in: float | None
+    next_72h_in: float | None
+    scraped_at: str | None
+    is_stale: bool
+
+
 class WeatherPeriod(BaseModel):
     date: str
     high_f: float | None
     low_f: float | None
     precip_pct: int | None
     snow_in_forecast: bool
+    snow_amount_in: float | None
     wind_mph: float | None
 
 
@@ -76,15 +79,6 @@ class WeatherDetail(BaseModel):
     scraped_at: str | None
     is_stale: bool
     forecast: list[WeatherPeriod]
-
-
-class CrowdDetail(BaseModel):
-    current_level: str | None
-    current_pct: int | None
-    source: str
-    label: str | None
-    hourly_start: str
-    hourly: list[int]
 
 
 class WebcamItem(BaseModel):
@@ -146,15 +140,18 @@ class ResortDetail(BaseModel):
     summit_elevation_ft: int | None
     vertical_drop_ft: int | None
     website: str | None
+    latitude: float
+    longitude: float
     snow: SnowDetail | None
+    snow_forecast: SnowForecastDetail | None
     lifts: LiftDetail | None
     trails: TrailSummary | None
-    crowd: CrowdDetail | None
     weather: WeatherDetail | None
     webcams: list[WebcamItem]
     parking: ParkingDetail
     traffic_cams: list[TrafficCamLink]
     traffic_cams_note: str | None
+    live_traffic_cams: list[WebcamItem]
 
 
 class BestResortResponse(BaseModel):

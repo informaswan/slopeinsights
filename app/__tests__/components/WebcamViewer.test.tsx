@@ -14,7 +14,7 @@ jest.mock('expo-video', () => ({
     addListener: jest.fn(() => ({ remove: jest.fn() })),
   })),
 }));
-jest.mock('expo-linking', () => ({ openURL: jest.fn() }));
+jest.mock('../../lib/openExternalLink', () => ({ openExternalLink: jest.fn() }));
 
 import { Platform as RNPlatform } from 'react-native';
 import { WebcamViewer } from '../../components/WebcamViewer';
@@ -85,11 +85,11 @@ describe('WebcamViewer — web HLS', () => {
     expect(screen.queryByTestId('webcam-video')).toBeNull();
   });
 
-  it('calls Linking.openURL when Open Cam is pressed', async () => {
-    const Linking = require('expo-linking');
+  it('calls openExternalLink when Open Cam is pressed', async () => {
+    const { openExternalLink } = require('../../lib/openExternalLink');
     const { fireEvent } = require('@testing-library/react-native');
     render(<WebcamViewer webcams={[hlsCam]} />, { wrapper: TestWrapper });
     await act(async () => { fireEvent.press(screen.getByText('Open Cam')); });
-    expect(Linking.openURL).toHaveBeenCalledWith(hlsCam.url);
+    expect(openExternalLink).toHaveBeenCalledWith(hlsCam.url);
   });
 });

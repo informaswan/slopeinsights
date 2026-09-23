@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { View, Text, TextInput, Pressable, Switch, ScrollView, StyleSheet } from 'react-native';
-import * as Linking from 'expo-linking';
+import { openExternalLink } from '../lib/openExternalLink';
 import { useRouter, usePathname } from 'expo-router';
 import { api } from '../lib/api';
 import type { ResortSummary } from '../lib/types';
@@ -48,6 +48,7 @@ export function Sidebar({ onNavigate }: Props) {
     { label: 'All mountains', path: '/', count: null as number | null },
     { label: 'My mountains', path: '/mine', count: favoriteIds.length },
     { label: 'Road cameras', path: '/road-cameras', count: null as number | null },
+    { label: 'Feedback', path: '/feedback', count: null as number | null },
   ];
 
   return (
@@ -121,13 +122,13 @@ export function Sidebar({ onNavigate }: Props) {
         </Text>
         <Pressable
           style={[styles.buttonPrimary, { backgroundColor: colors.sidebarText }]}
-          onPress={() => Linking.openURL(DONATION_URL)}
+          onPress={() => openExternalLink(DONATION_URL)}
         >
           <Text style={[styles.buttonPrimaryText, { color: colors.sidebar }]}>Buy us a coffee</Text>
         </Pressable>
         <Pressable
           style={[styles.buttonOutline, { borderColor: colors.sidebarMuted }]}
-          onPress={() => Linking.openURL(VENMO_URL)}
+          onPress={() => openExternalLink(VENMO_URL)}
         >
           <Text style={[styles.buttonOutlineText, { color: colors.sidebarText }]}>Tip on Venmo</Text>
         </Pressable>

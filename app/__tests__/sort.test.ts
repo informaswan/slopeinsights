@@ -9,7 +9,6 @@ function makeResort(overrides: Partial<ResortSummary> & Pick<ResortSummary, 'id'
     snow: null,
     lifts: null,
     trails: null,
-    crowd: null,
     ...overrides,
   };
 }
@@ -17,12 +16,12 @@ function makeResort(overrides: Partial<ResortSummary> & Pick<ResortSummary, 'id'
 const resorts: ResortSummary[] = [
   makeResort({ id: 'a', pass_type: 'epic', region: 'Colorado',
     snow: { base_in: 30, new_24h_in: 3, scraped_at: null, is_stale: false },
-    lifts: { open: 5, total: 10 }, crowd: { current_level: 'high', current_pct: 80, source: '' } }),
+    lifts: { open: 5, total: 10 } }),
   makeResort({ id: 'b', pass_type: 'ikon', region: 'Utah',
     snow: { base_in: 50, new_24h_in: 10, scraped_at: null, is_stale: false },
-    lifts: { open: 8, total: 10 }, crowd: { current_level: 'low', current_pct: 20, source: '' } }),
+    lifts: { open: 8, total: 10 } }),
   makeResort({ id: 'c', pass_type: 'epic', region: 'California',
-    snow: null, lifts: null, crowd: null }),
+    snow: null, lifts: null }),
 ];
 
 describe('sortResorts', () => {
@@ -36,13 +35,6 @@ describe('sortResorts', () => {
   it('sorts by base depth descending', () => {
     const sorted = sortResorts(resorts, 'base');
     expect(sorted[0].id).toBe('b');
-  });
-
-  it('sorts by crowd ascending (least crowded first)', () => {
-    const sorted = sortResorts(resorts, 'crowd');
-    expect(sorted[0].id).toBe('b');
-    expect(sorted[1].id).toBe('a');
-    expect(sorted[2].id).toBe('c');
   });
 
   it('sorts by lifts open descending', () => {

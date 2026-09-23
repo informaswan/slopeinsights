@@ -4,9 +4,9 @@ import { useResorts } from '../../hooks/useResorts';
 
 const mockResorts = [
   { id: 'vail', name: 'Vail', pass_type: 'epic' as const, region: 'Colorado',
-    state: 'CO', snow: null, lifts: null, trails: null, crowd: null },
+    state: 'CO', snow: null, lifts: null, trails: null },
   { id: 'mammoth', name: 'Mammoth', pass_type: 'ikon' as const, region: 'California',
-    state: 'CA', snow: null, lifts: null, trails: null, crowd: null },
+    state: 'CA', snow: null, lifts: null, trails: null },
 ];
 const mockBest = { resorts: [mockResorts[0]], generated_at: '2026-03-16T10:00:00Z' };
 

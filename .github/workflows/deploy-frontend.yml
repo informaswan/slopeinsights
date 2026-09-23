@@ -40,6 +40,15 @@ jobs:
           EXPO_PUBLIC_API_KEY: ${{ secrets.EXPO_PUBLIC_API_KEY }}
         run: npx expo export --platform web --clear
 
+      # See scripts/inject-seo-head.js — Expo's default web template has no real
+      # title/description, which is also what a non-JS crawler (most AI bots) sees
+      # since nothing here executes JavaScript for them.
+      - name: Inject SEO/AI-crawler metadata (and Google Analytics, if configured)
+        env:
+          # Optional repo variable (Settings > Secrets and variables > Actions > Variables).
+          GA_MEASUREMENT_ID: ${{ vars.GA_MEASUREMENT_ID }}
+        run: node scripts/inject-seo-head.js
+
       # GitHub Pages runs Jekyll by default, which ignores files/folders starting
       # with "_" — Expo's JS bundles live under _expo/, so without this the site
       # would silently 404 on every asset.

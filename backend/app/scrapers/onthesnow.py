@@ -89,8 +89,9 @@ class OnTheSnowScraper(BaseScraper):
         self.db.commit()
         self._record_success()
 
-    async def scrape_all(self) -> None:
+    async def scrape_all(self, skip_resort_ids: set[str] | frozenset[str] = frozenset()) -> None:
+        """skip_resort_ids: resorts already updated from their own feed (see app/scrapers/snow)."""
         from app.scrapers.base import run_concurrently
-        resorts = self.db.query(Resort).all()
+        resorts = [r for r in self.db.query(Resort).all() if r.id not in skip_resort_ids]
         await run_concurrently([lambda r=r: self.scrape_resort(r) for r in resorts], concurrency=3)
         await self.close()

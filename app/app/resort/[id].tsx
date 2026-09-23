@@ -1,11 +1,13 @@
 import React from 'react';
 import { View, Text, ScrollView, ActivityIndicator, TouchableOpacity, StyleSheet } from 'react-native';
-import * as Linking from 'expo-linking';
+import { openExternalLink } from '../../lib/openExternalLink';
+import { passBadge } from '../../lib/utils';
+import { DONATION_URL } from '../../constants/links';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useResortDetail } from '../../hooks/useResortDetail';
 import { WebcamViewer } from '../../components/WebcamViewer';
 import { SnowStats } from '../../components/SnowStats';
-import { CrowdChart } from '../../components/CrowdChart';
+import { FeatureWanted } from '../../components/FeatureWanted';
 import { WeatherRow } from '../../components/WeatherRow';
 import { ParkingSection } from '../../components/ParkingSection';
 import { CameraLinks } from '../../components/CameraLinks';
@@ -14,16 +16,6 @@ import { useFavorites } from '../../contexts/FavoritesContext';
 import { useIsWide } from '../../hooks/useIsWide';
 import { ChevronLeftIcon, StarIcon } from '../../components/icons';
 import { Spacing, FontSize, Radius } from '../../constants/theme';
-
-function getCurrentHourIndex(crowd: { hourly_start: string; hourly: number[] } | null): number | null {
-  if (!crowd) return null;
-  const now = new Date();
-  const [startH] = crowd.hourly_start.split(':').map(Number);
-  const currentH = now.getHours();
-  const index = currentH - startH;
-  if (index < 0 || index >= crowd.hourly.length) return null;
-  return index;
-}
 
 export default function ResortDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -52,8 +44,7 @@ export default function ResortDetailScreen() {
     );
   }
 
-  const passColor = resort.pass_type === 'epic' ? colors.epic : colors.ikon;
-  const passLabel = resort.pass_type === 'epic' ? 'Epic' : 'Ikon';
+  const { color: passColor, label: passLabel } = passBadge(resort.pass_type, colors);
   const isFavorite = favoriteIds.includes(resort.id);
   const panel = [styles.panel, { backgroundColor: colors.surface, borderColor: colors.border }];
 
@@ -92,21 +83,33 @@ export default function ResortDetailScreen() {
       <View style={styles.grid}>
         <View testID="snow-stats" style={panel}>
           <Text style={[styles.panelTitle, { color: colors.textSecondary }]}>Snow</Text>
-          <SnowStats snow={resort.snow} trails={resort.trails} />
+          <SnowStats snow={resort.snow} trails={resort.trails} forecast={resort.snow_forecast} />
         </View>
         <View testID="weather-row" style={panel}>
           <Text style={[styles.panelTitle, { color: colors.textSecondary }]}>Forecast</Text>
           <WeatherRow weather={resort.weather} />
         </View>
-        <View testID="crowd-chart" style={panel}>
-          <Text style={[styles.panelTitle, { color: colors.textSecondary }]}>Crowds</Text>
-          <CrowdChart crowd={resort.crowd} currentHourIndex={getCurrentHourIndex(resort.crowd)} />
+        <View testID="crowds-wanted" style={panel}>
+          <Text style={[styles.panelTitle, { color: colors.textSecondary }]}>Crowd levels</Text>
+          <FeatureWanted
+            title="Crowd levels are a feature we want"
+            body="Reliable crowd data comes from a paid data source, so this is waiting on funding. Want to see it here? Help us get there."
+            actionLabel="Help us add it"
+            url={DONATION_URL}
+          />
         </View>
         <View testID="parking-section" style={panel}>
           <Text style={[styles.panelTitle, { color: colors.textSecondary }]}>Parking</Text>
           <ParkingSection parking={resort.parking} />
         </View>
       </View>
+
+      {resort.live_traffic_cams && resort.live_traffic_cams.length > 0 && (
+        <View style={styles.liveTrafficPanel}>
+          <Text style={[styles.panelTitle, { color: colors.textSecondary }]}>Live road cameras</Text>
+          <WebcamViewer webcams={resort.live_traffic_cams} />
+        </View>
+      )}
 
       {resort.traffic_cams && resort.traffic_cams.length > 0 && (
         <View style={[styles.linkPanel, { backgroundColor: colors.surface, borderColor: colors.border }]}>
@@ -118,27 +121,30 @@ export default function ResortDetailScreen() {
         </View>
       )}
 
-      {(resort.summit_elevation_ft != null || resort.vertical_drop_ft != null || resort.website) && (
-        <View style={[styles.panel, styles.infoPanel, { backgroundColor: colors.surface, borderColor: colors.border }]}>
-          {resort.summit_elevation_ft != null && (
-            <View style={styles.infoRow}>
-              <Text style={[styles.infoLabel, { color: colors.textSecondary }]}>Summit elevation</Text>
-              <Text style={[styles.infoValue, { color: colors.text }]}>{resort.summit_elevation_ft.toLocaleString()} ft</Text>
-            </View>
-          )}
-          {resort.vertical_drop_ft != null && (
-            <View style={styles.infoRow}>
-              <Text style={[styles.infoLabel, { color: colors.textSecondary }]}>Vertical drop</Text>
-              <Text style={[styles.infoValue, { color: colors.text }]}>{resort.vertical_drop_ft.toLocaleString()} ft</Text>
-            </View>
-          )}
-          {resort.website && (
-            <TouchableOpacity onPress={() => Linking.openURL(resort.website!)}>
-              <Text style={[styles.websiteText, { color: colors.epic }]}>{resort.website.replace(/^https?:\/\//, '')}</Text>
-            </TouchableOpacity>
-          )}
-        </View>
-      )}
+      <View style={[styles.panel, styles.infoPanel, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+        {resort.summit_elevation_ft != null && (
+          <View style={styles.infoRow}>
+            <Text style={[styles.infoLabel, { color: colors.textSecondary }]}>Summit elevation</Text>
+            <Text style={[styles.infoValue, { color: colors.text }]}>{resort.summit_elevation_ft.toLocaleString()} ft</Text>
+          </View>
+        )}
+        {resort.vertical_drop_ft != null && (
+          <View style={styles.infoRow}>
+            <Text style={[styles.infoLabel, { color: colors.textSecondary }]}>Vertical drop</Text>
+            <Text style={[styles.infoValue, { color: colors.text }]}>{resort.vertical_drop_ft.toLocaleString()} ft</Text>
+          </View>
+        )}
+        {resort.website && (
+          <TouchableOpacity onPress={() => openExternalLink(resort.website!)}>
+            <Text style={[styles.websiteText, { color: colors.epic }]}>{resort.website.replace(/^https?:\/\//, '')}</Text>
+          </TouchableOpacity>
+        )}
+        <TouchableOpacity
+          onPress={() => openExternalLink(`https://www.google.com/maps/search/?api=1&query=${resort.latitude},${resort.longitude}`)}
+        >
+          <Text style={[styles.websiteText, { color: colors.epic }]}>View on Google Maps</Text>
+        </TouchableOpacity>
+      </View>
     </ScrollView>
   );
 }
@@ -164,6 +170,7 @@ const styles = StyleSheet.create({
   },
   saveText: { fontSize: FontSize.sm + 1, fontWeight: '600' },
   webcam: { borderRadius: Radius.md, overflow: 'hidden', maxWidth: 800, width: '100%' },
+  liveTrafficPanel: { gap: Spacing.xs, maxWidth: 800, width: '100%' },
   grid: { flexDirection: 'row', flexWrap: 'wrap', gap: Spacing.md },
   panel: { flexGrow: 1, flexBasis: 340, borderRadius: Radius.md, borderWidth: 1, overflow: 'hidden' },
   panelTitle: { fontSize: FontSize.sm, fontWeight: '600', paddingHorizontal: Spacing.md, paddingTop: Spacing.sm + 2 },

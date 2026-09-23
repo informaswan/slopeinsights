@@ -10,12 +10,14 @@ import { FilterSheet } from './FilterSheet';
 import type { FilterState } from './FilterSheet';
 import { sortResorts, applyFilters } from '../lib/sort';
 import type { PassFilter } from '../lib/sort';
+import { passBadge } from '../lib/utils';
 import { Spacing, FontSize, Radius } from '../constants/theme';
 
 const PASS_TABS: { label: string; value: PassFilter }[] = [
   { label: 'All', value: 'all' },
   { label: 'Epic', value: 'epic' },
   { label: 'Ikon', value: 'ikon' },
+  { label: 'Independent', value: 'independent' },
 ];
 
 interface Props {
@@ -117,7 +119,7 @@ export function MountainsScreen({ scope }: Props) {
               <View style={styles.tabs}>
                 {PASS_TABS.map((tab) => {
                   const isActive = passFilter === tab.value;
-                  const activeColor = tab.value === 'epic' ? colors.epic : tab.value === 'ikon' ? colors.ikon : colors.text;
+                  const activeColor = tab.value === 'all' ? colors.text : passBadge(tab.value, colors).color;
                   return (
                     <Pressable
                       key={tab.value}

@@ -1,5 +1,5 @@
 // __tests__/utils.test.ts
-import { formatAgo, crowdColor, crowdLabel } from '../lib/utils';
+import { formatAgo, passBadge } from '../lib/utils';
 import { LightColors } from '../constants/theme';
 
 describe('formatAgo', () => {
@@ -28,22 +28,10 @@ describe('formatAgo', () => {
   });
 });
 
-describe('crowdColor', () => {
-  it('returns green for low', () => expect(crowdColor('low', LightColors)).toBe(LightColors.crowdLow));
-  it('returns amber for medium', () => expect(crowdColor('medium', LightColors)).toBe(LightColors.crowdMedium));
-  it('returns red for high', () => expect(crowdColor('high', LightColors)).toBe(LightColors.crowdHigh));
-  it('returns muted for null', () => expect(crowdColor(null, LightColors)).toBe(LightColors.textMuted));
-  it('returns muted for closed', () => expect(crowdColor('closed', LightColors)).toBe(LightColors.textMuted));
-});
-
-describe('crowdLabel', () => {
-  it('returns capitalized label for known levels', () => {
-    expect(crowdLabel('low')).toBe('Low');
-    expect(crowdLabel('medium')).toBe('Medium');
-    expect(crowdLabel('high')).toBe('High');
-  });
-  it('returns em-dash for null or closed', () => {
-    expect(crowdLabel(null)).toBe('—');
-    expect(crowdLabel('closed')).toBe('—');
+describe('passBadge', () => {
+  it('labels and colors each pass type', () => {
+    expect(passBadge('epic', LightColors)).toEqual({ label: 'Epic', color: LightColors.epic });
+    expect(passBadge('ikon', LightColors)).toEqual({ label: 'Ikon', color: LightColors.ikon });
+    expect(passBadge('independent', LightColors)).toEqual({ label: 'Independent', color: LightColors.independent });
   });
 });

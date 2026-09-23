@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, fireEvent } from '@testing-library/react-native';
 
-jest.mock('expo-linking', () => ({ openURL: jest.fn() }));
+jest.mock('../../lib/openExternalLink', () => ({ openExternalLink: jest.fn() }));
 jest.mock('../../contexts/ThemeContext', () => {
   const { LightColors } = require('../../constants/theme');
   return {
@@ -28,17 +28,17 @@ describe('About screen', () => {
   });
 
   it('opens the donation link when "buy us a coffee" is pressed', () => {
-    const Linking = require('expo-linking');
+    const { openExternalLink } = require('../../lib/openExternalLink');
     const { getByText } = renderAbout();
     fireEvent.press(getByText(/buy us a coffee/));
-    expect(Linking.openURL).toHaveBeenCalledWith('https://buymeacoffee.com/slopeinsights');
+    expect(openExternalLink).toHaveBeenCalledWith('https://buymeacoffee.com/slopeinsights');
   });
 
   it('opens the Venmo link when "send a tip on Venmo" is pressed', () => {
-    const Linking = require('expo-linking');
+    const { openExternalLink } = require('../../lib/openExternalLink');
     const { getByText } = renderAbout();
     fireEvent.press(getByText(/send a tip on Venmo/));
-    expect(Linking.openURL).toHaveBeenCalledWith('https://venmo.com/u/Michael-Swanson-61');
+    expect(openExternalLink).toHaveBeenCalledWith('https://venmo.com/u/Michael-Swanson-61');
   });
 
   it('has no emoji in the copy', () => {

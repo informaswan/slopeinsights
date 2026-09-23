@@ -8,7 +8,7 @@ jest.mock('expo-router', () => ({
   useRouter: () => ({ push: mockPush }),
   usePathname: () => mockPathname,
 }));
-jest.mock('expo-linking', () => ({ openURL: jest.fn() }));
+jest.mock('../../lib/openExternalLink', () => ({ openExternalLink: jest.fn() }));
 const mockToggleTheme = jest.fn();
 jest.mock('../../contexts/ThemeContext', () => {
   const { LightColors } = require('../../constants/theme');
@@ -44,6 +44,7 @@ describe('Sidebar', () => {
     expect(getByText('All mountains')).toBeTruthy();
     expect(getByText('My mountains')).toBeTruthy();
     expect(getByText('Road cameras')).toBeTruthy();
+    expect(getByText('Feedback')).toBeTruthy();
     expect(getByText('Buy us a coffee')).toBeTruthy();
     expect(getByText('Tip on Venmo')).toBeTruthy();
     expect(getByLabelText('Dark mode')).toBeTruthy();
@@ -67,9 +68,11 @@ describe('Sidebar', () => {
     expect(mockPush).toHaveBeenCalledWith('/');
     fireEvent.press(getByText('Road cameras'));
     expect(mockPush).toHaveBeenCalledWith('/road-cameras');
+    fireEvent.press(getByText('Feedback'));
+    expect(mockPush).toHaveBeenCalledWith('/feedback');
     fireEvent.press(getByText('About'));
     expect(mockPush).toHaveBeenCalledWith('/about');
-    expect(onNavigate).toHaveBeenCalledTimes(4);
+    expect(onNavigate).toHaveBeenCalledTimes(5);
   });
 
   it('searches mountains by name and opens the one you pick', async () => {
@@ -94,12 +97,12 @@ describe('Sidebar', () => {
   });
 
   it('opens the donation links', () => {
-    const Linking = require('expo-linking');
+    const { openExternalLink } = require('../../lib/openExternalLink');
     const { getByText } = render(<Sidebar />);
     fireEvent.press(getByText('Buy us a coffee'));
-    expect(Linking.openURL).toHaveBeenCalledWith('https://buymeacoffee.com/slopeinsights');
+    expect(openExternalLink).toHaveBeenCalledWith('https://buymeacoffee.com/slopeinsights');
     fireEvent.press(getByText('Tip on Venmo'));
-    expect(Linking.openURL).toHaveBeenCalledWith('https://venmo.com/u/Michael-Swanson-61');
+    expect(openExternalLink).toHaveBeenCalledWith('https://venmo.com/u/Michael-Swanson-61');
   });
 
   it('toggles dark mode', () => {

@@ -22,7 +22,6 @@ const REGIONS = ['Colorado', 'Utah', 'California', 'Wyoming', 'Pacific NW', 'Nor
 const SORT_OPTIONS: { value: SortOption; label: string }[] = [
   { value: 'snow',  label: 'Most fresh snow' },
   { value: 'base',  label: 'Deepest base' },
-  { value: 'crowd', label: 'Least crowded' },
 ];
 
 export const FilterSheet = forwardRef<any, Props>(

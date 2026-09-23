@@ -7,7 +7,7 @@ const mockDetail = {
   region: 'Colorado', state: 'CO', country: 'US',
   summit_elevation_ft: 11570, vertical_drop_ft: 3450,
   website: 'https://www.vail.com',
-  snow: null, lifts: null, trails: null, crowd: null, weather: null, webcams: [],
+  snow: null, lifts: null, trails: null, weather: null, webcams: [],
   parking: { has_live_data: false, scraped_at: null, is_stale: false, live_lots: [], static_lots: [] },
 };
 

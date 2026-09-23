@@ -31,9 +31,11 @@ jest.mock('../../contexts/FavoritesContext', () => ({
 const mockResorts = [
   { id: 'vail', name: 'Vail', pass_type: 'epic', region: 'Colorado', state: 'CO',
     snow: { base_in: 40, new_24h_in: 5, scraped_at: null, is_stale: false },
-    lifts: { open: 15, total: 31 }, trails: null, crowd: { current_level: 'medium', current_pct: 55, source: '' } },
+    lifts: { open: 15, total: 31 }, trails: null },
   { id: 'mammoth', name: 'Mammoth', pass_type: 'ikon', region: 'California', state: 'CA',
-    snow: null, lifts: null, trails: null, crowd: null },
+    snow: null, lifts: null, trails: null },
+  { id: 'monarch', name: 'Monarch Mountain', pass_type: 'independent', region: 'Colorado', state: 'CO',
+    snow: null, lifts: null, trails: null },
 ];
 const mockBest = { resorts: [mockResorts[0]], generated_at: '' };
 
@@ -76,6 +78,15 @@ it('filters to Ikon resorts when Ikon tab is pressed', async () => {
   fireEvent.press(getByLabelText('Filter by Ikon'));
   expect(queryByText('Vail')).toBeNull();
   expect(queryByText('Mammoth')).toBeTruthy();
+});
+
+it('filters to independent mountains when the Independent tab is pressed', async () => {
+  const { findByText, queryByText, getByLabelText } = render(<HomeScreen />);
+  await findByText('Vail');
+  fireEvent.press(getByLabelText('Filter by Independent'));
+  expect(queryByText('Vail')).toBeNull();
+  expect(queryByText('Mammoth')).toBeNull();
+  expect(queryByText('Monarch Mountain')).toBeTruthy();
 });
 
 it('shows error state with retry on fetch failure', async () => {
