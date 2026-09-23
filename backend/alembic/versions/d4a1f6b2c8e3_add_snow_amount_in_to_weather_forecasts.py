@@ -18,7 +18,23 @@ branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 
 
+def _inspector():
+    return sa.inspect(op.get_bind())
+
+
+def _has_table(name: str) -> bool:
+    return _inspector().has_table(name)
+
+
+def _has_column(table: str, column: str) -> bool:
+    return any(c["name"] == column for c in _inspector().get_columns(table))
+
+
 def upgrade() -> None:
+    # The app's startup create_all() may already have made this table without the column;
+    # skip if a previous run added it.
+    if _has_column('weather_forecasts', 'snow_amount_in'):
+        return
     op.add_column('weather_forecasts', sa.Column('snow_amount_in', sa.Float(), nullable=True))
 
 

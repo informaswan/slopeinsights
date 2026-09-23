@@ -17,7 +17,22 @@ branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 
 
+def _inspector():
+    return sa.inspect(op.get_bind())
+
+
+def _has_table(name: str) -> bool:
+    return _inspector().has_table(name)
+
+
+def _has_column(table: str, column: str) -> bool:
+    return any(c["name"] == column for c in _inspector().get_columns(table))
+
+
 def upgrade() -> None:
+    # The app's startup create_all() creates brand-new tables on its own.
+    if _has_table('snow_forecasts'):
+        return
     op.create_table('snow_forecasts',
     sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
     sa.Column('resort_id', sa.String(), nullable=False),

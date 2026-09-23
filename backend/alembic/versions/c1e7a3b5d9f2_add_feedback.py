@@ -17,7 +17,21 @@ branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 
 
+def _inspector():
+    return sa.inspect(op.get_bind())
+
+
+def _has_table(name: str) -> bool:
+    return _inspector().has_table(name)
+
+
+def _has_column(table: str, column: str) -> bool:
+    return any(c["name"] == column for c in _inspector().get_columns(table))
+
+
 def upgrade() -> None:
+    if _has_table('feedback'):
+        return
     op.create_table('feedback',
     sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
     sa.Column('category', sa.String(), nullable=False),
