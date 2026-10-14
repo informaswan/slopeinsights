@@ -49,6 +49,19 @@ describe('WebcamViewer — tab bar', () => {
   });
 });
 
+describe('WebcamViewer — dead cams', () => {
+  it('does not offer a tab for a cam that is not live', () => {
+    render(<WebcamViewer webcams={[deadCam, jpegCam]} />, { wrapper: TestWrapper });
+    expect(screen.queryByText('Village')).toBeNull();
+    expect(screen.getByTestId('webcam-image')).toBeTruthy();
+  });
+
+  it('shows no tab bar when only one cam is live', () => {
+    render(<WebcamViewer webcams={[deadCam, jpegCam]} />, { wrapper: TestWrapper });
+    expect(screen.queryByTestId('webcam-tabs')).toBeNull();
+  });
+});
+
 describe('WebcamViewer — native HLS', () => {
   it('renders VideoView for an alive HLS cam on native', () => {
     render(<WebcamViewer webcams={[hlsCam]} />, { wrapper: TestWrapper });

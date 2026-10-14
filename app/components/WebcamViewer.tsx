@@ -54,10 +54,12 @@ function CamView({ cam }: { cam: WebcamItem }) {
   return <JpegCam url={cam.url} />;
 }
 
-export function WebcamViewer({ webcams }: { webcams: WebcamItem[] }) {
+export function WebcamViewer({ webcams: allWebcams }: { webcams: WebcamItem[] }) {
   const [activeIndex, setActiveIndex] = useState(0);
-  const allDead = webcams.length === 0 || webcams.every((c) => !c.is_alive);
-  if (allDead) return <View style={styles.container}><UnavailablePlaceholder /></View>;
+  // The backend marks a cam dead when it isn't showing a live picture (see
+  // scrapers/webcam_health.py), so don't offer it as a tab at all.
+  const webcams = allWebcams.filter((c) => c.is_alive);
+  if (webcams.length === 0) return <View style={styles.container}><UnavailablePlaceholder /></View>;
 
   const showTabs = webcams.length > 1;
   const activeCam = webcams[activeIndex] ?? webcams[0];

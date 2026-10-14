@@ -1,7 +1,8 @@
 # tests/test_seed.py
-from app.seed import seed_resorts, seed_parking_lots, RESORTS, PARKING_LOTS
+from app.seed import seed_resorts, seed_webcams, seed_parking_lots, RESORTS, PARKING_LOTS
 from app.models.resort import Resort
 from app.models.parking import ParkingLot
+from app.models.webcam import Webcam
 
 
 def test_seed_resort_count(db):
@@ -83,3 +84,22 @@ def test_vail_has_named_parking_lots(db):
     }
     assert "Vail Village Parking Structure" in names
     assert "Lionshead Parking Structure" in names
+
+
+def test_seed_webcams_renames_a_cam_that_is_already_in_the_table(db):
+    seed_resorts(db)
+    db.add(Webcam(resort_id="solitude", label="Summit Express Bottom", cam_type="jpeg",
+                  url="https://webcams.opensnow.com/current/3787.jpg", is_alive=False))
+    db.commit()
+    seed_webcams(db)
+    cam = db.query(Webcam).filter_by(url="https://webcams.opensnow.com/current/3787.jpg").one()
+    assert cam.label == "Apex Express Bottom"
+    assert cam.is_alive is False  # the health checker owns this flag; reseeding must not revive a dead cam
+
+
+def test_seed_webcams_does_not_duplicate_on_reseed(db):
+    seed_resorts(db)
+    seed_webcams(db)
+    n = db.query(Webcam).count()
+    seed_webcams(db)
+    assert db.query(Webcam).count() == n

@@ -656,7 +656,7 @@ WEBCAMS: list[dict] = [
     {"resort_id": "solitude", "label": "Link Lift Line", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/4209.jpg"},
     {"resort_id": "solitude", "label": "Moonbeam Express Base", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/1854.jpg"},
     {"resort_id": "solitude", "label": "Powderhorn Top", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/2352.jpg"},
-    {"resort_id": "solitude", "label": "Summit Express Bottom", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/3787.jpg"},
+    {"resort_id": "solitude", "label": "Apex Express Bottom", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/3787.jpg"},
     {"resort_id": "solitude", "label": "Powderhorn Bottom", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/2114.jpg"},
     {"resort_id": "solitude", "label": "Sunshine Bowl", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/2115.jpg"},
     {"resort_id": "solitude", "label": "Moonbeam Parking", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/3365.jpg"},
@@ -768,11 +768,19 @@ def seed_resorts(db: Session) -> None:
 
 
 def seed_webcams(db: Session) -> None:
-    """Insert webcam rows — skips any URL already in the table."""
-    existing_urls = {url for (url,) in db.query(Webcam.url).all()}
+    """Insert webcam rows; for a URL already in the table, refresh its label.
+
+    is_alive is deliberately left alone: the webcam health checker owns it. Only the url and
+    label columns are read, and renames are a bulk UPDATE, so this never selects columns a
+    not-yet-migrated database might lack (it runs at startup, before any migration).
+    """
+    existing = dict(db.query(Webcam.url, Webcam.label).all())
     for data in WEBCAMS:
-        if data["url"] not in existing_urls:
+        url = data["url"]
+        if url not in existing:
             db.add(Webcam(**data))
+        elif existing[url] != data["label"]:
+            db.query(Webcam).filter(Webcam.url == url).update({"label": data["label"]})
     db.commit()
 
 
