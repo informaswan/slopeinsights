@@ -5,6 +5,7 @@ Heavy data assembly is delegated to app/routers/_helpers.py.
 """
 import json
 import logging
+import time
 from datetime import datetime, timezone
 from zoneinfo import ZoneInfo
 
@@ -257,13 +258,18 @@ async def webcam_proxy(url: str = Query(...)):
         "webcams.opensnow.com", "media.mammothresorts.com", "backend.roundshot.com",
         "511on.ca", "www.drivebc.ca",
     }
-    from urllib.parse import urlparse
+    from urllib.parse import urlencode, urlparse
     host = urlparse(url).hostname or ""
     if host not in allowed_hosts:
         raise HTTPException(status_code=400, detail="Disallowed webcam host")
+    # webcams.opensnow.com sits behind Cloudflare with a 1-year max-age, so asking for the
+    # identical URL every time returned whatever stale copy the nearest edge had cached
+    # (a September frame in October). A unique query string forces a fresh fetch.
+    url += ("&" if "?" in url else "?") + urlencode({"t": int(time.time())})
     async with httpx.AsyncClient(follow_redirects=True) as client:
         try:
-            r = await client.get(url, timeout=8.0, headers={"User-Agent": "Mozilla/5.0"})
+            r = await client.get(url, timeout=8.0,
+                                 headers={"User-Agent": "Mozilla/5.0", "Cache-Control": "no-cache"})
             r.raise_for_status()
         except Exception:
             raise HTTPException(status_code=502, detail="Upstream webcam unavailable")
