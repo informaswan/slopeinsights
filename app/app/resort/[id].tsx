@@ -5,6 +5,7 @@ import { passBadge } from '../../lib/utils';
 import { DONATION_URL } from '../../constants/links';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useResortDetail } from '../../hooks/useResortDetail';
+import { OfflineBanner } from '../../components/OfflineBanner';
 import { WebcamViewer } from '../../components/WebcamViewer';
 import { SnowStats } from '../../components/SnowStats';
 import { FeatureWanted } from '../../components/FeatureWanted';
@@ -19,13 +20,13 @@ import { Spacing, FontSize, Radius } from '../../constants/theme';
 
 export default function ResortDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
-  const { resort, loading, error, refresh } = useResortDetail(Array.isArray(id) ? id[0] : id);
+  const { resort, loading, error, cachedAt, refresh } = useResortDetail(Array.isArray(id) ? id[0] : id);
   const { colors } = useTheme();
   const router = useRouter();
   const isWide = useIsWide();
   const { favoriteIds, toggleFavorite } = useFavorites();
 
-  if (loading) {
+  if (loading && !resort) {
     return (
       <View style={[styles.centered, { backgroundColor: colors.background }]}>
         <ActivityIndicator testID="detail-loading" size="large" color={colors.epic} />
@@ -53,6 +54,7 @@ export default function ResortDetailScreen() {
       style={[styles.scroll, { backgroundColor: colors.background }]}
       contentContainerStyle={[styles.content, { padding: isWide ? Spacing.lg : Spacing.md }]}
     >
+      <OfflineBanner cachedAt={cachedAt ?? null} />
       <TouchableOpacity style={styles.back} onPress={() => router.push('/')} accessibilityLabel="Back to all mountains">
         <ChevronLeftIcon size={16} color={colors.textSecondary} />
         <Text style={[styles.backText, { color: colors.textSecondary }]}>All mountains</Text>

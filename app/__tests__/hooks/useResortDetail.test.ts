@@ -1,6 +1,7 @@
 // __tests__/hooks/useResortDetail.test.ts
 import { renderHook, waitFor, act } from '@testing-library/react-native';
 import { useResortDetail } from '../../hooks/useResortDetail';
+import { writeCache, readCache } from '../../lib/cache';
 
 const mockDetail = {
   id: 'vail', name: 'Vail', pass_type: 'epic' as const,
@@ -44,4 +45,57 @@ it('refresh reloads detail from the API', async () => {
 
   await act(async () => { await result.current.refresh(); });
   await waitFor(() => expect(result.current.resort?.name).toBe('Vail Updated'));
+});
+
+describe('offline cache', () => {
+  const NOW = 1_800_000_000_000;
+  afterEach(() => jest.restoreAllMocks());
+
+  async function seed(id: string, savedAt = NOW - 5 * 60_000) {
+    jest.spyOn(Date, 'now').mockReturnValue(savedAt);
+    await writeCache(`resort:${id}`, { ...mockDetail, id });
+    jest.spyOn(Date, 'now').mockReturnValue(NOW);
+    return savedAt;
+  }
+
+  it('shows the cached detail while the network request is in flight', async () => {
+    await seed('vail');
+    (global.fetch as jest.Mock).mockReturnValue(new Promise(() => {}));
+
+    const { result } = renderHook(() => useResortDetail('vail'));
+    await waitFor(() => expect(result.current.resort?.id).toBe('vail'));
+    expect(result.current.cachedAt).toBeNull();
+  });
+
+  it('keeps the cached detail and reports its age when the network fails', async () => {
+    const savedAt = await seed('vail');
+    (global.fetch as jest.Mock).mockRejectedValue(new Error('offline'));
+
+    const { result } = renderHook(() => useResortDetail('vail'));
+    await waitFor(() => expect(result.current.loading).toBe(false));
+
+    expect(result.current.resort?.id).toBe('vail');
+    expect(result.current.error).toBeNull();
+    expect(result.current.cachedAt).toBe(savedAt);
+  });
+
+  it('does not show one mountain\'s cache for another', async () => {
+    await seed('vail');
+    (global.fetch as jest.Mock).mockRejectedValue(new Error('offline'));
+
+    const { result } = renderHook(() => useResortDetail('mammoth'));
+    await waitFor(() => expect(result.current.loading).toBe(false));
+
+    expect(result.current.resort).toBeNull();
+    expect(result.current.error).toBe('Failed to load resort');
+  });
+
+  it('saves each successful load for next time', async () => {
+    (global.fetch as jest.Mock).mockResolvedValueOnce({ ok: true, json: async () => mockDetail });
+
+    const { result } = renderHook(() => useResortDetail('vail'));
+    await waitFor(() => expect(result.current.loading).toBe(false));
+
+    await waitFor(async () => expect((await readCache<any>('resort:vail'))?.data.id).toBe('vail'));
+  });
 });

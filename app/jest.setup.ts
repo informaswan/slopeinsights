@@ -18,3 +18,8 @@ configureInternal({
 });
 
 
+
+// The data hooks cache API responses in AsyncStorage. The mock is a process-wide singleton,
+// so without this a response cached by one test would leak into the next.
+import AsyncStorage from '@react-native-async-storage/async-storage';
+beforeEach(async () => { await AsyncStorage.clear(); });

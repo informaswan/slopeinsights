@@ -200,3 +200,32 @@ describe('ResortDetail screen — loading + error states', () => {
     expect(mockRefresh).toHaveBeenCalledTimes(1);
   });
 });
+
+
+describe('ResortDetail screen — offline cache', () => {
+  it('shows the offline banner above saved data', () => {
+    (useResortDetail as jest.Mock).mockReturnValue({
+      resort: mockResort, loading: false, error: null, cachedAt: Date.now() - 20 * 60_000, refresh: jest.fn(),
+    });
+    render(<ResortDetail />);
+    expect(screen.getByTestId('offline-banner')).toBeTruthy();
+    expect(screen.getByText('Jackson Hole')).toBeTruthy();
+  });
+
+  it('shows no banner for live data', () => {
+    (useResortDetail as jest.Mock).mockReturnValue({
+      resort: mockResort, loading: false, error: null, cachedAt: null, refresh: jest.fn(),
+    });
+    render(<ResortDetail />);
+    expect(screen.queryByTestId('offline-banner')).toBeNull();
+  });
+
+  it('keeps showing saved data while a refresh is in flight instead of a spinner', () => {
+    (useResortDetail as jest.Mock).mockReturnValue({
+      resort: mockResort, loading: true, error: null, cachedAt: null, refresh: jest.fn(),
+    });
+    render(<ResortDetail />);
+    expect(screen.queryByTestId('detail-loading')).toBeNull();
+    expect(screen.getByText('Jackson Hole')).toBeTruthy();
+  });
+});

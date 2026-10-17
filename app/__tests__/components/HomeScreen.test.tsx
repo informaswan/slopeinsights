@@ -2,6 +2,7 @@ import React from 'react';
 import { render, fireEvent } from '@testing-library/react-native';
 import HomeScreen from '../../app/index';
 import MyMountainsScreen from '../../app/mine';
+import { writeCache } from '../../lib/cache';
 
 const mockPush = jest.fn();
 jest.mock('expo-router', () => ({ useRouter: () => ({ push: mockPush }) }));
@@ -124,5 +125,26 @@ describe('My mountains', () => {
     const { findByText, queryByText } = render(<MyMountainsScreen />);
     expect(await findByText('No saved mountains yet')).toBeTruthy();
     expect(queryByText('Vail')).toBeNull();
+  });
+});
+
+
+describe('offline', () => {
+  it('shows saved mountains and an offline banner when the network is down', async () => {
+    await writeCache('resorts', mockResorts);
+    await writeCache('resorts-best', mockBest.resorts);
+    (global.fetch as jest.Mock).mockReset();
+    (global.fetch as jest.Mock).mockRejectedValue(new Error('Network error'));
+
+    const { findByTestId, findAllByText, queryByText } = render(<HomeScreen />);
+    expect(await findByTestId('offline-banner')).toBeTruthy();
+    expect((await findAllByText('Vail')).length).toBeGreaterThan(0);
+    expect(queryByText('Tap to retry')).toBeNull();
+  });
+
+  it('shows no banner when the data loaded fine', async () => {
+    const { findAllByText, queryByTestId } = render(<HomeScreen />);
+    await findAllByText('Vail');
+    expect(queryByTestId('offline-banner')).toBeNull();
   });
 });

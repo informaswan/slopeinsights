@@ -1,5 +1,6 @@
 import React, { useRef, useState, useMemo } from 'react';
 import { View, ScrollView, Pressable, Text, ActivityIndicator, RefreshControl, StyleSheet } from 'react-native';
+import { OfflineBanner } from './OfflineBanner';
 import { useResorts } from '../hooks/useResorts';
 import { useIsWide } from '../hooks/useIsWide';
 import { useFavorites } from '../contexts/FavoritesContext';
@@ -28,7 +29,7 @@ export function MountainsScreen({ scope }: Props) {
   const { colors } = useTheme();
   const isWide = useIsWide();
   const { favoriteIds, isLoaded: favoritesLoaded } = useFavorites();
-  const { resorts, best, loading, error, refresh } = useResorts();
+  const { resorts, best, loading, error, cachedAt, refresh } = useResorts();
   const [passFilter, setPassFilter] = useState<PassFilter>('all');
   const [filterState, setFilterState] = useState<FilterState>({ selectedRegions: new Set<string>(), sort: 'snow' });
   const [refreshing, setRefreshing] = useState(false);
@@ -101,6 +102,7 @@ export function MountainsScreen({ scope }: Props) {
           />
         }
       >
+        <OfflineBanner cachedAt={cachedAt} />
         <View style={styles.pageHeader}>
           <Text style={[styles.title, { color: colors.text }]}>{title}</Text>
           {!noneSaved && <Text style={[styles.subtitle, { color: colors.textSecondary }]}>{subtitle}</Text>}
