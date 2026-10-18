@@ -10,13 +10,14 @@ from datetime import datetime, timezone
 from zoneinfo import ZoneInfo
 
 import httpx
-from fastapi import APIRouter, Depends, HTTPException, Query, Security
+from fastapi import APIRouter, Depends, HTTPException, Query, Request, Security
 from fastapi.responses import Response
 from fastapi.security.api_key import APIKeyHeader
 from sqlalchemy.orm import Session
 
 from app.config import settings
 from app.database import get_db
+from app.limiter import limiter
 from app.cache import (
     get_cached_resort_list, set_cached_resort_list,
     get_cached_resort_detail, set_cached_resort_detail, CACHE_TTL_SECONDS,
@@ -251,8 +252,10 @@ def get_resort_webcams(resort_id: str, db: Session = Depends(get_db), _: str = D
     }
 
 
+# One detail page loads several cams on a refresh timer, so this gets its own, higher budget.
 @router.get("/webcam-proxy")
-async def webcam_proxy(url: str = Query(...)):
+@limiter.limit("300/minute")
+async def webcam_proxy(request: Request, url: str = Query(...)):
     """Proxy webcam JPEG images to avoid cross-origin hotlink blocks."""
     allowed_hosts = {
         "webcams.opensnow.com", "media.mammothresorts.com", "backend.roundshot.com",
