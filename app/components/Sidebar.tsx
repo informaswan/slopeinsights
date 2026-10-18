@@ -10,6 +10,7 @@ import { DONATION_URL, VENMO_URL } from '../constants/links';
 import { FontSize, Radius, Spacing } from '../constants/theme';
 import { MountainLogo } from './MountainLogo';
 import { SearchIcon } from './icons';
+import { touchPad, touchText } from '../constants/touch';
 
 interface Props {
   onNavigate?: () => void;
@@ -45,8 +46,8 @@ export function Sidebar({ onNavigate }: Props) {
   };
 
   const navItems = [
-    { label: 'All mountains', path: '/', count: null as number | null },
-    { label: 'My mountains', path: '/mine', count: favoriteIds.length },
+    { label: 'My mountains', path: '/', count: favoriteIds.length },
+    { label: 'All mountains', path: '/all', count: null as number | null },
     { label: 'Road cameras', path: '/road-cameras', count: null as number | null },
     { label: 'Feedback', path: '/feedback', count: null as number | null },
   ];
@@ -182,23 +183,23 @@ const styles = StyleSheet.create({
   nav: { marginTop: Spacing.lg, gap: 2 },
   navItem: {
     flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',
-    paddingVertical: 8, paddingHorizontal: Spacing.sm + 2, borderRadius: Radius.sm,
+    paddingVertical: 8 + touchPad, paddingHorizontal: Spacing.sm + 2, borderRadius: Radius.sm,
     borderLeftWidth: 2, borderLeftColor: 'transparent',
   },
-  navText: { fontSize: FontSize.sm + 1, fontWeight: '500' },
+  navText: { fontSize: FontSize.sm + 1 + touchText, fontWeight: '500' },
   navTextActive: { fontWeight: '600' },
   navCount: { fontSize: FontSize.xs, fontWeight: '600' },
   spacer: { flex: 1, minHeight: Spacing.lg },
   support: { borderTopWidth: 1, paddingTop: Spacing.md, gap: Spacing.sm },
   supportTitle: { fontSize: FontSize.sm + 1, fontWeight: '600' },
   supportBody: { fontSize: FontSize.sm, lineHeight: 18, marginBottom: Spacing.xs },
-  buttonPrimary: { borderRadius: Radius.md, paddingVertical: 9, alignItems: 'center' },
+  buttonPrimary: { borderRadius: Radius.md, paddingVertical: 9 + touchPad, alignItems: 'center' },
   buttonPrimaryText: { fontSize: FontSize.sm + 1, fontWeight: '600' },
-  buttonOutline: { borderWidth: 1, borderRadius: Radius.md, paddingVertical: 8, alignItems: 'center' },
+  buttonOutline: { borderWidth: 1, borderRadius: Radius.md, paddingVertical: 8 + touchPad, alignItems: 'center' },
   buttonOutlineText: { fontSize: FontSize.sm + 1, fontWeight: '500' },
   footer: { borderTopWidth: 1, marginTop: Spacing.md, paddingTop: Spacing.md, gap: Spacing.sm + 2 },
   row: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   rowLabel: { fontSize: FontSize.sm + 1 },
-  aboutLink: { fontSize: FontSize.sm + 1 },
+  aboutLink: { fontSize: FontSize.sm + 1 + touchText, paddingVertical: touchPad },
   legalLinks: { flexDirection: 'row', gap: Spacing.md },
 });

@@ -9,6 +9,8 @@ jest.mock('expo-router', () => {
   };
   return { Stack };
 });
+// The real provider renders nothing until the phone reports its insets.
+jest.mock('react-native-safe-area-context', () => require('react-native-safe-area-context/jest/mock').default);
 jest.mock('react-native-gesture-handler', () => {
   const { View } = require('react-native');
   return { GestureHandlerRootView: View };
@@ -34,7 +36,7 @@ describe('RootLayout', () => {
     render(<RootLayout />);
     const shell = screen.getByTestId('app-shell');
     expect(shell).toBeTruthy();
-    for (const name of ['index', 'mine', 'road-cameras', 'resort/[id]', 'about']) {
+    for (const name of ['index', 'all', 'mine', 'road-cameras', 'resort/[id]', 'about']) {
       expect(screen.getByTestId(`screen-${name}`)).toBeTruthy();
     }
   });

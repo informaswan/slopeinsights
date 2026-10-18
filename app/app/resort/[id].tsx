@@ -17,12 +17,15 @@ import { useFavorites } from '../../contexts/FavoritesContext';
 import { useIsWide } from '../../hooks/useIsWide';
 import { ChevronLeftIcon, StarIcon } from '../../components/icons';
 import { Spacing, FontSize, Radius } from '../../constants/theme';
+import { touchPad, touchText } from '../../constants/touch';
 
 export default function ResortDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const { resort, loading, error, cachedAt, refresh } = useResortDetail(Array.isArray(id) ? id[0] : id);
   const { colors } = useTheme();
   const router = useRouter();
+  // Back to wherever they came from (My mountains or All mountains); home if they opened this page directly.
+  const goBack = () => (router.canGoBack?.() ? router.back() : router.push('/'));
   const isWide = useIsWide();
   const { favoriteIds, toggleFavorite } = useFavorites();
 
@@ -55,9 +58,9 @@ export default function ResortDetailScreen() {
       contentContainerStyle={[styles.content, { padding: isWide ? Spacing.lg : Spacing.md }]}
     >
       <OfflineBanner cachedAt={cachedAt ?? null} />
-      <TouchableOpacity style={styles.back} onPress={() => router.push('/')} accessibilityLabel="Back to all mountains">
+      <TouchableOpacity style={styles.back} onPress={goBack} accessibilityLabel="Back">
         <ChevronLeftIcon size={16} color={colors.textSecondary} />
-        <Text style={[styles.backText, { color: colors.textSecondary }]}>All mountains</Text>
+        <Text style={[styles.backText, { color: colors.textSecondary }]}>Back</Text>
       </TouchableOpacity>
 
       <View style={styles.header}>
@@ -156,10 +159,10 @@ const styles = StyleSheet.create({
   content: { gap: Spacing.md, maxWidth: 1100, width: '100%' },
   centered: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: Spacing.lg },
   errorText: { fontSize: FontSize.md, textAlign: 'center', marginBottom: Spacing.md },
-  retryButton: { paddingHorizontal: Spacing.lg, paddingVertical: Spacing.sm, borderRadius: Radius.md },
+  retryButton: { paddingHorizontal: Spacing.lg, paddingVertical: Spacing.sm + touchPad, borderRadius: Radius.md },
   retryText: { color: '#fff', fontSize: FontSize.md, fontWeight: '600' },
-  back: { flexDirection: 'row', alignItems: 'center', gap: 4, alignSelf: 'flex-start', paddingVertical: 2 },
-  backText: { fontSize: FontSize.sm + 1 },
+  back: { flexDirection: 'row', alignItems: 'center', gap: 4, alignSelf: 'flex-start', paddingVertical: 2 + touchPad },
+  backText: { fontSize: FontSize.sm + 1 + touchText },
   header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', gap: Spacing.md },
   headerText: { flex: 1, gap: 2 },
   resortName: { fontSize: FontSize.xl, fontWeight: '700', letterSpacing: -0.4 },
@@ -168,9 +171,9 @@ const styles = StyleSheet.create({
   location: { fontSize: FontSize.sm },
   saveButton: {
     flexDirection: 'row', alignItems: 'center', gap: 6,
-    borderWidth: 1, borderRadius: Radius.md, paddingHorizontal: Spacing.sm + 4, paddingVertical: 7,
+    borderWidth: 1, borderRadius: Radius.md, paddingHorizontal: Spacing.sm + 4, paddingVertical: 7 + touchPad,
   },
-  saveText: { fontSize: FontSize.sm + 1, fontWeight: '600' },
+  saveText: { fontSize: FontSize.sm + 1 + touchText, fontWeight: '600' },
   webcam: { borderRadius: Radius.md, overflow: 'hidden', maxWidth: 800, width: '100%' },
   liveTrafficPanel: { gap: Spacing.xs, maxWidth: 800, width: '100%' },
   grid: { flexDirection: 'row', flexWrap: 'wrap', gap: Spacing.md },

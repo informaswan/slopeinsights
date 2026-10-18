@@ -3,6 +3,8 @@ import { View, Text, Pressable, ScrollView, Modal, StyleSheet } from 'react-nati
 import type { SortOption, PassFilter } from '../lib/sort';
 import { Spacing, FontSize, Radius } from '../constants/theme';
 import { useTheme } from '../contexts/ThemeContext';
+import { touchPad, touchText } from '../constants/touch';
+import { useInsets } from '../hooks/useInsets';
 
 export type { SortOption, PassFilter };
 
@@ -27,6 +29,7 @@ const SORT_OPTIONS: { value: SortOption; label: string }[] = [
 export const FilterSheet = forwardRef<any, Props>(
   ({ filterState, onApply, filteredCount }, ref) => {
     const { colors } = useTheme();
+    const insets = useInsets();
     const [visible, setVisible] = useState(false);
     const [localState, setLocalState] = useState<FilterState>(() => ({
       selectedRegions: new Set(filterState.selectedRegions),
@@ -58,7 +61,7 @@ export const FilterSheet = forwardRef<any, Props>(
     return (
       <Modal visible={visible} transparent animationType="fade" onRequestClose={() => setVisible(false)}>
         <Pressable style={styles.backdrop} onPress={() => setVisible(false)}>
-          <Pressable style={[styles.sheet, { backgroundColor: colors.surface }]} onPress={(e) => e.stopPropagation()}>
+          <Pressable style={[styles.sheet, { backgroundColor: colors.surface, paddingBottom: Spacing.xl + insets.bottom }]} onPress={(e) => e.stopPropagation()}>
             <View style={[styles.header, { borderBottomColor: colors.border }]}>
               <Text style={[styles.title, { color: colors.text }]}>Filter & Sort</Text>
               <Pressable onPress={() => setVisible(false)} style={styles.closeBtn}>
@@ -119,17 +122,17 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
   },
   title: { fontSize: FontSize.lg, fontWeight: '700' },
-  closeBtn: { padding: Spacing.xs },
+  closeBtn: { padding: Spacing.xs + touchPad },
   closeText: { fontSize: FontSize.lg },
   content: { padding: Spacing.md, paddingBottom: Spacing.xl },
   sectionTitle: { fontSize: FontSize.xs, fontWeight: '700', marginBottom: Spacing.sm, textTransform: 'uppercase', letterSpacing: 1 },
-  option: { paddingVertical: Spacing.sm, paddingHorizontal: Spacing.md, borderRadius: Radius.md, marginBottom: Spacing.xs },
-  optionText: { fontSize: FontSize.md },
+  option: { paddingVertical: Spacing.sm + touchPad, paddingHorizontal: Spacing.md, borderRadius: Radius.md, marginBottom: Spacing.xs },
+  optionText: { fontSize: FontSize.md + touchText },
   optionTextSelected: { color: '#fff', fontWeight: '600' },
   regionGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: Spacing.sm, marginBottom: Spacing.lg },
-  regionChip: { borderRadius: Radius.full, paddingVertical: Spacing.xs, paddingHorizontal: Spacing.md, borderWidth: 1 },
-  regionText: { fontSize: FontSize.sm },
+  regionChip: { borderRadius: Radius.full, paddingVertical: Spacing.xs + touchPad, paddingHorizontal: Spacing.md, borderWidth: 1 },
+  regionText: { fontSize: FontSize.sm + touchText },
   regionTextSelected: { color: '#fff', fontWeight: '600' },
-  applyButton: { borderRadius: Radius.md, paddingVertical: Spacing.md, alignItems: 'center', marginTop: Spacing.md },
-  applyText: { color: '#fff', fontSize: FontSize.md, fontWeight: '700' },
+  applyButton: { borderRadius: Radius.md, paddingVertical: Spacing.md + touchPad, alignItems: 'center', marginTop: Spacing.md },
+  applyText: { color: '#fff', fontSize: FontSize.md + touchText, fontWeight: '700' },
 });

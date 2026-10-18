@@ -24,14 +24,14 @@ const jpegCam: WebcamItem = { label: 'Base', cam_type: 'jpeg', url: 'https://exa
 const deadCam: WebcamItem = { label: 'Village', cam_type: 'jpeg', url: 'https://example.com/dead.jpg', is_alive: false };
 
 describe('WebcamViewer — unavailable states', () => {
-  it('shows placeholder when webcams array is empty', () => {
+  it('says so when the mountain has no cameras', () => {
     render(<WebcamViewer webcams={[]} />, { wrapper: TestWrapper });
-    expect(screen.getByText('Camera temporarily unavailable')).toBeTruthy();
+    expect(screen.getByText('Camera not available for this mountain')).toBeTruthy();
   });
 
-  it('shows placeholder when all cams have is_alive=false', () => {
+  it('says the cameras are offline when they all are', () => {
     render(<WebcamViewer webcams={[deadCam]} />, { wrapper: TestWrapper });
-    expect(screen.getByText('Camera temporarily unavailable')).toBeTruthy();
+    expect(screen.getByText('Cameras offline right now')).toBeTruthy();
   });
 });
 
@@ -70,10 +70,35 @@ describe('WebcamViewer — native HLS', () => {
 });
 
 describe('WebcamViewer — JPEG cam', () => {
-  it('renders an Image with a timestamp query param', () => {
+  it('loads the picture through our server with a timestamp query param', () => {
     render(<WebcamViewer webcams={[jpegCam]} />, { wrapper: TestWrapper });
     const img = screen.getByTestId('webcam-image');
-    expect(img.props.source.uri).toMatch(/\?t=\d+/);
+    expect(img.props.source.uri).toContain('/api/webcam-proxy?url=' + encodeURIComponent(jpegCam.url));
+    expect(img.props.source.uri).toMatch(/&t=\d+$/);
+  });
+
+  it('shows when the picture was taken, under it', async () => {
+    const taken = new Date(Date.now() - 4 * 60_000).toISOString();
+    const spy = jest.spyOn(global, 'fetch').mockResolvedValue({ ok: true, json: async () => ({ updated: taken }) } as any);
+    render(<WebcamViewer webcams={[jpegCam]} />, { wrapper: TestWrapper });
+    expect(await screen.findByText('Updated 4m ago')).toBeTruthy();
+    spy.mockRestore();
+  });
+
+  it('shows no time line when the time is unknown', async () => {
+    const spy = jest.spyOn(global, 'fetch').mockResolvedValue({ ok: true, json: async () => ({ updated: null }) } as any);
+    render(<WebcamViewer webcams={[jpegCam]} />, { wrapper: TestWrapper });
+    await act(async () => {});
+    expect(screen.queryByTestId('webcam-updated')).toBeNull();
+    spy.mockRestore();
+  });
+
+  it('says so when the picture fails to load', () => {
+    const { fireEvent } = require('@testing-library/react-native');
+    render(<WebcamViewer webcams={[jpegCam]} />, { wrapper: TestWrapper });
+    expect(screen.queryByText("Couldn't load this picture")).toBeNull();
+    fireEvent(screen.getByTestId('webcam-image'), 'error');
+    expect(screen.getByText("Couldn't load this picture")).toBeTruthy();
   });
 
   it('refreshes the timestamp after 30 s', () => {

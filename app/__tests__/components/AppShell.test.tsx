@@ -1,6 +1,7 @@
 import React from 'react';
 import { Text, Pressable } from 'react-native';
 import { render, fireEvent } from '@testing-library/react-native';
+import { SafeAreaInsetsContext } from 'react-native-safe-area-context';
 import { AppShell } from '../../components/AppShell';
 
 let mockIsWide = true;
@@ -56,5 +57,30 @@ describe('AppShell on a narrow screen', () => {
     fireEvent.press(getByLabelText('Open menu'));
     fireEvent.press(getByLabelText('Close menu'));
     expect(queryByTestId('sidebar')).toBeNull();
+  });
+});
+
+
+describe('AppShell safe areas (phone)', () => {
+  beforeEach(() => { mockIsWide = false; });
+
+  const withInsets = (insets: any, ui: React.ReactElement) => (
+    <SafeAreaInsetsContext.Provider value={insets}>{ui}</SafeAreaInsetsContext.Provider>
+  );
+  const flat = (style: any) => Object.assign({}, ...[style].flat(Infinity).filter(Boolean));
+
+  it('keeps the top bar below the status bar and the page above the gesture bar', () => {
+    const { getByTestId } = render(
+      withInsets({ top: 30, bottom: 20, left: 0, right: 0 }, <AppShell>{page}</AppShell>),
+    );
+    const bar = flat(getByTestId('top-bar').props.style);
+    expect(bar.paddingTop).toBe(30);
+    expect(bar.height).toBeGreaterThan(30 + 48); // room for the bar itself plus the status bar
+    expect(flat(getByTestId('app-column').props.style).paddingBottom).toBe(20);
+  });
+
+  it('needs no provider (website, tests)', () => {
+    const { getByText } = render(<AppShell>{page}</AppShell>);
+    expect(getByText('page content')).toBeTruthy();
   });
 });

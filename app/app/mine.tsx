@@ -1,6 +1,6 @@
-import React from 'react';
-import { MountainsScreen } from '../components/MountainsScreen';
+import { Redirect } from 'expo-router';
 
-export default function MyMountainsScreen() {
-  return <MountainsScreen scope="mine" />;
+// "My mountains" is the home page now; keep old links and bookmarks working.
+export default function MyMountainsRedirect() {
+  return <Redirect href="/" />;
 }

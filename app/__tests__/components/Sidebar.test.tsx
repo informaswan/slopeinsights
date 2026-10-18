@@ -63,9 +63,9 @@ describe('Sidebar', () => {
     const onNavigate = jest.fn();
     const { getByText } = render(<Sidebar onNavigate={onNavigate} />);
     fireEvent.press(getByText('My mountains'));
-    expect(mockPush).toHaveBeenCalledWith('/mine');
-    fireEvent.press(getByText('All mountains'));
     expect(mockPush).toHaveBeenCalledWith('/');
+    fireEvent.press(getByText('All mountains'));
+    expect(mockPush).toHaveBeenCalledWith('/all');
     fireEvent.press(getByText('Road cameras'));
     expect(mockPush).toHaveBeenCalledWith('/road-cameras');
     fireEvent.press(getByText('Feedback'));

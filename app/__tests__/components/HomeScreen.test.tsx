@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, fireEvent } from '@testing-library/react-native';
 import HomeScreen from '../../app/index';
-import MyMountainsScreen from '../../app/mine';
+import AllMountainsScreen from '../../app/all';
 import { writeCache } from '../../lib/cache';
 
 const mockPush = jest.fn();
@@ -50,23 +50,23 @@ beforeEach(() => {
 });
 
 it('shows loading spinner while data loads', () => {
-  const { getByTestId } = render(<HomeScreen />);
+  const { getByTestId } = render(<AllMountainsScreen />);
   expect(getByTestId('loading-spinner')).toBeTruthy();
 });
 
 it('renders resort names after loading', async () => {
-  const { findByText } = render(<HomeScreen />);
+  const { findByText } = render(<AllMountainsScreen />);
   expect(await findByText('Vail')).toBeTruthy();
   expect(await findByText('Mammoth')).toBeTruthy();
 });
 
 it('renders the Best conditions today banner', async () => {
-  const { findByText } = render(<HomeScreen />);
+  const { findByText } = render(<AllMountainsScreen />);
   expect(await findByText('Best conditions today')).toBeTruthy();
 });
 
 it('filters to Epic resorts when Epic tab is pressed', async () => {
-  const { findByText, queryByText, getByLabelText } = render(<HomeScreen />);
+  const { findByText, queryByText, getByLabelText } = render(<AllMountainsScreen />);
   await findByText('Vail');
   fireEvent.press(getByLabelText('Filter by Epic'));
   expect(queryByText('Mammoth')).toBeNull();
@@ -74,7 +74,7 @@ it('filters to Epic resorts when Epic tab is pressed', async () => {
 });
 
 it('filters to Ikon resorts when Ikon tab is pressed', async () => {
-  const { findByText, queryByText, getByLabelText } = render(<HomeScreen />);
+  const { findByText, queryByText, getByLabelText } = render(<AllMountainsScreen />);
   await findByText('Vail');
   fireEvent.press(getByLabelText('Filter by Ikon'));
   expect(queryByText('Vail')).toBeNull();
@@ -82,7 +82,7 @@ it('filters to Ikon resorts when Ikon tab is pressed', async () => {
 });
 
 it('filters to independent mountains when the Independent tab is pressed', async () => {
-  const { findByText, queryByText, getByLabelText } = render(<HomeScreen />);
+  const { findByText, queryByText, getByLabelText } = render(<AllMountainsScreen />);
   await findByText('Vail');
   fireEvent.press(getByLabelText('Filter by Independent'));
   expect(queryByText('Vail')).toBeNull();
@@ -93,38 +93,44 @@ it('filters to independent mountains when the Independent tab is pressed', async
 it('shows error state with retry on fetch failure', async () => {
   (global.fetch as jest.Mock).mockReset();
   (global.fetch as jest.Mock).mockRejectedValue(new Error('Network error'));
-  const { findByText } = render(<HomeScreen />);
+  const { findByText } = render(<AllMountainsScreen />);
   expect(await findByText('Tap to retry')).toBeTruthy();
 });
 
 it('titles the page All mountains and shows every resort even when some are starred', async () => {
   mockFavoriteIds = ['mammoth'];
-  const { findByText } = render(<HomeScreen />);
+  const { findByText } = render(<AllMountainsScreen />);
   expect(await findByText('All mountains')).toBeTruthy();
   expect(await findByText('Vail')).toBeTruthy();
   expect(await findByText('Mammoth')).toBeTruthy();
 });
 
 it('has no account UI and no lift information', async () => {
-  const { findByText, queryByText } = render(<HomeScreen />);
+  const { findByText, queryByText } = render(<AllMountainsScreen />);
   await findByText('Vail');
   expect(queryByText('??')).toBeNull();
   expect(queryByText(/lift/i)).toBeNull();
 });
 
-describe('My mountains', () => {
+describe('Home is My mountains', () => {
   it('shows only starred resorts', async () => {
     mockFavoriteIds = ['mammoth'];
-    const { findByText, queryByText } = render(<MyMountainsScreen />);
+    const { findByText, queryByText } = render(<HomeScreen />);
     expect(await findByText('My mountains')).toBeTruthy();
     expect(await findByText('Mammoth')).toBeTruthy();
     expect(queryByText('Vail')).toBeNull();
   });
 
   it('explains how to save mountains when none are saved', async () => {
-    const { findByText, queryByText } = render(<MyMountainsScreen />);
+    const { findByText, queryByText } = render(<HomeScreen />);
     expect(await findByText('No saved mountains yet')).toBeTruthy();
     expect(queryByText('Vail')).toBeNull();
+  });
+
+  it('offers a way to browse all mountains when none are saved', async () => {
+    const { findByLabelText } = render(<HomeScreen />);
+    fireEvent.press(await findByLabelText('Browse all mountains'));
+    expect(mockPush).toHaveBeenCalledWith('/all');
   });
 });
 
@@ -136,14 +142,14 @@ describe('offline', () => {
     (global.fetch as jest.Mock).mockReset();
     (global.fetch as jest.Mock).mockRejectedValue(new Error('Network error'));
 
-    const { findByTestId, findAllByText, queryByText } = render(<HomeScreen />);
+    const { findByTestId, findAllByText, queryByText } = render(<AllMountainsScreen />);
     expect(await findByTestId('offline-banner')).toBeTruthy();
     expect((await findAllByText('Vail')).length).toBeGreaterThan(0);
     expect(queryByText('Tap to retry')).toBeNull();
   });
 
   it('shows no banner when the data loaded fine', async () => {
-    const { findAllByText, queryByTestId } = render(<HomeScreen />);
+    const { findAllByText, queryByTestId } = render(<AllMountainsScreen />);
     await findAllByText('Vail');
     expect(queryByTestId('offline-banner')).toBeNull();
   });

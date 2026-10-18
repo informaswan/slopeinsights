@@ -4,6 +4,7 @@ import { api, type FeedbackPayload } from '../lib/api';
 import { useTheme } from '../contexts/ThemeContext';
 import { useIsWide } from '../hooks/useIsWide';
 import { FontSize, Radius, Spacing } from '../constants/theme';
+import { touchPad, touchText } from '../constants/touch';
 
 const CATEGORIES: { value: FeedbackPayload['category']; label: string }[] = [
   { value: 'idea', label: 'Idea' },
@@ -151,8 +152,8 @@ const styles = StyleSheet.create({
   title: { fontSize: FontSize.xl, fontWeight: '700', letterSpacing: -0.4 },
   body: { fontSize: FontSize.md, lineHeight: 24 },
   chips: { flexDirection: 'row', flexWrap: 'wrap', gap: Spacing.xs, marginTop: Spacing.xs },
-  chip: { borderWidth: 1, borderRadius: Radius.full, paddingHorizontal: Spacing.sm + 2, paddingVertical: Spacing.xs + 2 },
-  chipText: { fontSize: FontSize.sm, fontWeight: '600' },
+  chip: { borderWidth: 1, borderRadius: Radius.full, paddingHorizontal: Spacing.sm + 2, paddingVertical: Spacing.xs + 2 + touchPad },
+  chipText: { fontSize: FontSize.sm + touchText, fontWeight: '600' },
   input: { borderWidth: 1, borderRadius: Radius.md, paddingHorizontal: Spacing.sm + 2, paddingVertical: Spacing.sm, fontSize: FontSize.md },
   textarea: { minHeight: 140, textAlignVertical: 'top' },
   count: { fontSize: FontSize.xs, alignSelf: 'flex-end' },
@@ -160,6 +161,6 @@ const styles = StyleSheet.create({
   send: { borderRadius: Radius.md, paddingVertical: Spacing.sm + 2, alignItems: 'center', marginTop: Spacing.xs },
   sendText: { color: '#fff', fontSize: FontSize.md, fontWeight: '700' },
   error: { fontSize: FontSize.sm },
-  button: { alignSelf: 'flex-start', borderWidth: 1, borderRadius: Radius.md, paddingHorizontal: Spacing.md, paddingVertical: Spacing.xs + 2 },
-  buttonText: { fontSize: FontSize.sm, fontWeight: '600' },
+  button: { alignSelf: 'flex-start', borderWidth: 1, borderRadius: Radius.md, paddingHorizontal: Spacing.md, paddingVertical: Spacing.xs + 2 + touchPad },
+  buttonText: { fontSize: FontSize.sm + touchText, fontWeight: '600' },
 });

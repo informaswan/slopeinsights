@@ -115,10 +115,20 @@ describe('ResortDetail screen — loaded', () => {
     expect(screen.queryByText(/lift/i)).toBeNull();
   });
 
-  it('links back to all mountains', () => {
+  it('goes back to the previous screen, or home when there is none', () => {
     render(<ResortDetail />);
-    fireEvent.press(screen.getByLabelText('Back to all mountains'));
+    fireEvent.press(screen.getByLabelText('Back'));
     expect(mockPush).toHaveBeenCalledWith('/');
+  });
+
+  it('goes back in history when there is some', () => {
+    const mockBack = jest.fn();
+    require('expo-router').useRouter.mockReturnValueOnce({ push: mockPush, back: mockBack, canGoBack: () => true });
+    mockPush.mockClear();
+    render(<ResortDetail />);
+    fireEvent.press(screen.getByLabelText('Back'));
+    expect(mockBack).toHaveBeenCalled();
+    expect(mockPush).not.toHaveBeenCalled();
   });
 
   it('saves the resort to My mountains', () => {

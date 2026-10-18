@@ -11,10 +11,10 @@ function proxied(url: string) {
 
 const CAM_HEIGHT = 360; // fallback for RN styles only
 
-function UnavailablePlaceholder() {
+function UnavailablePlaceholder({ message = 'Camera not available for this mountain' }: { message?: string }) {
   return (
     <View style={styles.placeholder}>
-      <Text style={styles.placeholderText}>Camera temporarily unavailable</Text>
+      <Text style={styles.placeholderText}>{message}</Text>
     </View>
   );
 }
@@ -55,7 +55,10 @@ export function WebcamViewer({ webcams: allWebcams }: { webcams: WebcamItem[] })
   // The backend marks a cam dead when it isn't showing a live picture (see
   // scrapers/webcam_health.py), so don't offer it as a tab at all.
   const webcams = allWebcams.filter((c) => c.is_alive);
-  if (webcams.length === 0) return <View style={styles.container}><UnavailablePlaceholder /></View>;
+  if (webcams.length === 0) {
+    const message = allWebcams.length === 0 ? undefined : 'Cameras offline right now';
+    return <View style={styles.container}><UnavailablePlaceholder message={message} /></View>;
+  }
 
   const showTabs = webcams.length > 1;
   const activeCam = webcams[activeIndex] ?? webcams[0];

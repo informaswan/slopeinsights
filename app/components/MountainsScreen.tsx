@@ -1,5 +1,6 @@
 import React, { useRef, useState, useMemo } from 'react';
 import { View, ScrollView, Pressable, Text, ActivityIndicator, RefreshControl, StyleSheet } from 'react-native';
+import { useRouter } from 'expo-router';
 import { OfflineBanner } from './OfflineBanner';
 import { useResorts } from '../hooks/useResorts';
 import { useIsWide } from '../hooks/useIsWide';
@@ -13,6 +14,7 @@ import { sortResorts, applyFilters } from '../lib/sort';
 import type { PassFilter } from '../lib/sort';
 import { passBadge } from '../lib/utils';
 import { Spacing, FontSize, Radius } from '../constants/theme';
+import { touchPad, touchText } from '../constants/touch';
 
 const PASS_TABS: { label: string; value: PassFilter }[] = [
   { label: 'All', value: 'all' },
@@ -28,6 +30,7 @@ interface Props {
 export function MountainsScreen({ scope }: Props) {
   const { colors } = useTheme();
   const isWide = useIsWide();
+  const router = useRouter();
   const { favoriteIds, isLoaded: favoritesLoaded } = useFavorites();
   const { resorts, best, loading, error, cachedAt, refresh } = useResorts();
   const [passFilter, setPassFilter] = useState<PassFilter>('all');
@@ -114,6 +117,13 @@ export function MountainsScreen({ scope }: Props) {
             <Text style={[styles.emptySubtext, { color: colors.textMuted }]}>
               Tap the star on any mountain to keep it here.
             </Text>
+            <Pressable
+              accessibilityLabel="Browse all mountains"
+              style={[styles.retryButton, styles.browseButton, { backgroundColor: colors.epic }]}
+              onPress={() => router.push('/all')}
+            >
+              <Text style={styles.retryText}>Browse all mountains</Text>
+            </Pressable>
           </View>
         ) : (
           <>
@@ -177,20 +187,21 @@ const styles = StyleSheet.create({
   center: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: Spacing.xl, gap: Spacing.sm },
   errorTitle: { fontSize: FontSize.lg, fontWeight: '700' },
   errorText: { fontSize: FontSize.sm, textAlign: 'center' },
-  retryButton: { paddingHorizontal: Spacing.lg, paddingVertical: Spacing.sm, borderRadius: Radius.md, marginTop: Spacing.sm },
+  retryButton: { paddingHorizontal: Spacing.lg, paddingVertical: Spacing.sm + touchPad, borderRadius: Radius.md, marginTop: Spacing.sm },
   retryText: { color: '#fff', fontWeight: '600', fontSize: FontSize.md },
   pageHeader: { gap: 2 },
   title: { fontSize: FontSize.xl, fontWeight: '700', letterSpacing: -0.4 },
   subtitle: { fontSize: FontSize.sm },
   toolbar: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', borderBottomWidth: 1 },
   tabs: { flexDirection: 'row', gap: Spacing.md },
-  tab: { paddingVertical: Spacing.sm, borderBottomWidth: 2, borderBottomColor: 'transparent', marginBottom: -1 },
-  tabText: { fontSize: FontSize.sm + 1, fontWeight: '500' },
-  filterButton: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingVertical: Spacing.sm },
-  filterButtonText: { fontSize: FontSize.sm + 1, fontWeight: '500' },
+  tab: { paddingVertical: Spacing.sm + touchPad, borderBottomWidth: 2, borderBottomColor: 'transparent', marginBottom: -1 },
+  tabText: { fontSize: FontSize.sm + 1 + touchText, fontWeight: '500' },
+  filterButton: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingVertical: Spacing.sm + touchPad, paddingLeft: Spacing.sm + touchPad },
+  filterButtonText: { fontSize: FontSize.sm + 1 + touchText, fontWeight: '500' },
   filterDot: { width: 7, height: 7, borderRadius: 4 },
   grid: { flexDirection: 'row', flexWrap: 'wrap', gap: Spacing.sm + 2 },
   empty: { paddingVertical: Spacing.xl, gap: Spacing.xs },
+  browseButton: { alignSelf: 'flex-start', marginTop: Spacing.md },
   emptyText: { fontSize: FontSize.md, fontWeight: '600' },
   emptySubtext: { fontSize: FontSize.sm },
 });

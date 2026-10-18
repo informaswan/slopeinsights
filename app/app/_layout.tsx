@@ -2,6 +2,8 @@ import React from 'react';
 import { StyleSheet } from 'react-native';
 import { Stack } from 'expo-router';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { StatusBar } from 'expo-status-bar';
 import { ThemeProvider, useTheme } from '../contexts/ThemeContext';
 import { FavoritesProvider } from '../contexts/FavoritesContext';
 import { AppShell } from '../components/AppShell';
@@ -18,6 +20,7 @@ function AppNavigator() {
         }}
       >
         <Stack.Screen name="index" />
+        <Stack.Screen name="all" />
         <Stack.Screen name="mine" />
         <Stack.Screen name="road-cameras" />
         <Stack.Screen name="resort/[id]" />
@@ -33,11 +36,15 @@ function AppNavigator() {
 export default function RootLayout() {
   return (
     <GestureHandlerRootView style={styles.root}>
-      <ThemeProvider>
-        <FavoritesProvider>
-          <AppNavigator />
-        </FavoritesProvider>
-      </ThemeProvider>
+      <SafeAreaProvider>
+        <ThemeProvider>
+          <FavoritesProvider>
+            {/* The top bar is dark, so the status bar icons need to be light. */}
+            <StatusBar style="light" />
+            <AppNavigator />
+          </FavoritesProvider>
+        </ThemeProvider>
+      </SafeAreaProvider>
     </GestureHandlerRootView>
   );
 }
