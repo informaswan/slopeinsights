@@ -146,9 +146,17 @@ export function Sidebar({ onNavigate }: Props) {
             accessibilityLabel="Dark mode"
           />
         </View>
-        <Pressable onPress={() => go('/about')}>
-          <Text style={[styles.aboutLink, { color: colors.sidebarMuted }]}>About</Text>
-        </Pressable>
+        <View style={styles.legalLinks}>
+          <Pressable onPress={() => go('/about')}>
+            <Text style={[styles.aboutLink, { color: colors.sidebarMuted }]}>About</Text>
+          </Pressable>
+          <Pressable onPress={() => go('/privacy')}>
+            <Text style={[styles.aboutLink, { color: colors.sidebarMuted }]}>Privacy</Text>
+          </Pressable>
+          <Pressable onPress={() => go('/support')}>
+            <Text style={[styles.aboutLink, { color: colors.sidebarMuted }]}>Support</Text>
+          </Pressable>
+        </View>
       </View>
     </ScrollView>
   );
@@ -192,4 +200,5 @@ const styles = StyleSheet.create({
   row: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   rowLabel: { fontSize: FontSize.sm + 1 },
   aboutLink: { fontSize: FontSize.sm + 1 },
+  legalLinks: { flexDirection: 'row', gap: Spacing.md },
 });

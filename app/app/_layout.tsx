@@ -23,6 +23,8 @@ function AppNavigator() {
         <Stack.Screen name="resort/[id]" />
         <Stack.Screen name="feedback" />
         <Stack.Screen name="about" />
+        <Stack.Screen name="privacy" />
+        <Stack.Screen name="support" />
       </Stack>
     </AppShell>
   );
