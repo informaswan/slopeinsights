@@ -1,0 +1,21 @@
+{
+  "cli": {
+    "version": ">= 16.0.0",
+    "appVersionSource": "remote"
+  },
+  "build": {
+    "internal": {
+      "distribution": "store",
+      "android": { "buildType": "app-bundle" },
+      "autoIncrement": true,
+      "env": { "EXPO_PUBLIC_API_URL": "https://api.slopeinsights.com" }
+    },
+    "production": {
+      "autoIncrement": true,
+      "env": { "EXPO_PUBLIC_API_URL": "https://api.slopeinsights.com" }
+    }
+  },
+  "submit": {
+    "production": {}
+  }
+}
