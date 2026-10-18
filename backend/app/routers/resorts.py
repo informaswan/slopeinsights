@@ -252,23 +252,28 @@ def get_resort_webcams(resort_id: str, db: Session = Depends(get_db), _: str = D
     }
 
 
-# One detail page loads several cams on a refresh timer, so this gets its own, higher budget.
-@router.get("/webcam-proxy")
-@limiter.limit("300/minute")
-async def webcam_proxy(request: Request, url: str = Query(...)):
-    """Proxy webcam JPEG images to avoid cross-origin hotlink blocks."""
-    allowed_hosts = {
-        "webcams.opensnow.com", "media.mammothresorts.com", "backend.roundshot.com",
-        "511on.ca", "www.drivebc.ca",
-    }
+_WEBCAM_HOSTS = {
+    "webcams.opensnow.com", "media.mammothresorts.com", "backend.roundshot.com",
+    "511on.ca", "www.drivebc.ca",
+}
+
+
+def _fresh_webcam_url(url: str) -> str:
     from urllib.parse import urlencode, urlparse
-    host = urlparse(url).hostname or ""
-    if host not in allowed_hosts:
+    if (urlparse(url).hostname or "") not in _WEBCAM_HOSTS:
         raise HTTPException(status_code=400, detail="Disallowed webcam host")
     # webcams.opensnow.com sits behind Cloudflare with a 1-year max-age, so asking for the
     # identical URL every time returned whatever stale copy the nearest edge had cached
     # (a September frame in October). A unique query string forces a fresh fetch.
-    url += ("&" if "?" in url else "?") + urlencode({"t": int(time.time())})
+    return url + ("&" if "?" in url else "?") + urlencode({"t": int(time.time())})
+
+
+# One detail page loads several cams on a refresh timer, so these get their own, higher budget.
+@router.get("/webcam-proxy")
+@limiter.limit("300/minute")
+async def webcam_proxy(request: Request, url: str = Query(...)):
+    """Proxy webcam JPEG images to avoid cross-origin hotlink blocks."""
+    url = _fresh_webcam_url(url)
     async with httpx.AsyncClient(follow_redirects=True) as client:
         try:
             r = await client.get(url, timeout=8.0,
@@ -278,6 +283,25 @@ async def webcam_proxy(request: Request, url: str = Query(...)):
             raise HTTPException(status_code=502, detail="Upstream webcam unavailable")
     return Response(content=r.content, media_type=r.headers.get("content-type", "image/jpeg"),
                     headers={"Cache-Control": "public, max-age=30"})
+
+
+@router.get("/webcam-proxy/info")
+@limiter.limit("300/minute")
+async def webcam_picture_time(request: Request, url: str = Query(...)):
+    """When the camera's current picture was taken, as the host reports it (null if unknown)."""
+    from email.utils import parsedate_to_datetime
+    url = _fresh_webcam_url(url)
+    updated = None
+    async with httpx.AsyncClient(follow_redirects=True) as client:
+        try:
+            r = await client.head(url, timeout=8.0,
+                                  headers={"User-Agent": "Mozilla/5.0", "Cache-Control": "no-cache"})
+            header = r.headers.get("last-modified")
+            if r.status_code < 400 and header:
+                updated = parsedate_to_datetime(header).isoformat()
+        except Exception:
+            updated = None
+    return {"updated": updated}
 
 
 @router.get("/resorts/{resort_id}/parking")

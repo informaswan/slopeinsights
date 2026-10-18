@@ -62,3 +62,49 @@ def test_existing_query_string_is_preserved(client, upstream_requests):
 def test_disallowed_host_is_still_rejected(client, upstream_requests):
     r = client.get("/api/webcam-proxy", params={"url": "https://evil.example.com/a.jpg"})
     assert r.status_code == 400 and upstream_requests == []
+
+
+# --- picture time ------------------------------------------------------------------------
+
+@pytest.fixture
+def upstream_head(monkeypatch):
+    seen = []
+    headers = {"last-modified": "Sun, 18 Oct 2026 17:45:33 GMT"}
+
+    class FakeClient:
+        def __init__(self, *a, **kw):
+            pass
+
+        async def __aenter__(self):
+            return self
+
+        async def __aexit__(self, *exc):
+            return False
+
+        async def head(self, url, **kw):
+            seen.append(url)
+            return httpx.Response(200, headers=headers, request=httpx.Request("HEAD", url))
+
+    monkeypatch.setattr("app.routers.resorts.httpx.AsyncClient", FakeClient)
+    return seen, headers
+
+
+def test_info_reports_the_picture_time(client, upstream_head):
+    seen, _ = upstream_head
+    r = client.get("/api/webcam-proxy/info", params={"url": CAM})
+    assert r.status_code == 200
+    assert r.json() == {"updated": "2026-10-18T17:45:33+00:00"}
+    assert "t" in parse_qs(urlparse(seen[0]).query)  # still bypasses the upstream edge cache
+
+
+def test_info_is_null_without_a_usable_header(client, upstream_head):
+    _, headers = upstream_head
+    headers.clear()
+    assert client.get("/api/webcam-proxy/info", params={"url": CAM}).json() == {"updated": None}
+    headers["last-modified"] = "not a date"
+    assert client.get("/api/webcam-proxy/info", params={"url": CAM}).json() == {"updated": None}
+
+
+def test_info_rejects_disallowed_hosts(client, upstream_head):
+    r = client.get("/api/webcam-proxy/info", params={"url": "https://evil.example.com/x.jpg"})
+    assert r.status_code == 400
