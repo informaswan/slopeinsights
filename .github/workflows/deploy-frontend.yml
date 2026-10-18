@@ -67,6 +67,13 @@ jobs:
       - name: SPA fallback for deep links
         run: cp dist/index.html dist/404.html
 
+      # The fallback above answers with a 404 status. The pages that app stores and
+      # search engines fetch directly (the privacy policy URL in particular) should
+      # answer 200, so give them real files: GitHub Pages serves privacy.html at /privacy.
+      - name: Real pages for fixed routes
+        run: |
+          for page in privacy support about all; do cp dist/index.html "dist/$page.html"; done
+
       - uses: actions/upload-pages-artifact@v3
         with:
           path: app/dist
