@@ -681,9 +681,57 @@ WEBCAMS: list[dict] = [
     {"resort_id": "tremblant", "label": "Place Des Voyageurs", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/1689.jpg"},
     {"resort_id": "tremblant", "label": "South Base", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/1690.jpg"},
     {"resort_id": "tremblant", "label": "North Side", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/1691.jpg"},
-    # NOTE: Loon Mountain, Crystal Mountain WA, Afton Alps, Roundtop,
-    #       Wilmot Mountain, and Blue Mountain Ontario have no embedded
-    #       webcam feeds on OpenSnow — they link to resort-hosted pages.
+    # ── AFTON ALPS ────────────────────────────────────────────────
+    {"resort_id": "afton-alps", "label": "Nancy's Nursery", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/1112.jpg"},
+    {"resort_id": "afton-alps", "label": "Landing Zone Terrain Park", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/3048.jpg"},
+    # ── ROUNDTOP ──────────────────────────────────────────────────
+    {"resort_id": "roundtop", "label": "Minuteman", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/955.jpg"},
+    {"resort_id": "roundtop", "label": "Discovery", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/3942.jpg"},
+    # ── CRYSTAL MOUNTAIN ──────────────────────────────────────────
+    {"resort_id": "crystal-mountain", "label": "Crystal 360", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/4228.jpg"},
+    # ── MT. BACHELOR ──────────────────────────────────────────────
+    {"resort_id": "mt-bachelor", "label": "Snow Stake", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/1828.jpg"},
+    {"resort_id": "mt-bachelor", "label": "Base of Pine Marten", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/3057.jpg"},
+    {"resort_id": "mt-bachelor", "label": "The Cone", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/3245.jpg"},
+    {"resort_id": "mt-bachelor", "label": "Pine Marten Lodge", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/854.jpg"},
+    {"resort_id": "mt-bachelor", "label": "Mid-Mountain View", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/4618.jpg"},
+    {"resort_id": "mt-bachelor", "label": "Top of Outback", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/857.jpg"},
+    {"resort_id": "mt-bachelor", "label": "Top of Cloudchaser", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/4620.jpg"},
+    {"resort_id": "mt-bachelor", "label": "Top of Sunrise", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/4619.jpg"},
+    {"resort_id": "mt-bachelor", "label": "Summit Lift Line", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/2677.jpg"},
+    {"resort_id": "mt-bachelor", "label": "Sunrise Base", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/3059.jpg"},
+    {"resort_id": "mt-bachelor", "label": "Marshmallow", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/2676.jpg"},
+    # ── TELLURIDE ─────────────────────────────────────────────────
+    {"resort_id": "telluride", "label": "Village Cam", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/1750.jpg"},
+    {"resort_id": "telluride", "label": "See Forever", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/3340.jpg"},
+    {"resort_id": "telluride", "label": "Hoot Brown Terrain Park", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/3234.jpg"},
+    {"resort_id": "telluride", "label": "Bon Vivant", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/3286.jpg"},
+    {"resort_id": "telluride", "label": "Mountain Lodge", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/2087.jpg"},
+    {"resort_id": "telluride", "label": "Downtown Telluride", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/4623.jpg"},
+    # ── MT. HOOD MEADOWS ──────────────────────────────────────────
+    {"resort_id": "mt-hood-meadows", "label": "Top of Vista", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/2533.jpg"},
+    {"resort_id": "mt-hood-meadows", "label": "Top of Cascade", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/2527.jpg"},
+    {"resort_id": "mt-hood-meadows", "label": "Top of Blue", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/2530.jpg"},
+    {"resort_id": "mt-hood-meadows", "label": "Top of Heather", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/2528.jpg"},
+    {"resort_id": "mt-hood-meadows", "label": "Snow Stake", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/3594.jpg"},
+    {"resort_id": "mt-hood-meadows", "label": "Bottom of Vista", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/2531.jpg"},
+    {"resort_id": "mt-hood-meadows", "label": "Base Area", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/2532.jpg"},
+    # ── TIMBERLINE LODGE ──────────────────────────────────────────
+    {"resort_id": "timberline-lodge", "label": "Snow Stake", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/3479.jpg"},
+    {"resort_id": "timberline-lodge", "label": "Timberline Lodge", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/1774.jpg"},
+    {"resort_id": "timberline-lodge", "label": "Jeff Flood", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/2147.jpg"},
+    {"resort_id": "timberline-lodge", "label": "Palmer", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/1776.jpg"},
+    {"resort_id": "timberline-lodge", "label": "Pucci", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/1777.jpg"},
+    {"resort_id": "timberline-lodge", "label": "Bruno's", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/3054.jpg"},
+    {"resort_id": "timberline-lodge", "label": "Magic Mile", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/3478.jpg"},
+    # ── MONARCH MOUNTAIN ──────────────────────────────────────────
+    {"resort_id": "monarch", "label": "Snow Stake", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/2593.jpg"},
+    {"resort_id": "monarch", "label": "Pano Flats", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/4198.jpg"},
+    {"resort_id": "monarch", "label": "Base Lodge Looking Up", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/1283.jpg"},
+    {"resort_id": "monarch", "label": "Mountain View", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/1856.jpg"},
+    {"resort_id": "monarch", "label": "Monarch Pass Looking West", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/497.jpg"},
+    # NOTE: Loon Mountain, Wilmot Mountain and Blue Mountain Ontario have no cameras of their
+    #       own on OpenSnow (checked October 2026), so their detail pages say none is available.
 ]
 
 

@@ -103,3 +103,10 @@ def test_seed_webcams_does_not_duplicate_on_reseed(db):
     n = db.query(Webcam).count()
     seed_webcams(db)
     assert db.query(Webcam).count() == n
+
+
+def test_only_resorts_without_an_opensnow_feed_have_no_cameras():
+    # Loon, Wilmot and Blue Mountain have no cameras of their own on OpenSnow.
+    from app.seed import RESORTS, WEBCAMS
+    with_cams = {w["resort_id"] for w in WEBCAMS}
+    assert {r["id"] for r in RESORTS} - with_cams == {"loon-mountain", "wilmot-mountain", "blue-mountain"}
