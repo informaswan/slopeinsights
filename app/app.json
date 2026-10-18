@@ -8,12 +8,7 @@
     "userInterfaceStyle": "light",
     "ios": {
       "bundleIdentifier": "com.slopeinsights.app",
-      "supportsTablet": false,
-      "iap": {
-        "products": [
-          "com.slopeinsights.app.fullaccess"
-        ]
-      }
+      "supportsTablet": false
     },
     "android": {
       "package": "com.slopeinsights.app",
