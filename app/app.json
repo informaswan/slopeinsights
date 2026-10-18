@@ -32,6 +32,13 @@
     ],
     "experiments": {
       "typedRoutes": true
-    }
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "cc8302d3-34a6-4223-8cc2-ccf27fb21248"
+      }
+    },
+    "owner": "swansonsites-llc"
   }
 }
