@@ -4,6 +4,8 @@ import type { ResortSummary } from './types';
 export type SortOption = 'snow' | 'base' | 'lifts';
 export type PassFilter = 'all' | 'epic' | 'ikon' | 'independent';
 
+export const REGIONS = ['Colorado', 'Utah', 'California', 'Wyoming', 'Pacific NW', 'Northeast', 'Montana / Idaho', 'Canada', 'Other US'];
+
 export function sortResorts(resorts: ResortSummary[], sort: SortOption): ResortSummary[] {
   return [...resorts].sort((a, b) => {
     switch (sort) {

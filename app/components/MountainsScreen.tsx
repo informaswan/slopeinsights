@@ -8,6 +8,7 @@ import { useFavorites } from '../contexts/FavoritesContext';
 import { useTheme } from '../contexts/ThemeContext';
 import { ResortCard } from './ResortCard';
 import { BestBanner } from './BestBanner';
+import { MountainFinder } from './MountainFinder';
 import { FilterSheet } from './FilterSheet';
 import type { FilterState } from './FilterSheet';
 import { sortResorts, applyFilters } from '../lib/sort';
@@ -115,15 +116,9 @@ export function MountainsScreen({ scope }: Props) {
           <View style={styles.empty}>
             <Text style={[styles.emptyText, { color: colors.textSecondary }]}>No saved mountains yet</Text>
             <Text style={[styles.emptySubtext, { color: colors.textMuted }]}>
-              Tap the star on any mountain to keep it here.
+              Find a mountain and tap its star to keep it here.
             </Text>
-            <Pressable
-              accessibilityLabel="Browse all mountains"
-              style={[styles.retryButton, styles.browseButton, { backgroundColor: colors.epic }]}
-              onPress={() => router.push('/all')}
-            >
-              <Text style={styles.retryText}>Browse all mountains</Text>
-            </Pressable>
+            <MountainFinder resorts={resorts} />
           </View>
         ) : (
           <>
@@ -165,6 +160,16 @@ export function MountainsScreen({ scope }: Props) {
               <View style={styles.grid}>
                 {displayed.map((item) => <ResortCard key={item.id} resort={item} />)}
               </View>
+            )}
+
+            {scope === 'mine' && (
+              <Pressable
+                accessibilityLabel="Find more mountains"
+                style={[styles.retryButton, styles.browseButton, { borderColor: colors.epic, borderWidth: 1 }]}
+                onPress={() => router.push('/all')}
+              >
+                <Text style={[styles.retryText, { color: colors.epic }]}>Find more mountains</Text>
+              </Pressable>
             )}
           </>
         )}

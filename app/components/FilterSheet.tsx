@@ -1,5 +1,6 @@
 import React, { forwardRef, useState, useEffect, useCallback, useImperativeHandle } from 'react';
 import { View, Text, Pressable, ScrollView, Modal, StyleSheet } from 'react-native';
+import { REGIONS } from '../lib/sort';
 import type { SortOption, PassFilter } from '../lib/sort';
 import { Spacing, FontSize, Radius } from '../constants/theme';
 import { useTheme } from '../contexts/ThemeContext';
@@ -18,8 +19,6 @@ interface Props {
   onApply: (state: FilterState) => void;
   filteredCount: number;
 }
-
-const REGIONS = ['Colorado', 'Utah', 'California', 'Wyoming', 'Pacific NW', 'Northeast', 'Montana / Idaho', 'Canada', 'Other US'];
 
 const SORT_OPTIONS: { value: SortOption; label: string }[] = [
   { value: 'snow',  label: 'Most fresh snow' },
