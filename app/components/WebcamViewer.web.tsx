@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, ScrollView, StyleSheet } from 'react-native';
 import { openExternalLink } from '../lib/openExternalLink';
 import type { WebcamItem } from '../lib/types';
-import { ZoomableImage } from './ZoomableImage';
+import { ZoomFrame } from './ZoomFrame';
 import { Colors, Spacing, FontSize, Radius } from '../constants/theme';
 
 const API_BASE = process.env.EXPO_PUBLIC_API_URL ?? 'http://localhost:8000';
@@ -22,22 +22,11 @@ function UnavailablePlaceholder({ message = 'Camera not available for this mount
 
 function JpegCam({ url }: { url: string }) {
   const [ts, setTs] = useState(() => Date.now());
-  const [zoomed, setZoomed] = useState(false);
   useEffect(() => {
     const id = setInterval(() => setTs(Date.now()), 30_000);
     return () => clearInterval(id);
   }, []);
-  return (
-    <div style={{ width: '100%', height: 'min(56vh, 440px)', overflow: 'hidden', flexShrink: 0 }}>
-      <img
-        alt="Camera picture, click to enlarge"
-        src={`${proxied(url)}&t=${ts}`}
-        onClick={() => setZoomed(true)}
-        style={{ width: '100%', height: '100%', objectFit: 'contain', display: 'block', cursor: 'zoom-in' }}
-      />
-      <ZoomableImage uri={`${proxied(url)}&t=${ts}`} visible={zoomed} onClose={() => setZoomed(false)} />
-    </div>
-  );
+  return <ZoomFrame uri={`${proxied(url)}&t=${ts}`} />;
 }
 
 function CamView({ cam }: { cam: WebcamItem }) {

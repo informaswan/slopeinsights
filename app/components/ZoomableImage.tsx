@@ -1,5 +1,5 @@
 import React from 'react';
-import { Modal, Pressable, Text, Image, StyleSheet, View, useWindowDimensions } from 'react-native';
+import { Modal, Pressable, Text, Image, StyleSheet, useWindowDimensions } from 'react-native';
 import { GestureHandlerRootView, Gesture, GestureDetector } from 'react-native-gesture-handler';
 import Animated, { useSharedValue, useAnimatedStyle, withTiming } from 'react-native-reanimated';
 import { Spacing, FontSize, Radius } from '../constants/theme';
@@ -52,9 +52,6 @@ export function ZoomableImage({ uri, visible, onClose }: Props) {
         <Pressable accessibilityLabel="Close picture" style={styles.close} onPress={onClose}>
           <Text style={styles.closeText}>Close</Text>
         </Pressable>
-        <View pointerEvents="none" style={styles.hint}>
-          <Text style={styles.hintText}>Pinch to zoom · double-tap to reset</Text>
-        </View>
       </GestureHandlerRootView>
     </Modal>
   );
@@ -65,6 +62,4 @@ const styles = StyleSheet.create({
   center: { flex: 1, alignItems: 'center', justifyContent: 'center' },
   close: { position: 'absolute', top: 48, right: Spacing.md, backgroundColor: 'rgba(255,255,255,0.18)', borderRadius: Radius.full, paddingHorizontal: Spacing.md, paddingVertical: Spacing.sm + touchPad },
   closeText: { color: '#fff', fontWeight: '600', fontSize: FontSize.md },
-  hint: { position: 'absolute', bottom: 32, left: 0, right: 0, alignItems: 'center' },
-  hintText: { color: '#cbd5e1', fontSize: FontSize.xs },
 });
