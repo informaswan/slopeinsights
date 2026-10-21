@@ -13,11 +13,13 @@
     "android": {
       "package": "com.slopeinsights.app",
       "adaptiveIcon": {
-        "backgroundColor": "#1d4ed8"
+        "backgroundColor": "#12304d",
+        "foregroundImage": "./assets/adaptive-icon.png"
       }
     },
     "web": {
-      "bundler": "metro"
+      "bundler": "metro",
+      "favicon": "./public/favicon-48.png"
     },
     "plugins": [
       "expo-router",
@@ -39,6 +41,7 @@
         "projectId": "cc8302d3-34a6-4223-8cc2-ccf27fb21248"
       }
     },
-    "owner": "swansonsites-llc"
+    "owner": "swansonsites-llc",
+    "icon": "./assets/icon.png"
   }
 }

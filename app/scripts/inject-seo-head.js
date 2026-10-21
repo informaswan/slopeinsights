@@ -21,6 +21,10 @@ const DESCRIPTION =
 const TITLE = 'SlopeInsights — Ski Conditions, Weather, Parking & Road Cameras';
 
 const HEAD_TAGS = `<title>${TITLE}</title>
+    <link rel="icon" href="/favicon.ico" sizes="48x48" />
+    <link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <meta property="og:image" content="https://slopeinsights.com/icon-512.png" />
     <meta name="description" content="${DESCRIPTION}" />
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://slopeinsights.com" />
@@ -28,6 +32,7 @@ const HEAD_TAGS = `<title>${TITLE}</title>
     <meta property="og:title" content="${TITLE}" />
     <meta property="og:description" content="${DESCRIPTION}" />
     <meta name="twitter:card" content="summary" />
+    <meta name="twitter:image" content="https://slopeinsights.com/icon-512.png" />
     <meta name="twitter:title" content="SlopeInsights" />
     <meta name="twitter:description" content="${DESCRIPTION}" />`;
 

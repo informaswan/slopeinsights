@@ -33,7 +33,7 @@ export function BestBanner({ resorts }: Props) {
               onPress={() => router.push(`/resort/${r.id}`)}
             >
               <View style={styles.tileHeader}>
-                <Text style={[styles.name, { color: colors.text }]} numberOfLines={1}>{r.name}</Text>
+                <Text style={[styles.name, { color: colors.text }]}>{r.name}</Text>
                 <Text style={[styles.pass, { color: passColor }]}>{passLabel}</Text>
               </View>
               {snow24h != null ? (

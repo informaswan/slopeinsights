@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, Image, TouchableOpacity, ScrollView, StyleSheet, Platform } from 'react-native';
+import { View, Text, Image, TouchableOpacity, Pressable, ScrollView, StyleSheet, Platform } from 'react-native';
 import { openExternalLink } from '../lib/openExternalLink';
 import { VideoView, useVideoPlayer } from 'expo-video';
 import type { WebcamItem } from '../lib/types';
@@ -7,6 +7,7 @@ import { Colors, Spacing, FontSize, Radius } from '../constants/theme';
 import { proxiedWebcamUrl, fetchPictureTime } from '../lib/webcam';
 import { formatAgo } from '../lib/utils';
 import { touchPad, touchText } from '../constants/touch';
+import { ZoomableImage } from './ZoomableImage';
 
 const CAM_HEIGHT = 220;
 
@@ -35,6 +36,7 @@ function JpegCam({ url }: { url: string }) {
   const [ts, setTs] = useState(() => Date.now());
   const [failed, setFailed] = useState(false);
   const [pictureTime, setPictureTime] = useState<string | null>(null);
+  const [zoomed, setZoomed] = useState(false);
 
   useEffect(() => {
     const id = setInterval(() => setTs(Date.now()), 30_000);
@@ -52,7 +54,7 @@ function JpegCam({ url }: { url: string }) {
   const ago = formatAgo(pictureTime);
   return (
     <>
-      <View style={styles.media}>
+      <Pressable style={styles.media} accessibilityLabel="Enlarge camera picture" onPress={() => setZoomed(true)}>
         <Image
           testID="webcam-image"
           style={styles.media}
@@ -65,7 +67,8 @@ function JpegCam({ url }: { url: string }) {
             <Text style={styles.placeholderText}>Couldn't load this picture</Text>
           </View>
         )}
-      </View>
+      </Pressable>
+      <ZoomableImage uri={proxiedWebcamUrl(url, ts)} visible={zoomed} onClose={() => setZoomed(false)} />
       {ago && <Text testID="webcam-updated" style={styles.updated}>Updated {ago}</Text>}
     </>
   );

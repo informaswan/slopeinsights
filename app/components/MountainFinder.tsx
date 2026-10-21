@@ -9,7 +9,7 @@ import { Spacing, FontSize, Radius } from '../constants/theme';
 import { touchPad, touchText } from '../constants/touch';
 import { useTheme } from '../contexts/ThemeContext';
 import { useFavorites } from '../contexts/FavoritesContext';
-import { SearchIcon, StarIcon } from './icons';
+import { SearchIcon } from './icons';
 
 const PASSES: { label: string; value: PassFilter }[] = [
   { label: 'All', value: 'all' },
@@ -92,18 +92,18 @@ export function MountainFinder({ resorts }: { resorts: ResortSummary[] }) {
                 onPress={() => router.push(`/resort/${r.id}`)}
               >
                 <View style={styles.rowText}>
-                  <Text style={[styles.name, { color: colors.text }]} numberOfLines={1}>{r.name}</Text>
+                  <Text style={[styles.name, { color: colors.text }]}>{r.name}</Text>
                   <Text style={[styles.meta, { color: colors.textMuted }]}>
                     {r.state ?? r.region} · <Text style={{ color }}>{label}</Text>
                   </Text>
                 </View>
                 <Pressable
                   hitSlop={8}
-                  style={styles.star}
+                  style={[styles.addButton, saved ? { borderColor: colors.border, backgroundColor: colors.surfaceAlt } : { borderColor: colors.epic, backgroundColor: colors.epic }]}
                   accessibilityLabel={saved ? `Remove ${r.name} from My mountains` : `Save ${r.name} to My mountains`}
                   onPress={() => toggleFavorite(r.id)}
                 >
-                  <StarIcon size={20 + touchPad} filled={saved} color={saved ? colors.crowdMedium : colors.textMuted} />
+                  <Text style={[styles.addText, { color: saved ? colors.textSecondary : '#fff' }]}>{saved ? 'Added' : 'Add'}</Text>
                 </Pressable>
               </Pressable>
             );
@@ -119,14 +119,15 @@ const styles = StyleSheet.create({
   searchBox: { flexDirection: 'row', alignItems: 'center', gap: Spacing.sm, borderWidth: 1, borderRadius: Radius.md, paddingHorizontal: Spacing.sm + 2 },
   searchInput: { flex: 1, paddingVertical: Spacing.sm + touchPad, fontSize: FontSize.md + touchText },
   chips: { flexDirection: 'row', flexWrap: 'wrap', gap: Spacing.xs + 2 },
-  chip: { borderWidth: 1, borderRadius: Radius.full, paddingHorizontal: Spacing.sm + 4, paddingVertical: Spacing.xs + 2 + touchPad },
-  chipText: { fontSize: FontSize.sm + touchText },
+  chip: { flexShrink: 0, borderWidth: 1, borderRadius: Radius.full, paddingHorizontal: Spacing.sm + 4, paddingVertical: Spacing.xs + 2 + touchPad },
+  chipText: { flexShrink: 0, fontSize: FontSize.sm + touchText },
   chipTextOn: { fontWeight: '600' },
   list: { borderWidth: 1, borderRadius: Radius.md, overflow: 'hidden' },
   row: { flexDirection: 'row', alignItems: 'center', gap: Spacing.sm, paddingHorizontal: Spacing.md, paddingVertical: Spacing.sm + touchPad },
   rowText: { flex: 1, gap: 2 },
   name: { fontSize: FontSize.md + touchText, fontWeight: '600' },
   meta: { fontSize: FontSize.sm },
-  star: { padding: Spacing.xs },
+  addButton: { flexShrink: 0, borderWidth: 1, borderRadius: Radius.full, paddingHorizontal: Spacing.md, paddingVertical: Spacing.xs + 2 + touchPad },
+  addText: { fontSize: FontSize.sm + touchText, fontWeight: '600' },
   none: { fontSize: FontSize.md, paddingVertical: Spacing.lg },
 });

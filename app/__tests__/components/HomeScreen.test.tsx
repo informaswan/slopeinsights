@@ -124,7 +124,7 @@ describe('Home is My mountains', () => {
   it('explains how to save mountains when none are saved', async () => {
     const { findByText, queryByText } = render(<HomeScreen />);
     expect(await findByText('No saved mountains yet')).toBeTruthy();
-    expect(await findByText(/tap its star to keep it here/)).toBeTruthy();
+    expect(await findByText(/tap Add to keep it here/)).toBeTruthy();
     expect(queryByText('Best conditions today')).toBeNull(); // the finder, not the full dashboard
   });
 
@@ -136,11 +136,13 @@ describe('Home is My mountains', () => {
     expect(await findByText('Vail')).toBeTruthy();
   });
 
-  it('keeps a way to find more once some are saved', async () => {
+  it('opens the same finder from Add more mountains, and Done closes it', async () => {
     mockFavoriteIds = ['mammoth'];
     const { findByLabelText, queryByLabelText } = render(<HomeScreen />);
-    fireEvent.press(await findByLabelText('Find more mountains'));
-    expect(mockPush).toHaveBeenCalledWith('/all');
+    expect(queryByLabelText('Find a mountain')).toBeNull();
+    fireEvent.press(await findByLabelText('Add more mountains'));
+    expect(await findByLabelText('Find a mountain')).toBeTruthy();
+    fireEvent.press(await findByLabelText('Done adding mountains'));
     expect(queryByLabelText('Find a mountain')).toBeNull();
   });
 });

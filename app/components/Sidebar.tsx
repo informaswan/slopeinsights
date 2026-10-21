@@ -83,7 +83,7 @@ export function Sidebar({ onNavigate }: Props) {
           ) : (
             matches.map((r) => (
               <Pressable key={r.id} style={styles.resultRow} onPress={() => go(`/resort/${r.id}`)}>
-                <Text style={[styles.resultName, { color: colors.sidebarText }]} numberOfLines={1}>{r.name}</Text>
+                <Text style={[styles.resultName, { color: colors.sidebarText }]}>{r.name}</Text>
                 <Text style={[styles.resultMeta, { color: colors.sidebarMuted }]}>{r.state ?? r.region}</Text>
               </Pressable>
             ))
@@ -178,7 +178,7 @@ const styles = StyleSheet.create({
     paddingVertical: 7, paddingHorizontal: Spacing.xs, gap: Spacing.sm,
   },
   resultName: { fontSize: FontSize.sm + 1, flexShrink: 1 },
-  resultMeta: { fontSize: FontSize.xs },
+  resultMeta: { flexShrink: 0, fontSize: FontSize.xs },
   noResults: { fontSize: FontSize.sm, paddingVertical: Spacing.sm, paddingHorizontal: Spacing.xs },
   nav: { marginTop: Spacing.lg, gap: 2 },
   navItem: {

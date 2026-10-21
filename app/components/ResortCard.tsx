@@ -27,7 +27,7 @@ export function ResortCard({ resort }: Props) {
       onPress={() => router.push(`/resort/${resort.id}`)}
     >
       <View style={styles.titleRow}>
-        <Text style={[styles.name, { color: colors.text }]} numberOfLines={1}>{resort.name}</Text>
+        <Text style={[styles.name, { color: colors.text }]}>{resort.name}</Text>
         <Pressable
           hitSlop={8}
           accessibilityLabel={isFavorite ? `Remove ${resort.name} from My mountains` : `Save ${resort.name} to My mountains`}
@@ -89,8 +89,8 @@ const styles = StyleSheet.create({
   titleRow: { flexDirection: 'row', alignItems: 'center', gap: Spacing.sm },
   name: { flex: 1, fontSize: FontSize.md, fontWeight: '700', letterSpacing: -0.2 },
   metaRow: { flexDirection: 'row', alignItems: 'baseline', gap: Spacing.sm },
-  location: { fontSize: FontSize.xs, fontWeight: '500' },
-  pass: { fontSize: FontSize.xs, fontWeight: '700' },
+  location: { flexShrink: 0, fontSize: FontSize.xs, fontWeight: '500' },
+  pass: { flexShrink: 0, fontSize: FontSize.xs, fontWeight: '700' },
   metricsRow: { flexDirection: 'row', alignItems: 'flex-end', gap: Spacing.md, marginTop: 2 },
   metric: { flexDirection: 'row', alignItems: 'baseline', gap: 3 },
   number: { fontSize: FontSize.lg, fontWeight: '700', fontVariant: ['tabular-nums'] },

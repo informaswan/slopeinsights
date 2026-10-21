@@ -1,6 +1,5 @@
-import React, { useRef, useState, useMemo } from 'react';
+import React, { useRef, useState, useMemo, useEffect } from 'react';
 import { View, ScrollView, Pressable, Text, ActivityIndicator, RefreshControl, StyleSheet } from 'react-native';
-import { useRouter } from 'expo-router';
 import { OfflineBanner } from './OfflineBanner';
 import { useResorts } from '../hooks/useResorts';
 import { useIsWide } from '../hooks/useIsWide';
@@ -31,13 +30,17 @@ interface Props {
 export function MountainsScreen({ scope }: Props) {
   const { colors } = useTheme();
   const isWide = useIsWide();
-  const router = useRouter();
   const { favoriteIds, isLoaded: favoritesLoaded } = useFavorites();
   const { resorts, best, loading, error, cachedAt, refresh } = useResorts();
   const [passFilter, setPassFilter] = useState<PassFilter>('all');
   const [filterState, setFilterState] = useState<FilterState>({ selectedRegions: new Set<string>(), sort: 'snow' });
   const [refreshing, setRefreshing] = useState(false);
   const sheetRef = useRef<any>(null);
+  // Adding mountains stays open until the person taps Done, so it doesn't vanish after the first one.
+  const [adding, setAdding] = useState(false);
+  useEffect(() => {
+    if (scope === 'mine' && favoritesLoaded && favoriteIds.length === 0) setAdding(true);
+  }, [scope, favoritesLoaded]);
 
   const favoriteSet = useMemo(() => new Set(favoriteIds), [favoriteIds]);
   const inScope = (id: string) => scope === 'all' || favoriteSet.has(id);
@@ -86,7 +89,8 @@ export function MountainsScreen({ scope }: Props) {
   }
 
   const noneSaved = scope === 'mine' && favoriteIds.length === 0;
-  const title = scope === 'mine' ? 'My mountains' : 'All mountains';
+  const showFinder = scope === 'mine' && (adding || noneSaved);
+  const title = scope === 'all' ? 'All mountains' : showFinder ? 'Add mountains' : 'My mountains';
   const subtitle = freshPowderCount > 0
     ? `${freshPowderCount} ${freshPowderCount === 1 ? 'mountain' : 'mountains'} got fresh powder overnight`
     : "Today's conditions";
@@ -109,16 +113,25 @@ export function MountainsScreen({ scope }: Props) {
         <OfflineBanner cachedAt={cachedAt} />
         <View style={styles.pageHeader}>
           <Text style={[styles.title, { color: colors.text }]}>{title}</Text>
-          {!noneSaved && <Text style={[styles.subtitle, { color: colors.textSecondary }]}>{subtitle}</Text>}
+          {!showFinder && <Text style={[styles.subtitle, { color: colors.textSecondary }]}>{subtitle}</Text>}
         </View>
 
-        {noneSaved ? (
+        {showFinder ? (
           <View style={styles.empty}>
-            <Text style={[styles.emptyText, { color: colors.textSecondary }]}>No saved mountains yet</Text>
+            {noneSaved && <Text style={[styles.emptyText, { color: colors.textSecondary }]}>No saved mountains yet</Text>}
             <Text style={[styles.emptySubtext, { color: colors.textMuted }]}>
-              Find a mountain and tap its star to keep it here.
+              Find a mountain and tap Add to keep it here.
             </Text>
             <MountainFinder resorts={resorts} />
+            {!noneSaved && (
+              <Pressable
+                accessibilityLabel="Done adding mountains"
+                style={[styles.retryButton, { backgroundColor: colors.epic, alignSelf: 'flex-start' }]}
+                onPress={() => setAdding(false)}
+              >
+                <Text style={styles.retryText}>Done</Text>
+              </Pressable>
+            )}
           </View>
         ) : (
           <>
@@ -164,11 +177,11 @@ export function MountainsScreen({ scope }: Props) {
 
             {scope === 'mine' && (
               <Pressable
-                accessibilityLabel="Find more mountains"
+                accessibilityLabel="Add more mountains"
                 style={[styles.retryButton, styles.browseButton, { borderColor: colors.epic, borderWidth: 1 }]}
-                onPress={() => router.push('/all')}
+                onPress={() => setAdding(true)}
               >
-                <Text style={[styles.retryText, { color: colors.epic }]}>Find more mountains</Text>
+                <Text style={[styles.retryText, { color: colors.epic }]}>Add more mountains</Text>
               </Pressable>
             )}
           </>

@@ -15,6 +15,7 @@ jest.mock('expo-video', () => ({
   })),
 }));
 jest.mock('../../lib/openExternalLink', () => ({ openExternalLink: jest.fn() }));
+jest.mock('../../components/ZoomableImage', () => ({ ZoomableImage: () => null }));
 
 import { Platform as RNPlatform } from 'react-native';
 import { WebcamViewer } from '../../components/WebcamViewer';
