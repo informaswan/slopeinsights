@@ -8,12 +8,15 @@
     "userInterfaceStyle": "light",
     "ios": {
       "bundleIdentifier": "com.slopeinsights.app",
-      "supportsTablet": false
+      "supportsTablet": false,
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
       "package": "com.slopeinsights.app",
       "adaptiveIcon": {
-        "backgroundColor": "#12304d",
+        "backgroundColor": "#023a8a",
         "foregroundImage": "./assets/adaptive-icon.png"
       }
     },

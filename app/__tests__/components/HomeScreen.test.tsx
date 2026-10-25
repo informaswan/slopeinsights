@@ -36,7 +36,7 @@ const mockResorts = [
   { id: 'mammoth', name: 'Mammoth', pass_type: 'ikon', region: 'California', state: 'CA',
     snow: null, lifts: null, trails: null },
   { id: 'monarch', name: 'Monarch Mountain', pass_type: 'independent', region: 'Colorado', state: 'CO',
-    snow: null, lifts: null, trails: null },
+    snow: { base_in: 20, new_24h_in: 0, scraped_at: null, is_stale: false }, lifts: null, trails: null },
 ];
 const mockBest = { resorts: [mockResorts[0]], generated_at: '' };
 
@@ -165,5 +165,35 @@ describe('offline', () => {
     const { findAllByText, queryByTestId } = render(<AllMountainsScreen />);
     await findAllByText('Vail');
     expect(queryByTestId('offline-banner')).toBeNull();
+  });
+});
+
+import { CardPrefsProvider } from '../../contexts/CardPrefsContext';
+
+describe('Customize and Compare', () => {
+  it('keeps the compare chart closed until asked, and only offers it with two or more saved', async () => {
+    mockFavoriteIds = ['mammoth'];
+    const { findByText, queryByLabelText } = render(<HomeScreen />);
+    await findByText('Mammoth');
+    expect(queryByLabelText('Compare mountains')).toBeNull();
+  });
+
+  it('opens the chart on request', async () => {
+    mockFavoriteIds = ['mammoth', 'vail'];
+    const { findByLabelText, queryByTestId, findByTestId } = render(<HomeScreen />);
+    fireEvent.press(await findByLabelText('Compare mountains'));
+    expect(await findByTestId('compare-chart')).toBeTruthy();
+    fireEvent.press(await findByLabelText('Compare mountains'));
+    expect(queryByTestId('compare-chart')).toBeNull();
+  });
+
+  it('lets you turn a stat on for the cards', async () => {
+    mockFavoriteIds = ['monarch'];
+    const { findByLabelText, queryByText, findAllByText } = render(<CardPrefsProvider><HomeScreen /></CardPrefsProvider>);
+    expect((await findAllByText('7 days')).length).toBeGreaterThan(0);
+    expect(queryByText('next 72h')).toBeNull();
+    fireEvent.press(await findByLabelText('Customize cards'));
+    fireEvent.press(await findByLabelText('Show Expected next 72h on cards'));
+    expect((await findAllByText('next 72h')).length).toBeGreaterThan(0);
   });
 });

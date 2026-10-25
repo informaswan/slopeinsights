@@ -12,6 +12,8 @@ from sqlalchemy.orm import Session
 from app.models.resort import Resort
 from app.models.snow import SnowCondition
 from app.models.lift import LiftStatus
+from app.models.snow_forecast import SnowForecast
+from app.models.webcam import Webcam
 
 logger = logging.getLogger(__name__)
 
@@ -40,9 +42,27 @@ def build_resort_summary(resort: Resort, db: Session) -> dict:
         snow_summary = {
             "base_in": snow.base_in,
             "new_24h_in": snow.new_24h_in,
+            "new_48h_in": snow.new_48h_in,
+            "new_7d_in": snow.new_7d_in,
             "scraped_at": snow.scraped_at.isoformat() if snow.scraped_at else None,
             "is_stale": is_stale(snow.scraped_at, STALE_SNOW_SECONDS),
         }
+
+    forecast = db.query(SnowForecast).filter_by(resort_id=resort.id).first()
+    forecast_summary = None
+    if forecast:
+        forecast_summary = {
+            "next_24h_in": forecast.next_24h_in,
+            "next_48h_in": forecast.next_48h_in,
+            "next_72h_in": forecast.next_72h_in,
+        }
+
+    # The mountain's live still-picture cameras for the card (video streams and road cameras are left out).
+    cams = (
+        db.query(Webcam)
+        .filter_by(resort_id=resort.id, category="mountain", cam_type="jpeg", is_alive=True)
+        .order_by(Webcam.id).all()
+    )
 
     lift_summary = None
     if lifts:
@@ -59,6 +79,9 @@ def build_resort_summary(resort: Resort, db: Session) -> dict:
         "region": resort.region,
         "state": resort.state,
         "snow": snow_summary,
+        "snow_forecast": forecast_summary,
+        "camera_url": cams[0].url if cams else None,
+        "cameras": [{"label": w.label, "url": w.url} for w in cams],
         "lifts": lift_summary,
         "trails": trail_summary,
     }

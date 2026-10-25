@@ -2,8 +2,16 @@
 export interface SnowSummary {
   base_in: number | null;
   new_24h_in: number | null;
+  new_48h_in?: number | null;
+  new_7d_in?: number | null;
   scraped_at: string | null;
   is_stale: boolean;
+}
+
+export interface ForecastSummary {
+  next_24h_in: number | null;
+  next_48h_in: number | null;
+  next_72h_in: number | null;
 }
 
 export interface LiftSummary {
@@ -23,6 +31,9 @@ export interface ResortSummary {
   region: string;
   state: string;
   snow: SnowSummary | null;
+  snow_forecast?: ForecastSummary | null;
+  camera_url?: string | null;
+  cameras?: { label: string; url: string }[];
   lifts: LiftSummary | null;
   trails: TrailSummary | null;
 }

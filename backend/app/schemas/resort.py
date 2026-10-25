@@ -6,8 +6,17 @@ from pydantic import BaseModel
 class SnowSummary(BaseModel):
     base_in: float | None
     new_24h_in: float | None
+    new_48h_in: float | None = None
+    new_7d_in: float | None = None
     scraped_at: str | None
     is_stale: bool
+
+
+class ForecastSummary(BaseModel):
+    """Expected new snow (inches) from NWS, for showing on the mountain cards."""
+    next_24h_in: float | None
+    next_48h_in: float | None
+    next_72h_in: float | None
 
 
 class LiftSummary(BaseModel):
@@ -20,6 +29,11 @@ class TrailSummary(BaseModel):
     total: int | None
 
 
+class CameraPicture(BaseModel):
+    label: str
+    url: str
+
+
 class ResortSummary(BaseModel):
     id: str
     name: str
@@ -27,6 +41,9 @@ class ResortSummary(BaseModel):
     region: str
     state: str
     snow: SnowSummary | None
+    snow_forecast: ForecastSummary | None = None
+    camera_url: str | None = None
+    cameras: list[CameraPicture] = []
     lifts: LiftSummary | None
     trails: TrailSummary | None
 

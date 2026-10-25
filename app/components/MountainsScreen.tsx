@@ -8,6 +8,9 @@ import { useTheme } from '../contexts/ThemeContext';
 import { ResortCard } from './ResortCard';
 import { BestBanner } from './BestBanner';
 import { MountainFinder } from './MountainFinder';
+import { CompareChart } from './CompareChart';
+import { useCardPrefs } from '../contexts/CardPrefsContext';
+import { METRICS } from '../lib/cardMetrics';
 import { FilterSheet } from './FilterSheet';
 import type { FilterState } from './FilterSheet';
 import { sortResorts, applyFilters } from '../lib/sort';
@@ -38,6 +41,8 @@ export function MountainsScreen({ scope }: Props) {
   const sheetRef = useRef<any>(null);
   // Adding mountains stays open until the person taps Done, so it doesn't vanish after the first one.
   const [adding, setAdding] = useState(false);
+  const [panel, setPanel] = useState<'none' | 'customize' | 'compare'>('none');
+  const { metrics, toggleMetric, reset } = useCardPrefs();
   useEffect(() => {
     if (scope === 'mine' && favoritesLoaded && favoriteIds.length === 0) setAdding(true);
   }, [scope, favoritesLoaded]);
@@ -160,6 +165,59 @@ export function MountainsScreen({ scope }: Props) {
               </Pressable>
             </View>
 
+            <View style={styles.actions}>
+              <Pressable
+                accessibilityLabel="Customize cards"
+                style={[styles.action, { borderColor: panel === 'customize' ? colors.epic : colors.border }]}
+                onPress={() => setPanel(panel === 'customize' ? 'none' : 'customize')}
+              >
+                <Text style={[styles.actionText, { color: panel === 'customize' ? colors.epic : colors.textSecondary }]}>Customize cards</Text>
+              </Pressable>
+              {scope === 'mine' && favoriteIds.length >= 2 && (
+                <Pressable
+                  accessibilityLabel="Compare mountains"
+                  style={[styles.action, { borderColor: panel === 'compare' ? colors.epic : colors.border }]}
+                  onPress={() => setPanel(panel === 'compare' ? 'none' : 'compare')}
+                >
+                  <Text style={[styles.actionText, { color: panel === 'compare' ? colors.epic : colors.textSecondary }]}>Compare</Text>
+                </Pressable>
+              )}
+            </View>
+
+            {panel === 'customize' && (
+              <View style={[styles.panel, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+                <Text style={[styles.panelTitle, { color: colors.text }]}>Show on each card</Text>
+                {(['now', 'expected', 'extra'] as const).map((group) => (
+                  <View key={group} style={styles.panelGroup}>
+                    <Text style={[styles.panelLabel, { color: colors.textMuted }]}>{group === 'now' ? 'Right now' : group === 'expected' ? 'Expected (forecast)' : 'Picture'}</Text>
+                    <View style={styles.panelChips}>
+                      {METRICS.filter((m) => m.group === group).map((m) => {
+                        const on = metrics.includes(m.key);
+                        return (
+                          <Pressable
+                            key={m.key}
+                            accessibilityLabel={`Show ${m.longLabel} on cards`}
+                            accessibilityState={{ selected: on }}
+                            onPress={() => toggleMetric(m.key)}
+                            style={[styles.panelChip, { backgroundColor: on ? colors.epic : colors.surfaceAlt, borderColor: on ? colors.epic : colors.border }]}
+                          >
+                            <Text style={[styles.panelChipText, { color: on ? '#fff' : colors.text }, on && { fontWeight: '600' }]}>{m.longLabel}</Text>
+                          </Pressable>
+                        );
+                      })}
+                    </View>
+                  </View>
+                ))}
+                <Pressable accessibilityLabel="Reset cards" onPress={reset}>
+                  <Text style={[styles.panelReset, { color: colors.epic }]}>Reset to default</Text>
+                </Pressable>
+              </View>
+            )}
+
+            {panel === 'compare' && (
+              <CompareChart resorts={resorts.filter((r) => favoriteSet.has(r.id))} />
+            )}
+
             <BestBanner resorts={bestShown} />
 
             {displayed.length === 0 ? (
@@ -217,6 +275,17 @@ const styles = StyleSheet.create({
   filterButton: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingVertical: Spacing.sm + touchPad, paddingLeft: Spacing.sm + touchPad },
   filterButtonText: { fontSize: FontSize.sm + 1 + touchText, fontWeight: '500' },
   filterDot: { width: 7, height: 7, borderRadius: 4 },
+  actions: { flexDirection: 'row', gap: Spacing.sm, flexWrap: 'wrap' },
+  action: { borderWidth: 1, borderRadius: Radius.full, paddingHorizontal: Spacing.md, paddingVertical: Spacing.xs + 2 + touchPad },
+  actionText: { fontSize: FontSize.sm + touchText, fontWeight: '600' },
+  panel: { borderWidth: 1, borderRadius: Radius.md, padding: Spacing.md, gap: Spacing.sm },
+  panelTitle: { fontSize: FontSize.md, fontWeight: '700' },
+  panelGroup: { gap: Spacing.xs },
+  panelLabel: { fontSize: FontSize.xs, fontWeight: '600', textTransform: 'uppercase', letterSpacing: 0.4 },
+  panelChips: { flexDirection: 'row', flexWrap: 'wrap', gap: Spacing.xs + 2 },
+  panelChip: { borderWidth: 1, borderRadius: Radius.full, paddingHorizontal: Spacing.sm + 4, paddingVertical: Spacing.xs + 2 + touchPad },
+  panelChipText: { fontSize: FontSize.sm + touchText },
+  panelReset: { fontSize: FontSize.sm + touchText, fontWeight: '600' },
   grid: { flexDirection: 'row', flexWrap: 'wrap', gap: Spacing.sm + 2 },
   empty: { paddingVertical: Spacing.xl, gap: Spacing.xs },
   browseButton: { alignSelf: 'flex-start', marginTop: Spacing.md },

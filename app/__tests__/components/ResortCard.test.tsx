@@ -83,3 +83,48 @@ it('navigates to resort detail on press', () => {
   fireEvent.press(getByText('Vail'));
   expect(mockPush).toHaveBeenCalledWith('/resort/vail');
 });
+
+describe('camera picture on the card', () => {
+  const withCam = { ...base, camera_url: 'https://example.com/cam.jpg' };
+  const prefs = (metrics: string[]) => {
+    jest.resetModules();
+    jest.doMock('../../contexts/CardPrefsContext', () => ({ useCardPrefs: () => ({ metrics, toggleMetric: jest.fn(), reset: jest.fn() }) }));
+    return require('../../components/ResortCard').ResortCard;
+  };
+
+  it('is off to start with', () => {
+    const { queryByTestId } = render(<ResortCard resort={withCam} />, { wrapper: TestWrapper });
+    expect(queryByTestId('card-camera')).toBeNull();
+  });
+
+  it('shows the picture when it is switched on', () => {
+    const Card = prefs(['camera', 'base']);
+    const { getByTestId } = render(<Card resort={withCam} />, { wrapper: TestWrapper });
+    expect(getByTestId('card-camera').props.source.uri).toContain(encodeURIComponent('https://example.com/cam.jpg'));
+  });
+
+  it('leaves it out for a mountain without a still camera', () => {
+    const Card = prefs(['camera', 'base']);
+    const { queryByTestId } = render(<Card resort={base} />, { wrapper: TestWrapper });
+    expect(queryByTestId('card-camera')).toBeNull();
+  });
+
+  it('switches between cameras with the arrows, without opening the mountain', () => {
+    const Card = prefs(['camera']);
+    const many = { ...base, cameras: [
+      { label: 'Summit', url: 'https://example.com/a.jpg' },
+      { label: 'Base', url: 'https://example.com/b.jpg' },
+    ] };
+    const { getByTestId, getByLabelText, queryByLabelText } = render(<Card resort={many} />, { wrapper: TestWrapper });
+    expect(getByTestId('card-camera').props.source.uri).toContain(encodeURIComponent('a.jpg'));
+    fireEvent.press(getByLabelText('Next camera'));
+    expect(getByTestId('card-camera').props.source.uri).toContain(encodeURIComponent('b.jpg'));
+    fireEvent.press(getByLabelText('Next camera'));
+    expect(getByTestId('card-camera').props.source.uri).toContain(encodeURIComponent('a.jpg'));
+    fireEvent.press(getByLabelText('Previous camera'));
+    expect(getByTestId('card-camera').props.source.uri).toContain(encodeURIComponent('b.jpg'));
+    expect(mockPush).not.toHaveBeenCalled();
+    const one = render(<Card resort={withCam} />, { wrapper: TestWrapper });
+    expect(one.queryByLabelText('Next camera')).toBeNull();
+  });
+});

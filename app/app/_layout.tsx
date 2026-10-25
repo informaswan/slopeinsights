@@ -6,6 +6,7 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
 import { ThemeProvider, useTheme } from '../contexts/ThemeContext';
 import { FavoritesProvider } from '../contexts/FavoritesContext';
+import { CardPrefsProvider } from '../contexts/CardPrefsContext';
 import { AppShell } from '../components/AppShell';
 
 function AppNavigator() {
@@ -39,9 +40,11 @@ export default function RootLayout() {
       <SafeAreaProvider>
         <ThemeProvider>
           <FavoritesProvider>
+            <CardPrefsProvider>
             {/* The top bar is dark, so the status bar icons need to be light. */}
             <StatusBar style="light" />
             <AppNavigator />
+            </CardPrefsProvider>
           </FavoritesProvider>
         </ThemeProvider>
       </SafeAreaProvider>

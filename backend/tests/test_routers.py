@@ -72,6 +72,47 @@ def test_get_resorts_includes_snow(client, db):
     assert resorts["vail"]["snow"]["base_in"] == 36.0
 
 
+def test_get_resorts_includes_recent_snow_and_forecast_for_the_cards(client, db):
+    from app.models.snow_forecast import SnowForecast
+    seed_resorts(db)
+    now = datetime.now(timezone.utc)
+    db.add(SnowCondition(
+        resort_id="vail", base_in=36.0, new_24h_in=6.0, new_48h_in=10.0,
+        new_7d_in=18.0, trails_open=150, trails_total=195, scraped_at=now, is_stale=False,
+    ))
+    db.add(SnowForecast(resort_id="vail", next_24h_in=2.0, next_48h_in=4.0, next_72h_in=7.0, scraped_at=now))
+    db.commit()
+    resorts = {r["id"]: r for r in client.get("/api/resorts", headers={"X-API-Key": "dev-key"}).json()}
+    assert resorts["vail"]["snow"]["new_48h_in"] == 10.0
+    assert resorts["vail"]["snow"]["new_7d_in"] == 18.0
+    assert resorts["vail"]["snow_forecast"] == {"next_24h_in": 2.0, "next_48h_in": 4.0, "next_72h_in": 7.0}
+    other = next(r for i, r in resorts.items() if i != "vail")
+    assert other["snow_forecast"] is None
+
+
+def test_get_resorts_gives_each_card_one_live_camera_picture(client, db):
+    seed_resorts(db)
+    db.add(Webcam(resort_id="vail", label="Stream", cam_type="hls", url="https://x/s.m3u8", is_alive=True))
+    db.add(Webcam(resort_id="vail", label="Dead", cam_type="jpeg", url="https://x/dead.jpg", is_alive=False))
+    db.add(Webcam(resort_id="vail", label="Base", cam_type="jpeg", url="https://x/base.jpg", is_alive=True))
+    db.add(Webcam(resort_id="vail", label="Road", cam_type="jpeg", url="https://x/road.jpg", is_alive=True, category="traffic"))
+    db.commit()
+    resorts = {r["id"]: r for r in client.get("/api/resorts", headers={"X-API-Key": "dev-key"}).json()}
+    assert resorts["vail"]["camera_url"] == "https://x/base.jpg"
+    assert resorts["vail"]["cameras"] == [{"label": "Base", "url": "https://x/base.jpg"}]
+    other = next(r for i, r in resorts.items() if i != "vail")
+    assert other["camera_url"] is None and other["cameras"] == []
+
+
+def test_get_resorts_lists_every_live_camera_picture_in_order(client, db):
+    seed_resorts(db)
+    for label in ("Summit", "Base", "Lodge"):
+        db.add(Webcam(resort_id="vail", label=label, cam_type="jpeg", url=f"https://x/{label}.jpg", is_alive=True))
+    db.commit()
+    resorts = {r["id"]: r for r in client.get("/api/resorts", headers={"X-API-Key": "dev-key"}).json()}
+    assert [c["label"] for c in resorts["vail"]["cameras"]] == ["Summit", "Base", "Lodge"]
+
+
 def test_get_resort_detail(client, db):
     seed_resorts(db)
     db.add(SnowCondition(

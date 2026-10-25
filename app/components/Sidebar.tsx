@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { View, Text, TextInput, Pressable, Switch, ScrollView, StyleSheet } from 'react-native';
+import { View, Text, Image, TextInput, Pressable, Switch, ScrollView, StyleSheet } from 'react-native';
 import { openExternalLink } from '../lib/openExternalLink';
 import { useRouter, usePathname } from 'expo-router';
 import { api } from '../lib/api';
@@ -8,7 +8,6 @@ import { useTheme } from '../contexts/ThemeContext';
 import { useFavorites } from '../contexts/FavoritesContext';
 import { DONATION_URL, VENMO_URL } from '../constants/links';
 import { FontSize, Radius, Spacing } from '../constants/theme';
-import { MountainLogo } from './MountainLogo';
 import { SearchIcon } from './icons';
 import { touchPad, touchText } from '../constants/touch';
 
@@ -58,7 +57,7 @@ export function Sidebar({ onNavigate }: Props) {
       contentContainerStyle={styles.container}
     >
       <Pressable style={styles.brand} onPress={() => go('/')} accessibilityLabel="SlopeInsights home">
-        <MountainLogo size={26} color={colors.sidebarText} snowColor={colors.sidebarAccent} />
+        <Image source={require('../assets/logo.png')} style={styles.logo} accessibilityLabel="SlopeInsights logo" />
         <Text style={[styles.brandText, { color: colors.sidebarText }]}>SlopeInsights</Text>
       </Pressable>
 
@@ -165,6 +164,7 @@ export function Sidebar({ onNavigate }: Props) {
 
 const styles = StyleSheet.create({
   container: { flexGrow: 1, padding: Spacing.md, paddingTop: Spacing.lg },
+  logo: { width: 30, height: 30, borderRadius: 7 },
   brand: { flexDirection: 'row', alignItems: 'center', gap: Spacing.sm, marginBottom: Spacing.lg },
   brandText: { fontSize: FontSize.md + 1, fontWeight: '700', letterSpacing: -0.2 },
   searchBox: {
