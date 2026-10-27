@@ -8,6 +8,7 @@ import type { ThemeColors } from '../constants/theme';
 
 interface Props {
   weather: WeatherDetail | null;
+  summitElevationFt?: number | null;
 }
 
 function parseDate(date: string): Date {
@@ -42,6 +43,11 @@ function ForecastCard({ period, colors }: { period: WeatherPeriod; colors: Theme
         <Text style={[styles.highTemp, { color: colors.text }]}>{period.high_f ?? '—'}°</Text>
         <Text style={[styles.lowTemp, { color: colors.textMuted }]}>{period.low_f ?? '—'}°</Text>
       </View>
+      {(period.summit_high_f != null || period.summit_low_f != null) && (
+        <Text testID="summit-temps" style={[styles.summit, { color: colors.textSecondary }]}>
+          Summit {period.summit_high_f ?? '—'}° / {period.summit_low_f ?? '—'}°
+        </Text>
+      )}
       <Text style={[styles.precip, { color: colors.snowBlue }]}>{period.precip_pct ?? '—'}%</Text>
       <Text style={[styles.wind, { color: colors.textMuted }]}>{period.wind_mph ?? '—'} mph</Text>
       {(period.snow_amount_in ?? 0) > 0 ? (
@@ -53,7 +59,7 @@ function ForecastCard({ period, colors }: { period: WeatherPeriod; colors: Theme
   );
 }
 
-export function WeatherRow({ weather }: Props) {
+export function WeatherRow({ weather, summitElevationFt }: Props) {
   const { colors } = useTheme();
 
   if (!weather) {
@@ -72,6 +78,11 @@ export function WeatherRow({ weather }: Props) {
           <ForecastCard key={period.date} period={period} colors={colors} />
         ))}
       </View>
+      {weather.forecast.some((p) => p.summit_high_f != null || p.summit_low_f != null) && (
+        <Text style={[styles.summitNote, { color: colors.textMuted }]}>
+          Summit temperatures are estimates{summitElevationFt ? ` for ${summitElevationFt.toLocaleString('en-US')} ft` : ''}, about 3.5°F colder per 1,000 ft up from the forecast point.
+        </Text>
+      )}
       <Text style={[styles.updated, { color: weather.is_stale ? colors.warning : colors.textMuted }]}>
         {updated ? `Updated ${updated}` : 'Update time unknown'}
       </Text>
@@ -91,6 +102,8 @@ const styles = StyleSheet.create({
   tempRow: { flexDirection: 'row', gap: Spacing.xs, alignItems: 'baseline' },
   highTemp: { fontSize: FontSize.md, fontWeight: '700' },
   lowTemp: { fontSize: FontSize.sm },
+  summit: { fontSize: FontSize.xs, marginTop: 2 },
+  summitNote: { fontSize: FontSize.xs, marginTop: Spacing.sm, textAlign: 'center' },
   precip: { fontSize: FontSize.xs, marginTop: 2 },
   wind: { fontSize: FontSize.xs },
   snowIcon: { fontSize: FontSize.md, marginTop: 2 },

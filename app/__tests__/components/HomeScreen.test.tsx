@@ -60,9 +60,9 @@ it('renders resort names after loading', async () => {
   expect(await findByText('Mammoth')).toBeTruthy();
 });
 
-it('renders the Best conditions today banner', async () => {
+it('tags the best-conditions cards', async () => {
   const { findByText } = render(<AllMountainsScreen />);
-  expect(await findByText('Best conditions today')).toBeTruthy();
+  expect(await findByText('Best conditions')).toBeTruthy();
 });
 
 it('filters to Epic resorts when Epic tab is pressed', async () => {
@@ -125,7 +125,7 @@ describe('Home is My mountains', () => {
     const { findByText, queryByText } = render(<HomeScreen />);
     expect(await findByText('No saved mountains yet')).toBeTruthy();
     expect(await findByText(/tap Add to keep it here/)).toBeTruthy();
-    expect(queryByText('Best conditions today')).toBeNull(); // the finder, not the full dashboard
+    expect(queryByText('Best conditions')).toBeNull(); // the finder, not the full dashboard
   });
 
   it('shows the mountain finder when none are saved, and saving one works from it', async () => {

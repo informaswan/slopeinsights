@@ -2,7 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, Image, TouchableOpacity, Pressable, ScrollView, StyleSheet, Platform } from 'react-native';
 import { openExternalLink } from '../lib/openExternalLink';
 import { VideoView, useVideoPlayer } from 'expo-video';
+import { WebView } from 'react-native-webview';
 import type { WebcamItem } from '../lib/types';
+import { isTrustedStream } from '../lib/streamHost';
 import { Colors, Spacing, FontSize, Radius } from '../constants/theme';
 import { proxiedWebcamUrl, fetchPictureTime } from '../lib/webcam';
 import { formatAgo } from '../lib/utils';
@@ -76,6 +78,7 @@ function JpegCam({ url }: { url: string }) {
 
 function CamView({ cam }: { cam: WebcamItem }) {
   if (!cam.is_alive) return <UnavailablePlaceholder />;
+  if (isTrustedStream(cam.stream_url)) return <StreamCam cam={cam} />;
   if (cam.cam_type === 'hls') {
     if (Platform.OS === 'web') {
       return (
@@ -89,6 +92,37 @@ function CamView({ cam }: { cam: WebcamItem }) {
     return <HlsPlayer url={cam.url} />;
   }
   return <JpegCam url={cam.url} />;
+}
+
+// A cam with a live stream plays it by default (muted); the picture is one tap away. YouTube refuses to play in a
+// bare webview (no referrer), so the embed is wrapped in a page served from a YouTube origin.
+function StreamCam({ cam }: { cam: WebcamItem }) {
+  const [live, setLive] = useState(true);
+  useEffect(() => { setLive(true); }, [cam.url]);
+  const html = `<html><body style="margin:0;background:#000"><iframe src="${cam.stream_url}" style="border:0;width:100%;height:100%" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen></iframe></body></html>`;
+  return (
+    <View style={styles.media}>
+      {live ? (
+        <WebView
+          testID="webcam-stream"
+          style={styles.media}
+          source={{ html, baseUrl: 'https://www.youtube-nocookie.com' }}
+          allowsInlineMediaPlayback
+          mediaPlaybackRequiresUserAction={false}
+          allowsFullscreenVideo
+        />
+      ) : (
+        <JpegCam url={cam.url} />
+      )}
+      <TouchableOpacity
+        style={styles.liveToggle}
+        accessibilityLabel={live ? 'Show picture' : 'Watch live'}
+        onPress={() => setLive(!live)}
+      >
+        <Text style={styles.liveToggleText}>{live ? 'Show picture' : '● Watch live'}</Text>
+      </TouchableOpacity>
+    </View>
+  );
 }
 
 export function WebcamViewer({ webcams: allWebcams }: { webcams: WebcamItem[] }) {
@@ -138,6 +172,8 @@ const styles = StyleSheet.create({
   tabActive: { backgroundColor: Colors.epic },
   tabText: { color: '#cbd5e1', fontSize: FontSize.xs + touchText },
   tabTextActive: { color: '#fff', fontWeight: '600' },
+  liveToggle: { position: 'absolute', top: Spacing.sm, right: Spacing.sm, paddingHorizontal: Spacing.sm, paddingVertical: 4, borderRadius: Radius.sm, backgroundColor: 'rgba(0,0,0,0.65)' },
+  liveToggleText: { color: '#fff', fontSize: FontSize.xs, fontWeight: '700' },
   openCamContainer: { flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: '#1e293b' },
   openCamButton: { paddingHorizontal: Spacing.lg, paddingVertical: Spacing.sm, borderRadius: Radius.md, backgroundColor: Colors.epic },
   openCamText: { color: '#fff', fontSize: FontSize.md, fontWeight: '600' },

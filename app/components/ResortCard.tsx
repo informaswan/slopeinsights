@@ -11,9 +11,9 @@ import { useCardPrefs } from '../contexts/CardPrefsContext';
 import { STAT_METRICS } from '../lib/cardMetrics';
 import { proxiedWebcamUrl } from '../lib/webcam';
 
-interface Props { resort: ResortSummary; }
+interface Props { resort: ResortSummary; badge?: string; }
 
-export function ResortCard({ resort }: Props) {
+export function ResortCard({ resort, badge }: Props) {
   const router = useRouter();
   const { colors } = useTheme();
   const { favoriteIds, toggleFavorite } = useFavorites();
@@ -35,6 +35,11 @@ export function ResortCard({ resort }: Props) {
       ]}
       onPress={() => router.push(`/resort/${resort.id}`)}
     >
+      {badge && (
+        <View style={[styles.badge, { backgroundColor: colors.snowBlue }]}>
+          <Text style={styles.badgeText}>{badge}</Text>
+        </View>
+      )}
       <View style={styles.titleRow}>
         <Text style={[styles.name, { color: colors.text }]}>{resort.name}</Text>
         <Pressable
@@ -42,7 +47,13 @@ export function ResortCard({ resort }: Props) {
           accessibilityLabel={isFavorite ? `Remove ${resort.name} from My mountains` : `Save ${resort.name} to My mountains`}
           onPress={() => toggleFavorite(resort.id)}
         >
-          <StarIcon size={16} filled={isFavorite} color={isFavorite ? colors.crowdMedium : colors.textMuted} />
+          {isFavorite ? (
+            <StarIcon size={16} filled color={colors.crowdMedium} />
+          ) : (
+            <View style={[styles.addPill, { borderColor: colors.epic }]}>
+              <Text style={[styles.addText, { color: colors.epic }]}>+ Add</Text>
+            </View>
+          )}
         </Pressable>
       </View>
 
@@ -101,6 +112,10 @@ export function ResortCard({ resort }: Props) {
 }
 
 const styles = StyleSheet.create({
+  addPill: { borderWidth: 1, borderRadius: Radius.sm, paddingHorizontal: Spacing.sm, paddingVertical: 1 },
+  addText: { fontSize: FontSize.xs, fontWeight: '700' },
+  badge: { alignSelf: 'flex-start', borderRadius: Radius.sm, paddingHorizontal: Spacing.sm, paddingVertical: 2 },
+  badgeText: { color: '#fff', fontSize: FontSize.xs, fontWeight: '700' },
   card: {
     flexGrow: 1,
     flexBasis: 240,

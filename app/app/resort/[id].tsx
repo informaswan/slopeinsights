@@ -76,8 +76,8 @@ export default function ResortDetailScreen() {
           accessibilityLabel={isFavorite ? `Remove ${resort.name} from My mountains` : `Save ${resort.name} to My mountains`}
           onPress={() => toggleFavorite(resort.id)}
         >
-          <StarIcon size={15} filled={isFavorite} color={isFavorite ? colors.crowdMedium : colors.textSecondary} />
-          <Text style={[styles.saveText, { color: colors.text }]}>{isFavorite ? 'Saved' : 'Save'}</Text>
+          {isFavorite && <StarIcon size={15} filled color={colors.crowdMedium} />}
+          <Text style={[styles.saveText, { color: colors.text }]}>{isFavorite ? 'Saved' : '+ Add'}</Text>
         </TouchableOpacity>
       </View>
 
@@ -92,7 +92,7 @@ export default function ResortDetailScreen() {
         </View>
         <View testID="weather-row" style={panel}>
           <Text style={[styles.panelTitle, { color: colors.textSecondary }]}>Forecast</Text>
-          <WeatherRow weather={resort.weather} />
+          <WeatherRow weather={resort.weather} summitElevationFt={resort.summit_elevation_ft} />
         </View>
         <View testID="crowds-wanted" style={panel}>
           <Text style={[styles.panelTitle, { color: colors.textSecondary }]}>Crowd levels</Text>

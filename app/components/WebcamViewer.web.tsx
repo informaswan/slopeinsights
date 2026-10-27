@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, ScrollView, StyleSheet } from 'react-native';
 import { openExternalLink } from '../lib/openExternalLink';
 import type { WebcamItem } from '../lib/types';
+import { isTrustedStream } from '../lib/streamHost';
 import { ZoomFrame } from './ZoomFrame';
 import { Colors, Spacing, FontSize, Radius } from '../constants/theme';
 
@@ -29,8 +30,38 @@ function JpegCam({ url }: { url: string }) {
   return <ZoomFrame uri={`${proxied(url)}&t=${ts}`} />;
 }
 
+// A cam with a live stream plays it by default (muted); the picture is one tap away. Only the open tab's stream loads.
+function StreamCam({ cam }: { cam: WebcamItem }) {
+  const [live, setLive] = useState(true);
+  useEffect(() => { setLive(true); }, [cam.url]);
+  return (
+    <View>
+      {live ? (
+        // @ts-ignore: react-native-web renders DOM elements
+        <iframe
+          title={`${cam.label} live`}
+          src={cam.stream_url!}
+          allow="autoplay; encrypted-media; picture-in-picture; fullscreen"
+          allowFullScreen
+          style={{ width: '100%', aspectRatio: '16 / 9', border: 0, display: 'block' }}
+        />
+      ) : (
+        <JpegCam url={cam.url} />
+      )}
+      <TouchableOpacity
+        style={styles.liveToggle}
+        accessibilityLabel={live ? 'Show picture' : 'Watch live'}
+        onPress={() => setLive(!live)}
+      >
+        <Text style={styles.liveToggleText}>{live ? 'Show picture' : '● Watch live'}</Text>
+      </TouchableOpacity>
+    </View>
+  );
+}
+
 function CamView({ cam }: { cam: WebcamItem }) {
   if (!cam.is_alive) return <UnavailablePlaceholder />;
+  if (isTrustedStream(cam.stream_url)) return <StreamCam cam={cam} />;
   if (cam.cam_type === 'hls') {
     return (
       <View style={styles.openCamContainer}>
@@ -87,6 +118,8 @@ const styles = StyleSheet.create({
   tabActive: { backgroundColor: Colors.epic },
   tabText: { color: '#cbd5e1', fontSize: FontSize.xs },
   tabTextActive: { color: '#fff', fontWeight: '600' },
+  liveToggle: { position: 'absolute', top: Spacing.sm, right: Spacing.sm, paddingHorizontal: Spacing.sm, paddingVertical: 4, borderRadius: Radius.sm, backgroundColor: 'rgba(0,0,0,0.65)' },
+  liveToggleText: { color: '#fff', fontSize: FontSize.xs, fontWeight: '700' },
   openCamContainer: { flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: '#1e293b' },
   openCamButton: { paddingHorizontal: Spacing.lg, paddingVertical: Spacing.sm, borderRadius: Radius.md, backgroundColor: Colors.epic },
   openCamText: { color: '#fff', fontSize: FontSize.md, fontWeight: '600' },

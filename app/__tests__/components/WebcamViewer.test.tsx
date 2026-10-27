@@ -14,6 +14,12 @@ jest.mock('expo-video', () => ({
     addListener: jest.fn(() => ({ remove: jest.fn() })),
   })),
 }));
+jest.mock('react-native-webview', () => ({
+  WebView: ({ testID }: { testID?: string }) => {
+    const { View } = require('react-native');
+    return <View testID={testID ?? 'webview'} />;
+  },
+}));
 jest.mock('../../lib/openExternalLink', () => ({ openExternalLink: jest.fn() }));
 jest.mock('../../components/ZoomableImage', () => ({ ZoomableImage: () => null }));
 
@@ -130,5 +136,26 @@ describe('WebcamViewer — web HLS', () => {
     render(<WebcamViewer webcams={[hlsCam]} />, { wrapper: TestWrapper });
     await act(async () => { fireEvent.press(screen.getByText('Open Cam')); });
     expect(openExternalLink).toHaveBeenCalledWith(hlsCam.url);
+  });
+});
+
+describe('WebcamViewer — live stream', () => {
+  const streamCam: WebcamItem = { ...jpegCam, stream_url: 'https://www.youtube-nocookie.com/embed/abc123?autoplay=1' };
+
+  it('plays the live stream by default and lets you switch to the picture', () => {
+    const { fireEvent } = require('@testing-library/react-native');
+    render(<WebcamViewer webcams={[streamCam]} />, { wrapper: TestWrapper });
+    expect(screen.getByTestId('webcam-stream')).toBeTruthy();
+    expect(screen.queryByTestId('webcam-image')).toBeNull();
+    fireEvent.press(screen.getByLabelText('Show picture'));
+    expect(screen.getByTestId('webcam-image')).toBeTruthy();
+    expect(screen.queryByTestId('webcam-stream')).toBeNull();
+    fireEvent.press(screen.getByLabelText('Watch live'));
+    expect(screen.getByTestId('webcam-stream')).toBeTruthy();
+  });
+
+  it('offers no live button for a cam without a stream', () => {
+    render(<WebcamViewer webcams={[jpegCam]} />, { wrapper: TestWrapper });
+    expect(screen.queryByLabelText('Watch live')).toBeNull();
   });
 });

@@ -73,6 +73,8 @@ export interface WeatherPeriod {
   date: string;
   high_f: number | null;
   low_f: number | null;
+  summit_high_f?: number | null; // estimated at the summit from the forecast's grid elevation
+  summit_low_f?: number | null;
   precip_pct: number | null;
   snow_in_forecast: boolean;
   snow_amount_in: number | null;
@@ -111,6 +113,7 @@ export interface WebcamItem {
   cam_type: 'hls' | 'jpeg';
   url: string;
   is_alive: boolean;
+  stream_url?: string | null; // YouTube live-stream embed, when the cam has one
 }
 
 export interface LiveLot {

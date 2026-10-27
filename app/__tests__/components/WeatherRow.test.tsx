@@ -132,3 +132,23 @@ it('shows the expected amount even when the forecast text never says "snow"', ()
   const { getByText } = render(<WeatherRow weather={quiet} />, { wrapper: TestWrapper });
   expect(getByText('Snow: 2.5"')).toBeTruthy();
 });
+
+describe('summit temperatures', () => {
+  const withSummit: WeatherDetail = {
+    ...weather,
+    forecast: weather.forecast.map((p) => ({ ...p, summit_high_f: p.high_f! - 6, summit_low_f: p.low_f! - 6 })),
+  };
+
+  it('shows the estimated summit high and low with a note on how they are worked out', () => {
+    const { getAllByTestId, getByText } = render(<WeatherRow weather={withSummit} summitElevationFt={11570} />, { wrapper: TestWrapper });
+    expect(getAllByTestId('summit-temps')).toHaveLength(3);
+    expect(getByText('Summit 22° / 8°')).toBeTruthy();
+    expect(getByText(/estimates for 11,570 ft/)).toBeTruthy();
+  });
+
+  it('shows nothing extra when the forecast has no summit temperatures', () => {
+    const { queryAllByTestId, queryByText } = render(<WeatherRow weather={weather} />, { wrapper: TestWrapper });
+    expect(queryAllByTestId('summit-temps')).toHaveLength(0);
+    expect(queryByText(/estimates/)).toBeNull();
+  });
+});

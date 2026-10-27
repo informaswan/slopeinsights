@@ -27,3 +27,21 @@ export function applyFilters(
     return true;
   });
 }
+
+// Client-side port of backend/app/scoring.py, so "best" can be ranked within a subset (e.g. My mountains).
+function bestScore(r: ResortSummary): number | null {
+  const snow = r.snow?.new_24h_in;
+  const open = r.lifts?.open;
+  if (snow == null || r.snow?.is_stale) return null; // lifts alone, or old data, can't make it "best"
+  const total = r.lifts?.total;
+  return Math.min((snow ?? 0) / 12, 1) * 0.7 + (total ? ((open ?? 0) / total) * 0.3 : 0);
+}
+
+export function topByConditions(resorts: ResortSummary[], n: number): ResortSummary[] {
+  return resorts
+    .map((r) => ({ r, score: bestScore(r) }))
+    .filter((x): x is { r: ResortSummary; score: number } => x.score != null)
+    .sort((a, b) => b.score - a.score)
+    .slice(0, n)
+    .map((x) => x.r);
+}

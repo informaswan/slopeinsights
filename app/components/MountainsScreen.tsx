@@ -6,14 +6,13 @@ import { useIsWide } from '../hooks/useIsWide';
 import { useFavorites } from '../contexts/FavoritesContext';
 import { useTheme } from '../contexts/ThemeContext';
 import { ResortCard } from './ResortCard';
-import { BestBanner } from './BestBanner';
 import { MountainFinder } from './MountainFinder';
 import { CompareChart } from './CompareChart';
 import { useCardPrefs } from '../contexts/CardPrefsContext';
 import { METRICS } from '../lib/cardMetrics';
 import { FilterSheet } from './FilterSheet';
 import type { FilterState } from './FilterSheet';
-import { sortResorts, applyFilters } from '../lib/sort';
+import { sortResorts, applyFilters, topByConditions } from '../lib/sort';
 import type { PassFilter } from '../lib/sort';
 import { passBadge } from '../lib/utils';
 import { Spacing, FontSize, Radius } from '../constants/theme';
@@ -50,10 +49,12 @@ export function MountainsScreen({ scope }: Props) {
   const favoriteSet = useMemo(() => new Set(favoriteIds), [favoriteIds]);
   const inScope = (id: string) => scope === 'all' || favoriteSet.has(id);
 
-  const bestShown = useMemo(
-    () => best.filter((r) => inScope(r.id) && (passFilter === 'all' || r.pass_type === passFilter)),
-    [best, scope, favoriteSet, passFilter],
-  );
+  // In My mountains, "best" is the best of the saved ones, even if it isn't best site-wide.
+  const bestShown = useMemo(() => {
+    const passOk = (r: { pass_type: string }) => passFilter === 'all' || r.pass_type === passFilter;
+    if (scope === 'mine') return topByConditions(resorts.filter((r) => favoriteSet.has(r.id) && passOk(r)), 3);
+    return best.filter(passOk);
+  }, [best, resorts, scope, favoriteSet, passFilter]);
 
   const displayed = useMemo(() => {
     const scoped = resorts.filter((r) => inScope(r.id));
@@ -218,10 +219,8 @@ export function MountainsScreen({ scope }: Props) {
               <CompareChart resorts={resorts.filter((r) => favoriteSet.has(r.id))} />
             )}
 
-            <BestBanner resorts={bestShown} />
-
-            {displayed.length === 0 ? (
-              bestShown.length === 0 && (
+            {displayed.length + bestShown.length === 0 ? (
+              (
                 <View style={styles.empty}>
                   <Text style={[styles.emptyText, { color: colors.textSecondary }]}>No mountains match your filters</Text>
                   <Text style={[styles.emptySubtext, { color: colors.textMuted }]}>Try changing the sort or region.</Text>
@@ -229,6 +228,7 @@ export function MountainsScreen({ scope }: Props) {
               )
             ) : (
               <View style={styles.grid}>
+                {bestShown.map((item, i) => <ResortCard key={item.id} resort={item} badge={scope === 'mine' ? `Best conditions #${i + 1}` : 'Best conditions'} />)}
                 {displayed.map((item) => <ResortCard key={item.id} resort={item} />)}
               </View>
             )}
