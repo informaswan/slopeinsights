@@ -23,6 +23,7 @@ from app.cache import (
     get_cached_resort_detail, set_cached_resort_detail, CACHE_TTL_SECONDS,
 )
 from app.scoring import rank_resorts
+from app.webcam_streams import stream_url_for
 from app.models.resort import Resort
 from app.models.lift import LiftStatus
 from app.models.weather import WeatherForecast
@@ -56,6 +57,7 @@ def _merge_forecast_by_date(rows: list[WeatherForecast]) -> list[dict]:
     for w in rows:
         day = days.setdefault(w.forecast_date, {
             "date": w.forecast_date, "high_f": None, "low_f": None,
+            "summit_high_f": None, "summit_low_f": None,
             "precip_pct": None, "snow_in_forecast": False, "wind_mph": None,
             "snow_amount_in": None,
         })
@@ -63,6 +65,10 @@ def _merge_forecast_by_date(rows: list[WeatherForecast]) -> list[dict]:
             day["high_f"] = w.high_f
         if w.low_f is not None and day["low_f"] is None:
             day["low_f"] = w.low_f
+        if w.summit_high_f is not None and day["summit_high_f"] is None:
+            day["summit_high_f"] = w.summit_high_f
+        if w.summit_low_f is not None and day["summit_low_f"] is None:
+            day["summit_low_f"] = w.summit_low_f
         if w.precip_pct is not None:
             day["precip_pct"] = max(day["precip_pct"] or 0, w.precip_pct)
         if w.wind_mph is not None:
@@ -210,12 +216,12 @@ def get_resort_detail(resort_id: str, response: Response, db: Session = Depends(
         "longitude": resort.longitude,
         "snow": snow_detail, "snow_forecast": snow_forecast_detail, "lifts": lift_detail, "trails": trail_summary,
         "weather": weather_detail,
-        "webcams": [{"label": w.label, "cam_type": w.cam_type, "url": w.url, "is_alive": w.is_alive} for w in webcams],
+        "webcams": [{"label": w.label, "cam_type": w.cam_type, "url": w.url, "is_alive": w.is_alive, "stream_url": stream_url_for(w.url)} for w in webcams],
         "parking": parking_detail,
         "traffic_cams": traffic_cams_for(resort.id, resort.state),
         "traffic_cams_note": traffic_cams_note(resort.id),
         "live_traffic_cams": [
-            {"label": w.label, "cam_type": w.cam_type, "url": w.url, "is_alive": w.is_alive}
+            {"label": w.label, "cam_type": w.cam_type, "url": w.url, "is_alive": w.is_alive, "stream_url": stream_url_for(w.url)}
             for w in live_traffic_cams
         ],
     }
@@ -248,7 +254,7 @@ def get_resort_webcams(resort_id: str, db: Session = Depends(get_db), _: str = D
     webcams = db.query(Webcam).filter_by(resort_id=resort_id, category="mountain").all()
     return {
         "resort_id": resort_id,
-        "items": [{"label": w.label, "cam_type": w.cam_type, "url": w.url, "is_alive": w.is_alive} for w in webcams],
+        "items": [{"label": w.label, "cam_type": w.cam_type, "url": w.url, "is_alive": w.is_alive, "stream_url": stream_url_for(w.url)} for w in webcams],
     }
 
 

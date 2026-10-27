@@ -443,6 +443,8 @@ WEBCAMS: list[dict] = [
     {"resort_id": "breckenridge", "label": "Peak 7", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/3913.jpg"},
     {"resort_id": "breckenridge", "label": "Peak 9", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/4160.jpg"},
     {"resort_id": "breckenridge", "label": "Looking South", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/1964.jpg"},
+    {"resort_id": "breckenridge", "label": "Town Main Street", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/4624.jpg"},
+    {"resort_id": "breckenridge", "label": "Mountain View", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/4627.jpg"},
     # ── KEYSTONE ──────────────────────────────────────────────────────────
     {"resort_id": "keystone", "label": "Snow Stake", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/606.jpg"},
     {"resort_id": "keystone", "label": "North Peak", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/2288.jpg"},
@@ -536,6 +538,10 @@ WEBCAMS: list[dict] = [
     {"resort_id": "mammoth", "label": "Main Lodge", "cam_type": "jpeg", "url": "https://media.mammothresorts.com/mmsa/mammoth/cams/Main_Broadway_1280x720.jpg"},
     {"resort_id": "mammoth", "label": "Eagle Lodge", "cam_type": "jpeg", "url": "https://media.mammothresorts.com/mmsa/mammoth/cams/Eagle_Home_1280x720.jpg"},
     {"resort_id": "mammoth", "label": "Canyon Lincoln", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/1148.jpg"},
+    {"resort_id": "mammoth", "label": "Summit - Top Station", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/2047.jpg"},
+    {"resort_id": "mammoth", "label": "McCoy Station (Chair 23)", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/1147.jpg"},
+    {"resort_id": "mammoth", "label": "Main Lodge 2", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/4532.jpg"},
+    {"resort_id": "mammoth", "label": "Eagle Lodge Base", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/3695.jpg"},
     # ── JACKSON HOLE ──────────────────────────────────────────────────────
     {"resort_id": "jackson-hole", "label": "Summit Cam", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/3785.jpg"},
     {"resort_id": "jackson-hole", "label": "Cody Bowl", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/474.jpg"},
@@ -552,6 +558,8 @@ WEBCAMS: list[dict] = [
     {"resort_id": "big-sky", "label": "Moonlight Basin", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/2574.jpg"},
     {"resort_id": "big-sky", "label": "Town Center", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/2575.jpg"},
     {"resort_id": "big-sky", "label": "Spanish Peaks", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/2576.jpg"},
+    {"resort_id": "big-sky", "label": "Andesite Snow Stake", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/2444.jpg"},
+    {"resort_id": "big-sky", "label": "Headwaters Snow Stake", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/3603.jpg"},
     # ── STEAMBOAT ─────────────────────────────────────────────────────────
     {"resort_id": "steamboat", "label": "Snow Stake Mid-Mountain", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/2780.jpg"},
     {"resort_id": "steamboat", "label": "Snow Stake Summit", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/3402.jpg"},
@@ -559,6 +567,7 @@ WEBCAMS: list[dict] = [
     {"resort_id": "steamboat", "label": "Four Points", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/3588.jpg"},
     {"resort_id": "steamboat", "label": "Gondola Square Base", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/3403.jpg"},
     {"resort_id": "steamboat", "label": "Christie Peak & Wild Blue Gondola", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/3914.jpg"},
+    {"resort_id": "steamboat", "label": "Gondola Square Base Area South", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/2609.jpg"},
     # ── WINTER PARK ───────────────────────────────────────────────────────
     {"resort_id": "winter-park", "label": "Snow Stake", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/2506.jpg"},
     {"resort_id": "winter-park", "label": "Lunch Rock", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/2872.jpg"},
@@ -618,12 +627,14 @@ WEBCAMS: list[dict] = [
     {"resort_id": "stratton", "label": "Main Lodge", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/3952.jpg"},
     {"resort_id": "stratton", "label": "Golf Course", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/3953.jpg"},
     {"resort_id": "stratton", "label": "Tube Park", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/4239.jpg"},
+    {"resort_id": "stratton", "label": "Sun Bowl Base", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/4535.jpg"},
     # ── SUGARBUSH ─────────────────────────────────────────────────────────
     {"resort_id": "sugarbush", "label": "Snow Stake Summit", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/2371.jpg"},
     {"resort_id": "sugarbush", "label": "Snow Stake Mid-Mountain", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/2372.jpg"},
     {"resort_id": "sugarbush", "label": "Base Area", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/947.jpg"},
     {"resort_id": "sugarbush", "label": "Gadd Peak", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/3069.jpg"},
     {"resort_id": "sugarbush", "label": "Mt. Ellen Base", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/4134.jpg"},
+    {"resort_id": "sugarbush", "label": "Heaven's Gate Cam", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/949.jpg"},
     # ── KILLINGTON ────────────────────────────────────────────────────────
     {"resort_id": "killington", "label": "Superstar", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/2296.jpg"},
     {"resort_id": "killington", "label": "North Ridge", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/2297.jpg"},
@@ -643,6 +654,8 @@ WEBCAMS: list[dict] = [
     {"resort_id": "sugarloaf", "label": "Top of Skyline", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/3934.jpg"},
     {"resort_id": "sugarloaf", "label": "Narrow Gauge", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/3982.jpg"},
     {"resort_id": "sugarloaf", "label": "Bullwinkle's", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/3981.jpg"},
+    {"resort_id": "sugarloaf", "label": "Snow Stake", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/4230.jpg"},
+    {"resort_id": "sugarloaf", "label": "Golf Course", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/4632.jpg"},
     # ── DEER VALLEY ───────────────────────────────────────────────────────
     {"resort_id": "deer-valley", "label": "Snow Stake", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/2689.jpg"},
     {"resort_id": "deer-valley", "label": "Scenic View", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/2648.jpg"},
@@ -651,6 +664,10 @@ WEBCAMS: list[dict] = [
     {"resort_id": "deer-valley", "label": "Empire Canyon Lodge", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/3238.jpg"},
     {"resort_id": "deer-valley", "label": "Top of Ruby", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/3890.jpg"},
     {"resort_id": "deer-valley", "label": "Hoodoo Express", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/4208.jpg"},
+    {"resort_id": "deer-valley", "label": "Galena Express", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/4490.jpg"},
+    {"resort_id": "deer-valley", "label": "Sultan Express", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/2349.jpg"},
+    {"resort_id": "deer-valley", "label": "Revelator Express", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/3055.jpg"},
+    {"resort_id": "deer-valley", "label": "Hoodoo Express 2", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/4615.jpg"},
     # ── SOLITUDE ──────────────────────────────────────────────────────────
     {"resort_id": "solitude", "label": "Snow Stake", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/3364.jpg"},
     {"resort_id": "solitude", "label": "Link Lift Line", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/4209.jpg"},
@@ -667,6 +684,7 @@ WEBCAMS: list[dict] = [
     {"resort_id": "schweitzer", "label": "Lakeview Triple Summit", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/3383.jpg"},
     {"resort_id": "schweitzer", "label": "Colburn Triple Summit", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/901.jpg"},
     {"resort_id": "schweitzer", "label": "Outback", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/3876.jpg"},
+    {"resort_id": "schweitzer", "label": "Rowdy Grouse looking North", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/3875.jpg"},
     # ── REVELSTOKE ────────────────────────────────────────────────────────
     {"resort_id": "revelstoke", "label": "Snow Stake", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/1508.jpg"},
     {"resort_id": "revelstoke", "label": "Top of Stoke (7,300ft)", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/1506.jpg"},

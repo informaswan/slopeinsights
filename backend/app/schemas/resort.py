@@ -86,6 +86,8 @@ class WeatherPeriod(BaseModel):
     date: str
     high_f: float | None
     low_f: float | None
+    summit_high_f: float | None = None  # estimated at the summit, from the forecast's grid elevation
+    summit_low_f: float | None = None
     precip_pct: int | None
     snow_in_forecast: bool
     snow_amount_in: float | None
@@ -103,6 +105,7 @@ class WebcamItem(BaseModel):
     cam_type: str
     url: str
     is_alive: bool
+    stream_url: str | None = None  # YouTube live-stream embed, when the cam has one
 
 
 class LiveLot(BaseModel):

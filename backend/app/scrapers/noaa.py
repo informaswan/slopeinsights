@@ -6,6 +6,7 @@ from zoneinfo import ZoneInfo
 
 from sqlalchemy.orm import Session
 
+from app.elevation import adjust_temp_f, meters_to_feet
 from app.models.resort import Resort
 from app.models.weather import WeatherForecast
 from app.models.snow_forecast import SnowForecast
@@ -107,6 +108,12 @@ def _snowfall_in_by_date(grid_data: dict, tz_name: str | None, now: datetime, nu
     return {k: round(v, 1) for k, v in totals.items()}
 
 
+def _grid_elevation_ft(forecast: dict) -> float | None:
+    """Terrain height NWS used for this forecast's grid cell, in feet (it reports meters)."""
+    value = ((forecast.get("properties") or {}).get("elevation") or {}).get("value")
+    return meters_to_feet(value) if isinstance(value, (int, float)) else None
+
+
 class NOAAScraper(BaseScraper):
     name = "noaa"
 
@@ -130,6 +137,7 @@ class NOAAScraper(BaseScraper):
             forecast_url = await self._get_forecast_url(resort)
             data = await self._fetch_json(forecast_url, headers=NOAA_HEADERS)
             periods = data["properties"]["periods"]
+            grid_ft = _grid_elevation_ft(data)
         except (ScraperError, KeyError) as exc:
             self._record_failure(str(exc))
             logger.warning("NOAA scrape failed for %s: %s", resort.name, exc)
@@ -168,11 +176,15 @@ class NOAAScraper(BaseScraper):
         self.db.query(WeatherForecast).filter_by(resort_id=resort.id).delete()
         for period in selected_periods:
             date_str = period["startTime"][:10]
+            temp = float(period["temperature"])
+            summit_temp = adjust_temp_f(temp, grid_ft, resort.summit_elevation_ft)
             self.db.add(WeatherForecast(
                 resort_id=resort.id,
                 forecast_date=date_str,
-                high_f=float(period["temperature"]) if period.get("isDaytime") else None,
-                low_f=float(period["temperature"]) if not period.get("isDaytime") else None,
+                high_f=temp if period.get("isDaytime") else None,
+                low_f=temp if not period.get("isDaytime") else None,
+                summit_high_f=summit_temp if period.get("isDaytime") else None,
+                summit_low_f=summit_temp if not period.get("isDaytime") else None,
                 precip_pct=period.get("probabilityOfPrecipitation", {}).get("value"),
                 snow_in_forecast=_has_snow(period.get("shortForecast", "")),
                 snow_amount_in=snow_by_date.get(date_str),

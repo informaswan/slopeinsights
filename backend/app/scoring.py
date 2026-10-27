@@ -28,7 +28,11 @@ def rank_resorts(resorts: list[dict], n: int = 5) -> list[dict]:
     """Score and rank a list of resort summary dicts. Returns top n."""
     scored = []
     for r in resorts:
-        snow = (r.get("snow") or {}).get("new_24h_in")
+        snow_data = r.get("snow") or {}
+        snow = snow_data.get("new_24h_in")
+        # Lift counts alone (or old data) must not make a mountain "best".
+        if snow is None or snow_data.get("is_stale"):
+            continue
         lifts = r.get("lifts") or {}
         score = compute_best_score(
             new_24h_in=snow,

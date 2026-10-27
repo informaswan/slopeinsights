@@ -10,6 +10,8 @@ class WeatherForecast(Base):
     forecast_date = Column(String, nullable=False)  # "YYYY-MM-DD"
     high_f = Column(Float)
     low_f = Column(Float)
+    summit_high_f = Column(Float)  # high_f estimated at the summit (see app/elevation.py)
+    summit_low_f = Column(Float)
     precip_pct = Column(Integer)
     snow_in_forecast = Column(Boolean, default=False)
     snow_amount_in = Column(Float)  # quantitative forecast snowfall, inches, from NWS gridpoint data

@@ -6,7 +6,7 @@ from slowapi.middleware import SlowAPIMiddleware
 from slowapi.errors import RateLimitExceeded
 from app.config import settings
 from app.limiter import limiter
-from app.database import SessionLocal, Base, engine
+from app.database import SessionLocal, Base, engine, ensure_columns
 from app.seed import seed_resorts, seed_webcams, seed_parking_lots
 from app.scheduler import create_scheduler
 from app.routers import resorts as resorts_router
@@ -18,6 +18,7 @@ from app.routers import feedback as feedback_router
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     Base.metadata.create_all(bind=engine)
+    ensure_columns(engine)
     db = SessionLocal()
     try:
         seed_resorts(db)
