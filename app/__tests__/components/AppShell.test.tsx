@@ -84,3 +84,29 @@ describe('AppShell safe areas (phone)', () => {
     expect(getByText('page content')).toBeTruthy();
   });
 });
+
+describe('AppShell when the window switches between phone and browser widths', () => {
+  // A screen with its own state, like the add-mountains mode, must not be rebuilt by the switch.
+  function Counter() {
+    const [n, setN] = React.useState(0);
+    return <Pressable accessibilityLabel="bump" onPress={() => setN(n + 1)}><Text>count {n}</Text></Pressable>;
+  }
+
+  it('keeps the screen and its state', () => {
+    mockIsWide = true;
+    const view = render(<AppShell><Counter /></AppShell>);
+    fireEvent.press(view.getByLabelText('bump'));
+    fireEvent.press(view.getByLabelText('bump'));
+    expect(view.getByText('count 2')).toBeTruthy();
+
+    mockIsWide = false;
+    view.rerender(<AppShell><Counter /></AppShell>);
+    expect(view.getByText('count 2')).toBeTruthy();
+    expect(view.getByTestId('top-bar')).toBeTruthy();
+
+    mockIsWide = true;
+    view.rerender(<AppShell><Counter /></AppShell>);
+    expect(view.getByText('count 2')).toBeTruthy();
+    expect(view.getByTestId('sidebar')).toBeTruthy();
+  });
+});

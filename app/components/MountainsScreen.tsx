@@ -1,5 +1,6 @@
 import React, { useRef, useState, useMemo, useEffect } from 'react';
 import { View, ScrollView, Pressable, Text, ActivityIndicator, RefreshControl, StyleSheet } from 'react-native';
+import { useRouter } from 'expo-router';
 import { OfflineBanner } from './OfflineBanner';
 import { useResorts } from '../hooks/useResorts';
 import { useIsWide } from '../hooks/useIsWide';
@@ -7,6 +8,7 @@ import { useFavorites } from '../contexts/FavoritesContext';
 import { useTheme } from '../contexts/ThemeContext';
 import { ResortCard } from './ResortCard';
 import { MountainFinder } from './MountainFinder';
+import { FloatingDone, FLOATING_DONE_CLEARANCE } from './FloatingDone';
 import { CompareChart } from './CompareChart';
 import { useCardPrefs } from '../contexts/CardPrefsContext';
 import { METRICS } from '../lib/cardMetrics';
@@ -34,6 +36,13 @@ export function MountainsScreen({ scope }: Props) {
   const isWide = useIsWide();
   const { favoriteIds, isLoaded: favoritesLoaded } = useFavorites();
   const { resorts, best, loading, error, cachedAt, refresh } = useResorts();
+  const router = useRouter();
+  // On All mountains, "Done" appears once something was added during this visit.
+  const savedOnArrival = useRef<Set<string> | null>(null);
+  useEffect(() => {
+    if (favoritesLoaded && savedOnArrival.current === null) savedOnArrival.current = new Set(favoriteIds);
+  }, [favoritesLoaded]);
+  const addedThisVisit = savedOnArrival.current ? favoriteIds.filter((id) => !savedOnArrival.current!.has(id)).length : 0;
   const [passFilter, setPassFilter] = useState<PassFilter>('all');
   const [filterState, setFilterState] = useState<FilterState>({ selectedRegions: new Set<string>(), sort: 'snow' });
   const [refreshing, setRefreshing] = useState(false);
@@ -42,9 +51,12 @@ export function MountainsScreen({ scope }: Props) {
   const [adding, setAdding] = useState(false);
   const [panel, setPanel] = useState<'none' | 'customize' | 'compare'>('none');
   const { metrics, toggleMetric, reset } = useCardPrefs();
+  // Whenever My mountains is empty the finder shows, and it must then stay open through the first Add
+  // (not only on first load: the list can also become empty later, e.g. after removing the last one).
+  const emptyMine = scope === 'mine' && favoritesLoaded && favoriteIds.length === 0;
   useEffect(() => {
-    if (scope === 'mine' && favoritesLoaded && favoriteIds.length === 0) setAdding(true);
-  }, [scope, favoritesLoaded]);
+    if (emptyMine) setAdding(true);
+  }, [emptyMine]);
 
   const favoriteSet = useMemo(() => new Set(favoriteIds), [favoriteIds]);
   const inScope = (id: string) => scope === 'all' || favoriteSet.has(id);
@@ -106,7 +118,7 @@ export function MountainsScreen({ scope }: Props) {
     <View style={[styles.root, { backgroundColor: colors.background }]}>
       <ScrollView
         style={styles.scroll}
-        contentContainerStyle={[styles.content, { padding: isWide ? Spacing.lg : Spacing.md }]}
+        contentContainerStyle={[styles.content, { padding: isWide ? Spacing.lg : Spacing.md }, ((showFinder && !noneSaved) || (scope === 'all' && addedThisVisit > 0)) && { paddingBottom: FLOATING_DONE_CLEARANCE }]}
         refreshControl={
           <RefreshControl
             refreshing={refreshing}
@@ -129,15 +141,6 @@ export function MountainsScreen({ scope }: Props) {
               Find a mountain and tap Add to keep it here.
             </Text>
             <MountainFinder resorts={resorts} />
-            {!noneSaved && (
-              <Pressable
-                accessibilityLabel="Done adding mountains"
-                style={[styles.retryButton, { backgroundColor: colors.epic, alignSelf: 'flex-start' }]}
-                onPress={() => setAdding(false)}
-              >
-                <Text style={styles.retryText}>Done</Text>
-              </Pressable>
-            )}
           </View>
         ) : (
           <>
@@ -245,6 +248,20 @@ export function MountainsScreen({ scope }: Props) {
           </>
         )}
       </ScrollView>
+      {showFinder && !noneSaved && (
+        <FloatingDone
+          accessibilityLabel="Done adding mountains"
+          label={`Done · ${favoriteIds.length} added`}
+          onPress={() => setAdding(false)}
+        />
+      )}
+      {scope === 'all' && addedThisVisit > 0 && (
+        <FloatingDone
+          accessibilityLabel="Done adding mountains"
+          label={`Done · ${addedThisVisit} added`}
+          onPress={() => router.push('/')}
+        />
+      )}
 
       <FilterSheet
         ref={sheetRef}
