@@ -93,6 +93,22 @@ RESORTS: list[dict] = [
         "liftie_id": "afton-alps", "onthesnow_slug": "minnesota/afton-alps",
     },
     {
+        "id": "buck-hill", "name": "Buck Hill", "pass_type": "independent",
+        "region": "Midwest", "state": "MN", "country": "US",
+        "latitude": 44.7233, "longitude": -93.2856,
+        "summit_elevation_ft": 1225, "vertical_drop_ft": 309,
+        "website": "https://buckhill.com", "timezone": "America/Chicago",
+        "liftie_id": "buck-hill", "onthesnow_slug": "minnesota/buck-hill",
+    },
+    {
+        "id": "hyland-hills", "name": "Hyland Hills", "pass_type": "independent",
+        "region": "Midwest", "state": "MN", "country": "US",
+        "latitude": 44.8435, "longitude": -93.3644,
+        "summit_elevation_ft": 1075, "vertical_drop_ft": 175,
+        "website": "https://www.threeriversparks.org/location/hyland-hills-ski-area", "timezone": "America/Chicago",
+        "liftie_id": "hyland-hills", "onthesnow_slug": "minnesota/hyland-ski-snowboard-area",
+    },
+    {
         "id": "mount-snow", "name": "Mount Snow", "pass_type": "epic",
         "region": "Northeast", "state": "VT", "country": "US",
         "latitude": 42.9595, "longitude": -72.9223,

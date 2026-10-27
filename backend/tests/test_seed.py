@@ -8,14 +8,14 @@ from app.models.webcam import Webcam
 def test_seed_resort_count(db):
     seed_resorts(db)
     count = db.query(Resort).count()
-    assert count == 50
+    assert count == 52
 
 
 def test_seed_idempotent(db):
     seed_resorts(db)
     seed_resorts(db)  # second call should not duplicate
     count = db.query(Resort).count()
-    assert count == 50
+    assert count == 52
 
 
 def test_seed_epic_count(db):
@@ -33,7 +33,7 @@ def test_seed_ikon_count(db):
 def test_seed_independent_count(db):
     seed_resorts(db)
     ids = {r.id for r in db.query(Resort).filter_by(pass_type="independent").all()}
-    assert ids == {"mt-hood-meadows", "timberline-lodge", "monarch"}
+    assert ids == {"mt-hood-meadows", "timberline-lodge", "monarch", "buck-hill", "hyland-hills"}
 
 
 def test_whistler_present(db):
@@ -106,7 +106,15 @@ def test_seed_webcams_does_not_duplicate_on_reseed(db):
 
 
 def test_only_resorts_without_an_opensnow_feed_have_no_cameras():
-    # Loon, Wilmot and Blue Mountain have no cameras of their own on OpenSnow.
+    # Loon, Wilmot, Blue Mountain, Buck Hill and Hyland Hills have no cameras of their own on OpenSnow.
     from app.seed import RESORTS, WEBCAMS
     with_cams = {w["resort_id"] for w in WEBCAMS}
-    assert {r["id"] for r in RESORTS} - with_cams == {"loon-mountain", "wilmot-mountain", "blue-mountain"}
+    assert {r["id"] for r in RESORTS} - with_cams == {"loon-mountain", "wilmot-mountain", "blue-mountain", "buck-hill", "hyland-hills"}
+
+
+def test_minnesota_additions_are_complete(db):
+    seed_resorts(db)
+    for rid in ("buck-hill", "hyland-hills"):
+        r = db.query(Resort).filter_by(id=rid).first()
+        assert r.state == "MN" and r.timezone == "America/Chicago"
+        assert r.summit_elevation_ft and r.vertical_drop_ft and r.onthesnow_slug
