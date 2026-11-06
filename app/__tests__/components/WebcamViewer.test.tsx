@@ -25,6 +25,8 @@ jest.mock('../../components/ZoomableImage', () => ({ ZoomableImage: () => null }
 
 import { Platform as RNPlatform } from 'react-native';
 import { WebcamViewer } from '../../components/WebcamViewer';
+import { openExternalLink } from '../../lib/openExternalLink';
+import { fireEvent } from '@testing-library/react-native';
 
 const hlsCam: WebcamItem = { label: 'Summit', cam_type: 'hls', url: 'https://example.com/stream.m3u8', is_alive: true };
 const jpegCam: WebcamItem = { label: 'Base', cam_type: 'jpeg', url: 'https://example.com/cam.jpg', is_alive: true };
@@ -157,5 +159,43 @@ describe('WebcamViewer — live stream', () => {
   it('offers no live button for a cam without a stream', () => {
     render(<WebcamViewer webcams={[jpegCam]} />, { wrapper: TestWrapper });
     expect(screen.queryByLabelText('Watch live')).toBeNull();
+  });
+});
+
+describe('WebcamViewer — source credit', () => {
+  const sourced: WebcamItem = { ...jpegCam, source_name: 'Vail', source_url: 'https://www.vail.com/cams' };
+
+  it('credits the cam\'s real source as a link', () => {
+    render(<WebcamViewer webcams={[sourced]} />, { wrapper: TestWrapper });
+    expect(screen.getByText('Vail')).toBeTruthy();
+    expect(screen.getByLabelText('Camera powered by Vail')).toBeTruthy();
+    fireEvent.press(screen.getByTestId('cam-credit'));
+    expect(openExternalLink).toHaveBeenCalledWith('https://www.vail.com/cams');
+  });
+
+  it('shows no credit when the source is unknown', () => {
+    render(<WebcamViewer webcams={[jpegCam]} />, { wrapper: TestWrapper });
+    expect(screen.queryByTestId('cam-credit')).toBeNull();
+  });
+});
+
+describe('WebcamViewer — link-only cams', () => {
+  const link: WebcamItem = {
+    label: 'Live cams at Vail', cam_type: 'link', url: 'https://www.vail.com/cams', is_alive: true,
+    source_name: 'Vail', source_url: 'https://www.vail.com/cams',
+  };
+
+  it('shows a button to the owner\'s page instead of a picture', () => {
+    render(<WebcamViewer webcams={[link]} />, { wrapper: TestWrapper });
+    expect(screen.queryByTestId('webcam-image')).toBeNull();
+    expect(screen.queryByTestId('cam-credit')).toBeNull();
+    fireEvent.press(screen.getByText('View live cams at Vail'));
+    expect(openExternalLink).toHaveBeenCalledWith('https://www.vail.com/cams');
+  });
+
+  it('a stream-only cam has no picture toggle', () => {
+    const stream: WebcamItem = { ...link, label: 'Snoasis', cam_type: 'stream', stream_url: 'https://www.youtube-nocookie.com/embed/abc?autoplay=1' };
+    render(<WebcamViewer webcams={[stream]} />, { wrapper: TestWrapper });
+    expect(screen.queryByLabelText('Show picture')).toBeNull();
   });
 });

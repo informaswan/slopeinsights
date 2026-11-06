@@ -20,6 +20,7 @@ from email.utils import parsedate_to_datetime
 from PIL import Image, UnidentifiedImageError
 
 from app.models.webcam import Webcam
+from app.webcam_view import picture_url
 from app.scrapers.base import BaseScraper
 
 logger = logging.getLogger(__name__)
@@ -73,7 +74,8 @@ class WebcamHealthChecker(BaseScraper):
     name = "webcam_health"
 
     async def check_all(self) -> None:
-        cams = self.db.query(Webcam).all()
+        # Cams with no picture we're allowed to fetch (OpenSnow-only) are never requested.
+        cams = [c for c in self.db.query(Webcam).all() if picture_url(c)]
         gate = asyncio.Semaphore(CONCURRENCY)
 
         async def check(cam: Webcam) -> bool:
@@ -88,13 +90,14 @@ class WebcamHealthChecker(BaseScraper):
         await self.close()
 
     async def _is_live(self, cam: Webcam) -> bool:
+        url = picture_url(cam)
         try:
             if cam.cam_type != "jpeg":
-                return (await self.client.head(cam.url, timeout=10.0)).status_code < 400
-            # Bypass the upstream CDN's year-long cache, or we'd inspect the same stale copy.
-            sep = "&" if "?" in cam.url else "?"
+                return (await self.client.head(url, timeout=10.0)).status_code < 400
+            # Bypass the upstream CDN's cache, or we'd inspect the same stale copy.
+            sep = "&" if "?" in url else "?"
             resp = await self.client.get(
-                f"{cam.url}{sep}t={int(time.time())}", timeout=15.0,
+                f"{url}{sep}t={int(time.time())}", timeout=15.0,
                 headers={"Cache-Control": "no-cache"},
             )
             if resp.status_code >= 400:

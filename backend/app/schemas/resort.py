@@ -106,6 +106,8 @@ class WebcamItem(BaseModel):
     url: str
     is_alive: bool
     stream_url: str | None = None  # YouTube live-stream embed, when the cam has one
+    source_name: str | None = None  # who provides the cam (e.g. the resort), credited in the app
+    source_url: str | None = None  # link to the source's own cam page
 
 
 class LiveLot(BaseModel):

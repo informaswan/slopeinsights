@@ -118,3 +118,13 @@ def test_minnesota_additions_are_complete(db):
         r = db.query(Resort).filter_by(id=rid).first()
         assert r.state == "MN" and r.timezone == "America/Chicago"
         assert r.summit_elevation_ft and r.vertical_drop_ft and r.onthesnow_slug
+
+
+def test_seed_webcams_removes_retired_cams(db):
+    from app.seed import RETIRED_WEBCAM_URLS, WEBCAMS
+    from app.models.webcam import Webcam
+    db.add(Webcam(resort_id="killington", label="Pico", cam_type="jpeg", url=RETIRED_WEBCAM_URLS[0]))
+    db.commit()
+    seed_webcams(db)
+    assert db.query(Webcam).filter_by(url=RETIRED_WEBCAM_URLS[0]).count() == 0
+    assert not {w["url"] for w in WEBCAMS} & set(RETIRED_WEBCAM_URLS)

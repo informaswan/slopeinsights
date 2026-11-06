@@ -10,6 +10,7 @@ import { proxiedWebcamUrl, fetchPictureTime } from '../lib/webcam';
 import { formatAgo } from '../lib/utils';
 import { touchPad, touchText } from '../constants/touch';
 import { ZoomableImage } from './ZoomableImage';
+import { CamCredit } from './CamCredit';
 
 const CAM_HEIGHT = 220;
 
@@ -78,6 +79,15 @@ function JpegCam({ url }: { url: string }) {
 
 function CamView({ cam }: { cam: WebcamItem }) {
   if (!cam.is_alive) return <UnavailablePlaceholder />;
+  if (cam.cam_type === 'link') {
+    return (
+      <View style={styles.openCamContainer}>
+        <TouchableOpacity testID="cam-link" style={styles.openCamButton} onPress={() => openExternalLink(cam.url)}>
+          <Text style={styles.openCamText}>{cam.source_name ? `View live cams at ${cam.source_name}` : 'View live cams'}</Text>
+        </TouchableOpacity>
+      </View>
+    );
+  }
   if (isTrustedStream(cam.stream_url)) return <StreamCam cam={cam} />;
   if (cam.cam_type === 'hls') {
     if (Platform.OS === 'web') {
@@ -114,6 +124,7 @@ function StreamCam({ cam }: { cam: WebcamItem }) {
       ) : (
         <JpegCam url={cam.url} />
       )}
+      {cam.cam_type !== 'stream' && (
       <TouchableOpacity
         style={styles.liveToggle}
         accessibilityLabel={live ? 'Show picture' : 'Watch live'}
@@ -121,6 +132,7 @@ function StreamCam({ cam }: { cam: WebcamItem }) {
       >
         <Text style={styles.liveToggleText}>{live ? 'Show picture' : '● Watch live'}</Text>
       </TouchableOpacity>
+      )}
     </View>
   );
 }
@@ -154,6 +166,7 @@ export function WebcamViewer({ webcams: allWebcams }: { webcams: WebcamItem[] })
         </ScrollView>
       )}
       <CamView cam={activeCam} />
+      <CamCredit cam={activeCam} />
     </View>
   );
 }

@@ -1,9 +1,8 @@
 # tests/test_webcam_proxy.py
 """The proxy must never be served a stale edge-cached copy of a camera image.
 
-webcams.opensnow.com sits behind Cloudflare with `max-age=31536000`, so requesting the
-identical URL every time returned a months-old frame (a September image in October).
-Each upstream request therefore carries a unique query string.
+Camera CDNs can cache a picture for a long time (OpenSnow's once served a September frame in
+October), so each upstream request carries a unique query string.
 """
 from itertools import count
 from urllib.parse import parse_qs, urlparse
@@ -11,7 +10,7 @@ from urllib.parse import parse_qs, urlparse
 import httpx
 import pytest
 
-CAM = "https://webcams.opensnow.com/current/607.jpg"
+CAM = "https://alta-webcams.sfo3.cdn.digitaloceanspaces.com/Superior.jpg"
 
 
 @pytest.fixture

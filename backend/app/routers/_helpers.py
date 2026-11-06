@@ -14,6 +14,7 @@ from app.models.snow import SnowCondition
 from app.models.lift import LiftStatus
 from app.models.snow_forecast import SnowForecast
 from app.models.webcam import Webcam
+from app.webcam_view import present_webcams
 
 logger = logging.getLogger(__name__)
 
@@ -58,11 +59,11 @@ def build_resort_summary(resort: Resort, db: Session) -> dict:
         }
 
     # The mountain's live still-picture cameras for the card (video streams and road cameras are left out).
-    cams = (
-        db.query(Webcam)
-        .filter_by(resort_id=resort.id, category="mountain", cam_type="jpeg", is_alive=True)
-        .order_by(Webcam.id).all()
-    )
+    cams = [
+        c for c in present_webcams(
+            db.query(Webcam).filter_by(resort_id=resort.id, category="mountain", is_alive=True).order_by(Webcam.id).all()
+        ) if c["cam_type"] == "jpeg"
+    ]
 
     lift_summary = None
     if lifts:
@@ -80,8 +81,8 @@ def build_resort_summary(resort: Resort, db: Session) -> dict:
         "state": resort.state,
         "snow": snow_summary,
         "snow_forecast": forecast_summary,
-        "camera_url": cams[0].url if cams else None,
-        "cameras": [{"label": w.label, "url": w.url} for w in cams],
+        "camera_url": cams[0]["url"] if cams else None,
+        "cameras": [{"label": c["label"], "url": c["url"]} for c in cams],
         "lifts": lift_summary,
         "trails": trail_summary,
     }

@@ -110,10 +110,13 @@ export interface WeatherDetail {
 
 export interface WebcamItem {
   label: string;
-  cam_type: 'hls' | 'jpeg';
+  // 'link' = no picture we may show, just a link to the owner's own cam page; 'stream' = a live stream only.
+  cam_type: 'hls' | 'jpeg' | 'link' | 'stream';
   url: string;
   is_alive: boolean;
   stream_url?: string | null; // YouTube live-stream embed, when the cam has one
+  source_name?: string | null; // who provides the cam (e.g. the resort), credited under the picture
+  source_url?: string | null; // link to the source's own cam page
 }
 
 export interface LiveLot {

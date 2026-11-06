@@ -80,6 +80,23 @@ LIVE_STREAMS: dict[str, str] = {  # a bare YouTube video id, or a full https:// 
     "2871": "Dt_WhmxV0yE",  # winter-park: Snoasis
     "2506": "yj-5Q1vBMaA",  # winter-park: Snow Stake
     "2508": "jGS0j-viJmM",  # winter-park: Tubing Hill
+    # Embeds from each resort's own cam page (camstreamer, hdrelay, ozolio), matched by the labels on that page.
+    # hdrelay links are signed with an expiry (A-Basin 2031, Killington early 2028): refresh them from the page then.
+    "2372": "2Kjx9cnxRXA",  # sugarbush: Snow Stake Mid-Mountain ("Mid Mountain Snow Stake")
+    "4134": "https://camstreamer.com/embed/5LEkrmqQkQalj530H5HDOtxd6q99Lkyk6e7JKzrq?autoplay=1&mute=1",  # sugarbush: Mt. Ellen Base
+    "3939": "https://camstreamer.com/embed/bvRmCc5qmXcMEJ02xMlIAL4cg3291Tfj0pzIp9tW?autoplay=1&mute=1",  # big-sky: Golf Course
+    "854": "https://camstreamer.com/embed/7WfyGuaHvti06WYRCx5L1XdgpKWyxHqN0iaDpKR4?autoplay=1&mute=1",  # mt-bachelor: Pine Marten Lodge
+    "2627": "https://relay.ozolio.com/pub.api?cmd=embed&oid=EMB_OBCE00000ECB",  # palisades-tahoe: Siberia
+    "2161": "https://relay.ozolio.com/pub.api?cmd=embed&oid=EMB_PVWK000010B0",  # revelstoke: Village
+    "1506": "https://relay.ozolio.com/pub.api?cmd=embed&oid=EMB_KPMC000010BF",  # revelstoke: Top of Stoke
+    "2623": "https://relay.ozolio.com/pub.api?cmd=embed&oid=EMB_SWUG000010C4",  # revelstoke: Top of Stellar
+    "2162": "https://relay.ozolio.com/pub.api?cmd=embed&oid=EMB_NDZZ000010B5",  # revelstoke: Top of Upper Gondola
+    "2017": "https://watch.hdrelay.io/player.html?cam=cam_arapahoe_basin_snow_stake_camera_1790623452872&profile=p_mvzp4drp1xbs&sig=e53f81ff16dac0f585807658&exp=1951331065664&dom=",  # arapahoe-basin: Snow Stake
+    "3133": "https://watch.hdrelay.io/player.html?cam=cam_arapahoe_basin_pali_cam_1790623627806&profile=p_mvzu7c2b7ppi&sig=dea21292c741ef11bd60196f&exp=1951338968368",  # arapahoe-basin: Base Area - Pali & Molly Hogan
+    "472": "https://watch.hdrelay.io/player.html?cam=cam_arapahoe_basin_black_mountain_lodge_1790623952319&profile=p_mvzu7e97fmc5&sig=7454b7643e1e09cd8bfcdfba&exp=1951338968374",  # arapahoe-basin: Mid-Mountain ("Black Mountain Lodge at Mid-Mountain")
+    "3231": "https://watch.hdrelay.io/player.html?cam=cam_snowshed_adventure_center_1789055086968&profile=p_mu553zjlpb6h&sig=2c04103571174c7fdc01ea75&exp=1821162100777&dom=",  # killington: Snowshed
+    "2352": "Lnznapxh2xM",  # solitude: Powderhorn Top ("top of the Powderhorn patrol shack")
+    "3787": "oWaG8txpW1c",  # solitude: Apex Express Bottom ("Apex Express and Sunrise lift lines")
 }
 
 _CAM_ID = re.compile(r"webcams\.opensnow\.com/current/(\d+)\.jpg")

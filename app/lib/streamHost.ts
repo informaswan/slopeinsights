@@ -1,5 +1,5 @@
 // Streams are shown in an iframe/webview, so only these hosts are ever loaded.
-const TRUSTED_STREAM_HOSTS = ['www.youtube-nocookie.com', 'relay.ozolio.com'];
+const TRUSTED_STREAM_HOSTS = ['www.youtube-nocookie.com', 'relay.ozolio.com', 'camstreamer.com', 'watch.hdrelay.io'];
 
 export function isTrustedStream(url?: string | null): url is string {
   if (!url) return false;

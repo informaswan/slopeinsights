@@ -23,7 +23,7 @@ from app.cache import (
     get_cached_resort_detail, set_cached_resort_detail, CACHE_TTL_SECONDS,
 )
 from app.scoring import rank_resorts
-from app.webcam_streams import stream_url_for
+from app.webcam_view import present_webcams
 from app.models.resort import Resort
 from app.models.lift import LiftStatus
 from app.models.weather import WeatherForecast
@@ -216,14 +216,11 @@ def get_resort_detail(resort_id: str, response: Response, db: Session = Depends(
         "longitude": resort.longitude,
         "snow": snow_detail, "snow_forecast": snow_forecast_detail, "lifts": lift_detail, "trails": trail_summary,
         "weather": weather_detail,
-        "webcams": [{"label": w.label, "cam_type": w.cam_type, "url": w.url, "is_alive": w.is_alive, "stream_url": stream_url_for(w.url)} for w in webcams],
+        "webcams": present_webcams(webcams),
         "parking": parking_detail,
         "traffic_cams": traffic_cams_for(resort.id, resort.state),
         "traffic_cams_note": traffic_cams_note(resort.id),
-        "live_traffic_cams": [
-            {"label": w.label, "cam_type": w.cam_type, "url": w.url, "is_alive": w.is_alive, "stream_url": stream_url_for(w.url)}
-            for w in live_traffic_cams
-        ],
+        "live_traffic_cams": present_webcams(live_traffic_cams),
     }
     set_cached_resort_detail(resort_id, result)
     return result
@@ -254,12 +251,12 @@ def get_resort_webcams(resort_id: str, db: Session = Depends(get_db), _: str = D
     webcams = db.query(Webcam).filter_by(resort_id=resort_id, category="mountain").all()
     return {
         "resort_id": resort_id,
-        "items": [{"label": w.label, "cam_type": w.cam_type, "url": w.url, "is_alive": w.is_alive, "stream_url": stream_url_for(w.url)} for w in webcams],
+        "items": present_webcams(webcams),
     }
 
 
 _WEBCAM_HOSTS = {
-    "webcams.opensnow.com", "media.mammothresorts.com", "backend.roundshot.com",
+    "alta-webcams.sfo3.cdn.digitaloceanspaces.com", "media.mammothresorts.com", "backend.roundshot.com",
     "511on.ca", "www.drivebc.ca",
 }
 
@@ -268,9 +265,8 @@ def _fresh_webcam_url(url: str) -> str:
     from urllib.parse import urlencode, urlparse
     if (urlparse(url).hostname or "") not in _WEBCAM_HOSTS:
         raise HTTPException(status_code=400, detail="Disallowed webcam host")
-    # webcams.opensnow.com sits behind Cloudflare with a 1-year max-age, so asking for the
-    # identical URL every time returned whatever stale copy the nearest edge had cached
-    # (a September frame in October). A unique query string forces a fresh fetch.
+    # Cam CDNs can cache a picture for a long time, so asking for the identical URL every time
+    # can return a stale copy. A unique query string forces a fresh fetch.
     return url + ("&" if "?" in url else "?") + urlencode({"t": int(time.time())})
 
 

@@ -539,7 +539,6 @@ WEBCAMS: list[dict] = [
     {"resort_id": "whitetail", "label": "Expert's Choice", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/3496.jpg"},
     # ── ASPEN SNOWMASS ────────────────────────────────────────────────────
     {"resort_id": "aspen-snowmass", "label": "Aspen Mountain Summit", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/2877.jpg"},
-    {"resort_id": "aspen-snowmass", "label": "Aspen Mountain Downtown View", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/2579.jpg"},
     {"resort_id": "aspen-snowmass", "label": "Aspen Mountain Snow Stake", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/2698.jpg"},
     {"resort_id": "aspen-snowmass", "label": "Highlands Loge Peak", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/2577.jpg"},
     {"resort_id": "aspen-snowmass", "label": "Highlands Base", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/3021.jpg"},
@@ -598,7 +597,6 @@ WEBCAMS: list[dict] = [
     {"resort_id": "palisades-tahoe", "label": "Palisades Base", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/4201.jpg"},
     {"resort_id": "palisades-tahoe", "label": "Top of Far East", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/3929.jpg"},
     {"resort_id": "palisades-tahoe", "label": "Alpine Chalet", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/4200.jpg"},
-    {"resort_id": "palisades-tahoe", "label": "Base Area", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/2628.jpg"},
     # ── ALTA ──────────────────────────────────────────────────────────────
     {"resort_id": "alta", "label": "Snow Stake", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/2826.jpg"},
     {"resort_id": "alta", "label": "Albion Basin", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/2287.jpg"},
@@ -654,10 +652,7 @@ WEBCAMS: list[dict] = [
     # ── KILLINGTON ────────────────────────────────────────────────────────
     {"resort_id": "killington", "label": "Superstar", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/2296.jpg"},
     {"resort_id": "killington", "label": "North Ridge", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/2297.jpg"},
-    {"resort_id": "killington", "label": "Mountain View", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/2298.jpg"},
     {"resort_id": "killington", "label": "Snowshed", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/3231.jpg"},
-    {"resort_id": "killington", "label": "Horizon", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/3954.jpg"},
-    {"resort_id": "killington", "label": "Pico", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/2300.jpg"},
     {"resort_id": "killington", "label": "Tubing Park", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/4229.jpg"},
     {"resort_id": "killington", "label": "Bear Mountain", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/3232.jpg"},
     # ── SUNDAY RIVER ──────────────────────────────────────────────────────
@@ -693,7 +688,6 @@ WEBCAMS: list[dict] = [
     {"resort_id": "solitude", "label": "Powderhorn Bottom", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/2114.jpg"},
     {"resort_id": "solitude", "label": "Sunshine Bowl", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/2115.jpg"},
     {"resort_id": "solitude", "label": "Moonbeam Parking", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/3365.jpg"},
-    {"resort_id": "solitude", "label": "Big Cottonwood Canyon", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/1982.jpg"},
     # ── SCHWEITZER ────────────────────────────────────────────────────────
     {"resort_id": "schweitzer", "label": "Village", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/2355.jpg"},
     {"resort_id": "schweitzer", "label": "Basin Express Summit", "cam_type": "jpeg", "url": "https://webcams.opensnow.com/current/2356.jpg"},
@@ -837,6 +831,10 @@ PARKING_LOTS: list[dict] = [
 ]
 
 
+# Cams OpenSnow has taken down (their picture URLs now 404). Removed from the table at startup.
+RETIRED_WEBCAM_URLS = [f"https://webcams.opensnow.com/current/{i}.jpg" for i in (1982, 2298, 2300, 2579, 2628, 3954)]
+
+
 def seed_resorts(db: Session) -> None:
     """Upsert all resorts (updates slugs if they changed)."""
     for data in RESORTS:
@@ -856,6 +854,7 @@ def seed_webcams(db: Session) -> None:
     label columns are read, and renames are a bulk UPDATE, so this never selects columns a
     not-yet-migrated database might lack (it runs at startup, before any migration).
     """
+    db.query(Webcam).filter(Webcam.url.in_(RETIRED_WEBCAM_URLS)).delete(synchronize_session=False)
     existing = dict(db.query(Webcam.url, Webcam.label).all())
     for data in WEBCAMS:
         url = data["url"]

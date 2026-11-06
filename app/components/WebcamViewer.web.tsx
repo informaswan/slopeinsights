@@ -4,6 +4,7 @@ import { openExternalLink } from '../lib/openExternalLink';
 import type { WebcamItem } from '../lib/types';
 import { isTrustedStream } from '../lib/streamHost';
 import { ZoomFrame } from './ZoomFrame';
+import { CamCredit } from './CamCredit';
 import { Colors, Spacing, FontSize, Radius } from '../constants/theme';
 
 const API_BASE = process.env.EXPO_PUBLIC_API_URL ?? 'http://localhost:8000';
@@ -48,6 +49,7 @@ function StreamCam({ cam }: { cam: WebcamItem }) {
       ) : (
         <JpegCam url={cam.url} />
       )}
+      {cam.cam_type !== 'stream' && (
       <TouchableOpacity
         style={styles.liveToggle}
         accessibilityLabel={live ? 'Show picture' : 'Watch live'}
@@ -55,12 +57,22 @@ function StreamCam({ cam }: { cam: WebcamItem }) {
       >
         <Text style={styles.liveToggleText}>{live ? 'Show picture' : '● Watch live'}</Text>
       </TouchableOpacity>
+      )}
     </View>
   );
 }
 
 function CamView({ cam }: { cam: WebcamItem }) {
   if (!cam.is_alive) return <UnavailablePlaceholder />;
+  if (cam.cam_type === 'link') {
+    return (
+      <View style={styles.openCamContainer}>
+        <TouchableOpacity testID="cam-link" style={styles.openCamButton} onPress={() => openExternalLink(cam.url)}>
+          <Text style={styles.openCamText}>{cam.source_name ? `View live cams at ${cam.source_name}` : 'View live cams'}</Text>
+        </TouchableOpacity>
+      </View>
+    );
+  }
   if (isTrustedStream(cam.stream_url)) return <StreamCam cam={cam} />;
   if (cam.cam_type === 'hls') {
     return (
@@ -102,6 +114,7 @@ export function WebcamViewer({ webcams: allWebcams }: { webcams: WebcamItem[] })
         </ScrollView>
       )}
       <CamView cam={activeCam} />
+      <CamCredit cam={activeCam} />
     </View>
   );
 }

@@ -169,6 +169,20 @@ def test_get_resort_webcams(client, db):
     assert data["items"][0]["cam_type"] == "hls"
 
 
+def test_opensnow_cams_become_a_link_to_their_real_source(client, db):
+    seed_resorts(db)
+    db.add(Webcam(resort_id="vail", label="Mid", cam_type="jpeg",
+                  url="https://webcams.opensnow.com/current/2452.jpg", is_alive=True))
+    db.add(Webcam(resort_id="vail", label="Other", cam_type="jpeg", url="https://x/other.jpg", is_alive=True))
+    db.commit()
+    items = client.get("/api/resorts/vail/webcams", headers={"X-API-Key": "dev-key"}).json()["items"]
+    by_label = {i["label"]: i for i in items}
+    link = by_label["Live cams at Vail"]
+    assert link["cam_type"] == "link" and link["url"].startswith("https://www.vail.com/")
+    assert "Mid" not in by_label  # OpenSnow's picture is never offered
+    assert by_label["Other"]["source_name"] is None and by_label["Other"]["url"] == "https://x/other.jpg"
+
+
 def test_get_resort_webcams_excludes_traffic_cams(client, db):
     seed_resorts(db)
     db.add(Webcam(resort_id="vail", label="Summit", cam_type="hls",

@@ -18,4 +18,7 @@ def test_non_opensnow_url_gets_none():
 def test_every_stream_is_on_a_trusted_host():
     for cam_id in LIVE_STREAMS:
         url = stream_url_for(f"https://webcams.opensnow.com/current/{cam_id}.jpg")
-        assert url.startswith(("https://www.youtube-nocookie.com/embed/", "https://relay.ozolio.com/pub.api?cmd=embed&oid=")), cam_id
+        assert url.startswith((
+            "https://www.youtube-nocookie.com/embed/", "https://relay.ozolio.com/pub.api?cmd=embed&oid=",
+            "https://camstreamer.com/embed/", "https://watch.hdrelay.io/player.html?",
+        )), cam_id
