@@ -189,6 +189,7 @@ describe('WebcamViewer — link-only cams', () => {
     render(<WebcamViewer webcams={[link]} />, { wrapper: TestWrapper });
     expect(screen.queryByTestId('webcam-image')).toBeNull();
     expect(screen.queryByTestId('cam-credit')).toBeNull();
+    expect(screen.getByText('Live cams hopefully coming soon')).toBeTruthy();
     fireEvent.press(screen.getByText('View live cams at Vail'));
     expect(openExternalLink).toHaveBeenCalledWith('https://www.vail.com/cams');
   });

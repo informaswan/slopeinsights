@@ -67,6 +67,7 @@ function CamView({ cam }: { cam: WebcamItem }) {
   if (cam.cam_type === 'link') {
     return (
       <View style={styles.openCamContainer}>
+        <Text testID="cam-coming-soon" style={styles.comingSoon}>Live cams hopefully coming soon</Text>
         <TouchableOpacity testID="cam-link" style={styles.openCamButton} onPress={() => openExternalLink(cam.url)}>
           <Text style={styles.openCamText}>{cam.source_name ? `View live cams at ${cam.source_name}` : 'View live cams'}</Text>
         </TouchableOpacity>
@@ -135,5 +136,6 @@ const styles = StyleSheet.create({
   liveToggleText: { color: '#fff', fontSize: FontSize.xs, fontWeight: '700' },
   openCamContainer: { flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: '#1e293b' },
   openCamButton: { paddingHorizontal: Spacing.lg, paddingVertical: Spacing.sm, borderRadius: Radius.md, backgroundColor: Colors.epic },
+  comingSoon: { color: '#cbd5e1', fontSize: FontSize.sm, marginBottom: Spacing.sm, textAlign: 'center' },
   openCamText: { color: '#fff', fontSize: FontSize.md, fontWeight: '600' },
 });
