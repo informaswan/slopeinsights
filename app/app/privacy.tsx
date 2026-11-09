@@ -16,7 +16,7 @@ export default function PrivacyScreen() {
   return (
     <LegalPage
       title="Privacy Policy"
-      updated="October 18, 2026"
+      updated="November 8, 2026"
       sections={[
         {
           heading: 'Who we are',
@@ -40,11 +40,11 @@ export default function PrivacyScreen() {
         },
         {
           heading: 'Third-party data and links',
-          body: 'Conditions, forecasts and camera images come from public resort feeds, the National Weather Service and road-camera providers. Camera pictures are loaded through our server. Links to resorts, road-camera sites and donation pages open other websites with their own privacy practices.',
+          body: 'Conditions, forecasts and camera images come from public resort feeds, the National Weather Service and road-camera providers. Where a resort or camera owner offers one, a live camera video is shown inside the app from the camera owner player (for example YouTube, CamStreamer, HDRelay or Ozolio), credited to its source, and that provider may receive your IP address and set its own cookies when it loads. Some camera pictures are loaded through our server. Links to resorts, camera owners, road-camera sites and donation pages open other websites with their own privacy practices.',
         },
         {
           heading: 'Ads, tracking and sharing',
-          body: 'SlopeInsights currently shows no ads and uses no analytics or advertising trackers. We do not sell your information. If that changes, we will update this policy first and ask for consent where the law requires it.',
+          body: 'The SlopeInsights mobile app currently shows no ads and uses no analytics or advertising trackers. Our website (slopeinsights.com) may use Google Analytics to count visits and see which pages are used; it collects aggregate usage data such as pages viewed, approximate location and device type, and you can block it with your browser privacy settings or a blocker. We do not sell your information. If that changes, we will update this policy first and ask for consent where the law requires it.',
         },
         {
           heading: 'Children',
